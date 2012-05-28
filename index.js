@@ -83,7 +83,7 @@ function parse(selector){
 
 				tokens.push({
 					type: "attribute",
-					name: data[1],
+					name: unescapeCSS(data[1]),
 					action: actionTypes[data[2]],
 					value: unescapeCSS(data[4] || data[5] || ""),
 					ignoreCase: !!data[6]
