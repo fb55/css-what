@@ -20,7 +20,14 @@ var tests = [
     { type: 'tag', name: 'div' } ] ], "sibling"],
     
     //attributes
-    [".foo", [ [ { type: 'class', value: 'foo' } ] ], "simple class"]
+    [".foo", [ [ { type: 'class', value: 'foo' } ] ], "simple class"],
+    ["[name^='foo[']",[[{"type":"attribute","name":"name","action":"start","value":"foo[","ignoreCase":false}]],"escaped attribute"],
+    ["[name^='foo[bar]']",[[{"type":"attribute","name":"name","action":"start","value":"foo[bar]","ignoreCase":false}]],"escaped attribute"],
+    ["[name$='[bar]']",[[{"type":"attribute","name":"name","action":"end","value":"[bar]","ignoreCase":false}]],"escaped attribute"],
+    ["[href *= 'google']",[[{"type":"attribute","name":"href","action":"any","value":"google","ignoreCase":false}]],"escaped attribute"],
+    ["[name=foo\\.baz]",[[{"type":"attribute","name":"name","action":"equals","value":"foo.baz","ignoreCase":false}]],"escaped attribute"],
+    ["[name=foo\\[bar\\]]",[[{"type":"attribute","name":"name","action":"equals","value":"foo[bar]","ignoreCase":false}]],"escaped attribute"],
+    ["[xml\\:test]",[[{"type":"attribute","name":"xml:test","action":"exists","value":"","ignoreCase":false}]],"escaped attribute"]
     
     //TODO
 ];
