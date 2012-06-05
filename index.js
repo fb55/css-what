@@ -27,10 +27,10 @@ var simpleSelectors = {
 	"*": "universal"
 };
 
-var namedSelectors = {
+var attribSelectors = {
 	__proto__: null,
-	"#": "id",
-	".": "class"
+	"#": ["id", "equals"],
+	".": ["class", "element"]
 };
 
 function unescapeCSS(str){
@@ -75,8 +75,14 @@ function parse(selector){
 
 			if(firstChar in simpleSelectors){
 				tokens.push({type: simpleSelectors[firstChar]});
-			} else if(firstChar in namedSelectors){
-				tokens.push({type: namedSelectors[firstChar], value: getName()});				
+			} else if(firstChar in attribSelectors){
+				tokens.push({
+					type: "attribute",
+					name: attribSelectors[firstChar][0],
+					action: attribSelectors[firstChar][1],
+					value: getName(),
+					ignoreCase: false
+				});
 			} else if(firstChar === "["){
 				data = selector.match(re_attr);
 				selector = selector.substr(data[0].length);
