@@ -15,5 +15,6 @@
   "optionalDependencies": {},
   "engines": {
     "node": "*"
-  }
+  },
+  "license": "BSD-like"
 }
