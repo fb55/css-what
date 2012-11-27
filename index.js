@@ -2,7 +2,7 @@
 
 //regexps
 var re_name = /^(?:\\.|[\w\-\u00c0-\uFFFF])+/,
-    re_cleanSelector = /\s*([>~+])\s*/g,
+    re_cleanSelector = /([^\\])\s*([>~+]|$)\s*/g, //Don't remove escaped spaces from "#\ > a".  This will trim spaces after "\ ", including trailing whitespace
     re_nthElement = /^([+\-]?\d*n)?\s*([+\-])?\s*(\d)?$/,
     re_escapedCss = /\\(\d{6}|.)/g,
     re_attr = /^\s*((?:\\.|[\w\u00c0-\uFFFF\-])+)\s*(?:(\S?)=\s*(?:(['"])(.*?)\3|(#?(?:\\.|[\w\u00c0-\uFFFF\-])*)|)|)\s*(i)?\]/; //https://github.com/jquery/sizzle/blob/master/sizzle.js#L374
@@ -51,7 +51,7 @@ function getClosingPos(selector){
 }
 
 function parse(selector){
-	selector = (selector + "").trim().replace(re_cleanSelector, "$1");
+	selector = (selector + "").trimLeft().replace(re_cleanSelector, "$1$2");
 
 	var subselects = [],
 	    tokens = [],
