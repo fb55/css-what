@@ -5,7 +5,7 @@ var re_name = /^(?:\\.|[\w\-\u00c0-\uFFFF])+/,
     re_cleanSelector = /([^\\])\s*([>~+]|$)\s*/g, //Don't remove escaped spaces from "#\ > a".  This will trim spaces after "\ ", including trailing whitespace
     re_nthElement = /^([+\-]?\d*n)?\s*([+\-])?\s*(\d)?$/,
     re_escapedCss = /\\(\d{6}|.)/g,
-	re_whitespace = /\s/,
+	re_nonNumeric = /^\D$/,
     re_attr = /^\s*((?:\\.|[\w\u00c0-\uFFFF\-])+)\s*(?:(\S?)=\s*(?:(['"])(.*?)\3|(#?(?:\\.|[\w\u00c0-\uFFFF\-])*)|)|)\s*(i)?\]/; //https://github.com/jquery/sizzle/blob/master/sizzle.js#L374
 
 var actionTypes = {
@@ -38,8 +38,7 @@ function unescapeCSS(str){
 	//based on http://mathiasbynens.be/notes/css-escapes
 	//TODO support short sequences (/\\\d{1,5} /)
 	return str.replace(re_escapedCss, function(m, s){
-		// isNaN(' ') is false (!)
-		if(isNaN(s) || re_whitespace.test(s)) return s;
+		if (re_nonNumeric.test(s)) return s;
 		return String.fromCharCode(parseInt(s, 10));
 	});
 }
