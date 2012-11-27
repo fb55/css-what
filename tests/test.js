@@ -19,6 +19,10 @@ var tests = [
     { type: 'sibling' },
     { type: 'tag', name: 'div' } ] ], "sibling"],
     
+    //Escaped whitespace
+    ["#\\  > a ", [ [ { type: 'attribute', name: 'id', value: ' ' }, { type: 'child' }, {type: 'tag', name: 'div' } ] ], "Space between escaped space and combinator" ],
+    ["#\\  ", [ [ { type: 'attribute', name: 'id', value: ' ' } ] ], "Space after escaped space" ],
+    
     //attributes
     ["[name^='foo[']",[[{"type":"attribute","name":"name","action":"start","value":"foo[","ignoreCase":false}]],"escaped attribute"],
     ["[name^='foo[bar]']",[[{"type":"attribute","name":"name","action":"start","value":"foo[bar]","ignoreCase":false}]],"escaped attribute"],
