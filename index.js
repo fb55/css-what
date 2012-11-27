@@ -2,9 +2,10 @@
 
 //regexps
 var re_name = /^(?:\\.|[\w\-\u00c0-\uFFFF])+/,
-    re_cleanSelector = /\s*([>~+])\s*/g,
+    re_cleanSelector = /([^\\])\s*([>~+]|$)\s*/g,
     re_nthElement = /^([+\-]?\d*n)?\s*([+\-])?\s*(\d)?$/,
     re_escapedCss = /\\(\d{6}|.)/g,
+    re_nonNumeric = /^\D$/,
     re_attr = /^\s*((?:\\.|[\w\u00c0-\uFFFF\-])+)\s*(?:(\S?)=\s*(?:(['"])(.*?)\3|(#?(?:\\.|[\w\u00c0-\uFFFF\-])*)|)|)\s*(i)?\]/; //https://github.com/jquery/sizzle/blob/master/sizzle.js#L374
 
 var actionTypes = {
@@ -37,7 +38,7 @@ function unescapeCSS(str){
 	//based on http://mathiasbynens.be/notes/css-escapes
 	//TODO support short sequences (/\\\d{1,5} /)
 	return str.replace(re_escapedCss, function(m, s){
-		if(isNaN(s)) return s;
+		if (re_nonNumeric.test(s)) return s;
 		return String.fromCharCode(parseInt(s, 10));
 	});
 }
@@ -51,7 +52,7 @@ function getClosingPos(selector){
 }
 
 function parse(selector){
-	selector = (selector + "").trim().replace(re_cleanSelector, "$1");
+	selector = (selector + "").trimLeft().replace(re_cleanSelector, "$1$2");
 
 	var subselects = [],
 	    tokens = [],
