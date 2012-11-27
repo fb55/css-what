@@ -2,16 +2,16 @@
 
 //regexps
 var re_name = /^(?:\\.|[\w\-\u00c0-\uFFFF])+/,
-	re_cleanSelector = /([^\\])\s*([>~+]|$)\s*/g, //Don't remove escaped spaces from "#\ > a".	This will trim spaces after "\ ", including trailing whitespace
-	re_nthElement = /^([+\-]?\d*n)?\s*([+\-])?\s*(\d)?$/,
-	re_escapedCss = /\\(\d{6}|.)/g,
-	re_nonNumeric = /^\D$/,
-	re_attr = /^\s*((?:\\.|[\w\u00c0-\uFFFF\-])+)\s*(?:(\S?)=\s*(?:(['"])(.*?)\3|(#?(?:\\.|[\w\u00c0-\uFFFF\-])*)|)|)\s*(i)?\]/; //https://github.com/jquery/sizzle/blob/master/sizzle.js#L374
+    re_cleanSelector = /([^\\])\s*([>~+]|$)\s*/g, //Don't remove escaped spaces from "#\ > a".  This will trim spaces after "\ ", including trailing whitespace
+    re_nthElement = /^([+\-]?\d*n)?\s*([+\-])?\s*(\d)?$/,
+    re_escapedCss = /\\(\d{6}|.)/g,
+    re_nonNumeric = /^\D$/,
+    re_attr = /^\s*((?:\\.|[\w\u00c0-\uFFFF\-])+)\s*(?:(\S?)=\s*(?:(['"])(.*?)\3|(#?(?:\\.|[\w\u00c0-\uFFFF\-])*)|)|)\s*(i)?\]/; //https://github.com/jquery/sizzle/blob/master/sizzle.js#L374
 
 var actionTypes = {
 	__proto__: null,
 	"undefined": "exists",
-	"":	 "equals",
+	"":  "equals",
 	"~": "element",
 	"^": "start",
 	"$": "end",
@@ -55,8 +55,8 @@ function parse(selector){
 	selector = (selector + "").trimLeft().replace(re_cleanSelector, "$1$2");
 
 	var subselects = [],
-		tokens = [],
-		data, firstChar, name;
+	    tokens = [],
+	    data, firstChar, name;
 	
 	function getName(){
 		var sub = selector.match(re_name)[0];
