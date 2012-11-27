@@ -2,7 +2,7 @@
 
 //regexps
 var re_name = /^(?:\\.|[\w\-\u00c0-\uFFFF])+/,
-    re_cleanSelector = /([^\\])\s*([>~+]|$)\s*/g, //Don't remove escaped spaces from "#\ > a".  This will trim spaces after "\ ", including trailing whitespace
+    re_cleanSelector = /([^\\])\s*([>~+]|$)\s*/g,
     re_nthElement = /^([+\-]?\d*n)?\s*([+\-])?\s*(\d)?$/,
     re_escapedCss = /\\(\d{6}|.)/g,
     re_nonNumeric = /^\D$/,
