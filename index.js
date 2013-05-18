@@ -1,12 +1,13 @@
-;(function(global){ "use strict";
+"use strict";
 
-//regexps
+module.exports = parse;
+
 var re_name = /^(?:\\.|[\w\-\u00c0-\uFFFF])+/,
     re_cleanSelector = /([^\\])\s*([>~+]|$)\s*/g,
-    re_nthElement = /^([+\-]?\d*n)?\s*([+\-])?\s*(\d)?$/,
     re_escapedCss = /\\(\d{6}|.)/g,
     re_nonNumeric = /^\D$/,
-    re_attr = /^\s*((?:\\.|[\w\u00c0-\uFFFF\-])+)\s*(?:(\S?)=\s*(?:(['"])(.*?)\3|(#?(?:\\.|[\w\u00c0-\uFFFF\-])*)|)|)\s*(i)?\]/; //https://github.com/jquery/sizzle/blob/master/sizzle.js#L374
+    //https://github.com/jquery/sizzle/blob/master/sizzle.js#L374
+    re_attr = /^\s*((?:\\.|[\w\u00c0-\uFFFF\-])+)\s*(?:(\S?)=\s*(?:(['"])(.*?)\3|(#?(?:\\.|[\w\u00c0-\uFFFF\-])*)|)|)\s*(i)?\]/;
 
 var actionTypes = {
 	__proto__: null,
@@ -23,6 +24,7 @@ var actionTypes = {
 var simpleSelectors = {
 	__proto__: null,
 	">": "child",
+	"<": "parent",
 	"~": "sibling",
 	"+": "adjacent",
 	"*": "universal"
@@ -44,10 +46,13 @@ function unescapeCSS(str){
 }
 
 function getClosingPos(selector){
-	for(var pos = 1, counter = 1, len = selector.length; counter > 0 && pos < len; pos++){
+	var pos = 1, counter = 1, len = selector.length;
+
+	for(; counter > 0 && pos < len; pos++){
 		if(selector.charAt(pos) === "(") counter++;
 		else if(selector.charAt(pos) === ")") counter--;
 	}
+
 	return pos;
 }
 
@@ -66,7 +71,7 @@ function parse(selector){
 
 	while(selector !== ""){
 		if(re_name.test(selector)){
-			tokens.push({type: "tag", name: getName().toLowerCase()});
+			tokens.push({type: "tag", name: getName()});
 		} else if(/^\s/.test(selector)){
 			tokens.push({type: "descendant"});
 			selector = selector.trimLeft();
@@ -121,16 +126,3 @@ function parse(selector){
 	subselects.push(tokens);
 	return subselects;
 }
-
-if(typeof module !== "undefined" && "exports" in module){
-	module.exports = parse;
-} else {
-	if(typeof define === "function" && define.amd){
-		define("CSSwhat", function(){
-			return parse;
-		});
-	}
-	global.CSSwhat = parse;
-}
-
-})(typeof window === "object" ? window : this);
