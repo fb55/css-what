@@ -2,11 +2,11 @@
 
 module.exports = parse;
 
-var re_name = /^(?:\\.|[\w\-\u00c0-\uFFFF])+/,
-    re_cleanSelector = /([^\\])\s*([>~+]|$)\s*/g,
-    re_escapedCss = /\\(\d{6}|.)/g,
-    re_nonNumeric = /^\D$/,
-    //https://github.com/jquery/sizzle/blob/master/sizzle.js#L374
+var re_ws = /^\s/,
+    re_name = /^(?:\\.|[\w\-\u00c0-\uFFFF])+/,
+    re_cleanSelector = /([^\\])\s*([>~+,]|$)\s*/g,
+    re_escape = /\\([\da-f]{1,6}\s?|(\s)|.)/ig,
+    //modified version of https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L87
     re_attr = /^\s*((?:\\.|[\w\u00c0-\uFFFF\-])+)\s*(?:(\S?)=\s*(?:(['"])(.*?)\3|(#?(?:\\.|[\w\u00c0-\uFFFF\-])*)|)|)\s*(i)?\]/;
 
 var actionTypes = {
@@ -36,13 +36,23 @@ var attribSelectors = {
 	".": ["class", "element"]
 };
 
+//unescape function taken from https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L139
+function funescape( _, escaped, escapedWhitespace ) {
+	var high = "0x" + escaped - 0x10000;
+	// NaN means non-codepoint
+	// Support: Firefox
+	// Workaround erroneous numeric interpretation of +"0x"
+	return high !== high || escapedWhitespace ?
+		escaped :
+		// BMP codepoint
+		high < 0 ?
+			String.fromCharCode( high + 0x10000 ) :
+			// Supplemental Plane codepoint (surrogate pair)
+			String.fromCharCode( high >> 10 | 0xD800, high & 0x3FF | 0xDC00 );
+}
+
 function unescapeCSS(str){
-	//based on http://mathiasbynens.be/notes/css-escapes
-	//TODO support short sequences (/\\\d{1,5} /)
-	return str.replace(re_escapedCss, function(m, s){
-		if (re_nonNumeric.test(s)) return s;
-		return String.fromCharCode(parseInt(s, 10));
-	});
+	return str.replace(re_escape, funescape);
 }
 
 function getClosingPos(selector){
@@ -72,7 +82,7 @@ function parse(selector){
 	while(selector !== ""){
 		if(re_name.test(selector)){
 			tokens.push({type: "tag", name: getName()});
-		} else if(/^\s/.test(selector)){
+		} else if(re_ws.test(selector)){
 			tokens.push({type: "descendant"});
 			selector = selector.trimLeft();
 		} else {
@@ -104,7 +114,7 @@ function parse(selector){
 			} else if(firstChar === ":"){
 				//if(selector.charAt(0) === ":"){} //TODO pseudo-element
 				name = getName();
-				data = "";
+				data = null;
 				
 				if(selector.charAt(0) === "("){
 					var pos = getClosingPos(selector);
@@ -118,7 +128,7 @@ function parse(selector){
 				tokens = [];
 			} else {
 				//otherwise, the parser needs to throw or it would enter an infinite loop
-				throw new Error("Unmatched selector:" + firstChar + selector);
+				throw new SyntaxError("Unmatched selector: " + firstChar + selector);
 			}
 		}
 	}
