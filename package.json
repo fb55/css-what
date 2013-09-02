@@ -2,7 +2,7 @@
   "author": "Felix Böhm <me@feedic.com> (http://feedic.com)",
   "name": "CSSwhat",
   "description": "a CSS selector parser",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "repository": {
     "url": "https://github.com/FB55/CSSwhat"
   },
