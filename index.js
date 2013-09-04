@@ -66,7 +66,7 @@ function getClosingPos(selector){
 	return pos;
 }
 
-function parse(selector){
+function parse(selector, options){
 	selector = (selector + "").trimLeft().replace(re_cleanSelector, "$1$2");
 
 	var subselects = [],
@@ -81,7 +81,13 @@ function parse(selector){
 
 	while(selector !== ""){
 		if(re_name.test(selector)){
-			tokens.push({type: "tag", name: getName()});
+			name = getName();
+
+			if(!options || !options.xmlMode){
+				name = name.toLowerCase();
+			}
+
+			tokens.push({type: "tag", name: name});
 		} else if(re_ws.test(selector)){
 			tokens.push({type: "descendant"});
 			selector = selector.trimLeft();
@@ -102,10 +108,15 @@ function parse(selector){
 			} else if(firstChar === "["){
 				data = selector.match(re_attr);
 				selector = selector.substr(data[0].length);
+				name = unescapeCSS(data[1]);
+
+				if(!options || !options.xmlMode){
+					name = name.toLowerCase();
+				}
 
 				tokens.push({
 					type: "attribute",
-					name: unescapeCSS(data[1]),
+					name: name,
 					action: actionTypes[data[2]],
 					value: unescapeCSS(data[4] || data[5] || ""),
 					ignoreCase: !!data[6]
