@@ -79,15 +79,19 @@ function parse(selector, options){
 		return unescapeCSS(sub);
 	}
 
+	function getLCName(){
+		var name = getName();
+
+		if(!options || !options.xmlMode){
+			name = name.toLowerCase();
+		}
+
+		return name;
+	}
+
 	while(selector !== ""){
 		if(re_name.test(selector)){
-			name = getName();
-
-			if(!options || !options.xmlMode){
-				name = name.toLowerCase();
-			}
-
-			tokens.push({type: "tag", name: name});
+			tokens.push({type: "tag", name: getLCName()});
 		} else if(re_ws.test(selector)){
 			tokens.push({type: "descendant"});
 			selector = selector.trimLeft();
@@ -107,6 +111,9 @@ function parse(selector, options){
 				});
 			} else if(firstChar === "["){
 				data = selector.match(re_attr);
+				if(!data){
+					throw new SyntaxError("Malformed attribute selector: " + selector);
+				}
 				selector = selector.substr(data[0].length);
 				name = unescapeCSS(data[1]);
 
@@ -124,7 +131,7 @@ function parse(selector, options){
 				
 			} else if(firstChar === ":"){
 				//if(selector.charAt(0) === ":"){} //TODO pseudo-element
-				name = getName();
+				name = getLCName();
 				data = null;
 				
 				if(selector.charAt(0) === "("){
