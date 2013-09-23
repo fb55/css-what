@@ -5,7 +5,9 @@ module.exports = parse;
 var re_ws = /^\s/,
     re_name = /^(?:\\.|[\w\-\u00c0-\uFFFF])+/,
     re_cleanSelector = /([^\\])\s*([>~+,]|$)\s*/g,
+    re_combinators = /^\s*[^\\]\s*[>~+,]|$\s*/g,
     re_escape = /\\([\da-f]{1,6}\s?|(\s)|.)/ig,
+    re_comma = /^\s*,\s*/,
     //modified version of https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L87
     re_attr = /^\s*((?:\\.|[\w\u00c0-\uFFFF\-])+)\s*(?:(\S?)=\s*(?:(['"])(.*?)\3|(#?(?:\\.|[\w\u00c0-\uFFFF\-])*)|)|)\s*(i)?\]/;
 
@@ -142,6 +144,9 @@ function parse(selector, options){
 				
 				tokens.push({type: "pseudo", name: name, data: data});
 			} else if(firstChar === ","){
+				if(tokens.length === 0){
+					throw new SyntaxError("empty sub-selector");
+				}
 				subselects.push(tokens);
 				tokens = [];
 			} else {
@@ -151,6 +156,9 @@ function parse(selector, options){
 		}
 	}
 	
+	if(subselects.length > 0 && tokens.length === 0){
+		throw new SyntaxError("empty sub-selector");
+	}
 	subselects.push(tokens);
 	return subselects;
 }
