@@ -1,4 +1,4 @@
-var deepEquals = require("assert").deepEqual,
+var assert = require("assert"),
     CSSwhat = require("../");
 
 var tests = [
@@ -377,6 +377,16 @@ var tests = [
 
 tests.forEach(function(arr, i){
 	arr[0] = CSSwhat(arr[0]);
-	deepEquals.apply(null, arr);
+	assert.deepEqual.apply(null, arr);
 	console.log("\t%d: '%s' passed", i + 1, arr[2]);
 });
+
+console.log("\nCollected selectors (qwery, sizzle, nwmatcher)...");
+
+var out = require("./out.json");
+
+Object.keys(out).forEach(function(s){
+	assert.deepEqual(CSSwhat(s), out[s], s);
+});
+
+console.log("Passed!");
