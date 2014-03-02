@@ -295,6 +295,22 @@ var tests = [
 		],
 		'escaped attribute'
 	],
+	[
+		'[name="foo ~ < > , bar" i]',
+		[
+			[
+				{
+					'type': 'attribute',
+					'name': 'name',
+					'action': 'equals',
+					'value': 'foo ~ < > , bar',
+					'ignoreCase': true
+				}
+			]
+		],
+		'attribute with previously normalized characters'
+	],
+
 
 
 	//pseudo selectors

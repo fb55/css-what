@@ -4,7 +4,6 @@ module.exports = parse;
 
 var re_ws = /^\s/,
     re_name = /^(?:\\.|[\w\-\u00c0-\uFFFF])+/,
-    re_cleanSelector = /([^\\])\s*([><~+,]|$)\s*/g,
     re_combinators = /^\s*[^\\]\s*[>~+,]|$\s*/g,
     re_escape = /\\([\da-f]{1,6}\s?|(\s)|.)/ig,
     re_comma = /^\s*,\s*/,
@@ -69,10 +68,11 @@ function getClosingPos(selector){
 }
 
 function parse(selector, options){
-	selector = (selector + "").trimLeft().replace(re_cleanSelector, "$1$2");
+	selector = (selector + "").trimLeft();
 
 	var subselects = [],
 	    tokens = [],
+	    sawWS = false,
 	    data, firstChar, name;
 	
 	function getName(){
@@ -93,9 +93,14 @@ function parse(selector, options){
 
 	while(selector !== ""){
 		if(re_name.test(selector)){
+			if(sawWS){
+				tokens.push({type: "descendant"});
+				sawWS = false;
+			}
+
 			tokens.push({type: "tag", name: getLCName()});
 		} else if(re_ws.test(selector)){
-			tokens.push({type: "descendant"});
+			sawWS = true;
 			selector = selector.trimLeft();
 		} else {
 			firstChar = selector.charAt(0);
@@ -103,7 +108,25 @@ function parse(selector, options){
 
 			if(firstChar in simpleSelectors){
 				tokens.push({type: simpleSelectors[firstChar]});
-			} else if(firstChar in attribSelectors){
+				selector = selector.trimLeft();
+				sawWS = false;
+				continue;
+			} else if(firstChar === ","){
+				if(tokens.length === 0){
+					throw new SyntaxError("empty sub-selector");
+				}
+				subselects.push(tokens);
+				tokens = [];
+
+				selector = selector.trimLeft();
+				sawWS = false;
+				continue;
+			} else if(sawWS){
+				tokens.push({type: "descendant"});
+				sawWS = false;
+			}
+
+			if(firstChar in attribSelectors){
 				tokens.push({
 					type: "attribute",
 					name: attribSelectors[firstChar][0],
@@ -143,12 +166,6 @@ function parse(selector, options){
 				}
 				
 				tokens.push({type: "pseudo", name: name, data: data});
-			} else if(firstChar === ","){
-				if(tokens.length === 0){
-					throw new SyntaxError("empty sub-selector");
-				}
-				subselects.push(tokens);
-				tokens = [];
 			} else {
 				//otherwise, the parser needs to throw or it would enter an infinite loop
 				throw new SyntaxError("Unmatched selector: " + firstChar + selector);
