@@ -27,8 +27,7 @@ var simpleSelectors = {
 	">": "child",
 	"<": "parent",
 	"~": "sibling",
-	"+": "adjacent",
-	"*": "universal"
+	"+": "adjacent"
 };
 
 var attribSelectors = {
@@ -126,7 +125,9 @@ function parse(selector, options){
 				sawWS = false;
 			}
 
-			if(firstChar in attribSelectors){
+			if(firstChar === "*"){
+				tokens.push({type: "universal"});
+			} else if(firstChar in attribSelectors){
 				tokens.push({
 					type: "attribute",
 					name: attribSelectors[firstChar][0],
