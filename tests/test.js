@@ -104,6 +104,25 @@ var tests = [
 		],
 		'sibling'
 	],
+	[
+		'p < div',
+		[
+			[
+				{
+					'type': 'tag',
+					'name': 'p'
+				},
+				{
+					'type': 'parent'
+				},
+				{
+					'type': 'tag',
+					'name': 'div'
+				}
+			]
+		],
+		'parent'
+	],
 
 
 	//Escaped whitespace

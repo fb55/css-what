@@ -4,7 +4,7 @@ module.exports = parse;
 
 var re_ws = /^\s/,
     re_name = /^(?:\\.|[\w\-\u00c0-\uFFFF])+/,
-    re_cleanSelector = /([^\\])\s*([>~+,]|$)\s*/g,
+    re_cleanSelector = /([^\\])\s*([><~+,]|$)\s*/g,
     re_combinators = /^\s*[^\\]\s*[>~+,]|$\s*/g,
     re_escape = /\\([\da-f]{1,6}\s?|(\s)|.)/ig,
     re_comma = /^\s*,\s*/,
