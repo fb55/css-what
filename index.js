@@ -87,7 +87,7 @@ function parse(selector, options){
 
 			name = getName();
 
-			if(!options || "lowerCaseTags" in options ? options.lowerCaseTags : !options.xmlMode){
+			if(!options || ("lowerCaseTags" in options ? options.lowerCaseTags : !options.xmlMode)){
 				name = name.toLowerCase();
 			}
 
@@ -138,10 +138,11 @@ function parse(selector, options){
 				name = unescapeCSS(data[1]);
 
 				if(
-					!options ||
-					"lowerCaseAttributeNames" in options ?
-						options.lowerCaseAttributeNames :
-						!options.xmlMode
+					!options || (
+						"lowerCaseAttributeNames" in options ?
+							options.lowerCaseAttributeNames :
+							!options.xmlMode
+					)
 				){
 					name = name.toLowerCase();
 				}
