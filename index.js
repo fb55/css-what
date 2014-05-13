@@ -78,16 +78,6 @@ function parse(selector, options){
 		return unescapeCSS(sub);
 	}
 
-	function getLCName(){
-		var name = getName();
-
-		if(!options || !options.xmlMode){
-			name = name.toLowerCase();
-		}
-
-		return name;
-	}
-
 	while(selector !== ""){
 		if(re_name.test(selector)){
 			if(sawWS){
@@ -95,7 +85,13 @@ function parse(selector, options){
 				sawWS = false;
 			}
 
-			tokens.push({type: "tag", name: getLCName()});
+			name = getName();
+
+			if(!options || !options.xmlMode && !options.lowerCaseTags){
+				name = name.toLowerCase();
+			}
+
+			tokens.push({type: "tag", name: name});
 		} else if(re_ws.test(selector)){
 			sawWS = true;
 			selector = selector.trimLeft();
@@ -141,7 +137,7 @@ function parse(selector, options){
 				selector = selector.substr(data[0].length);
 				name = unescapeCSS(data[1]);
 
-				if(!options || !options.xmlMode){
+				if(!options || !options.xmlMode && !options.lowerCaseAttributeNames){
 					name = name.toLowerCase();
 				}
 
@@ -155,7 +151,7 @@ function parse(selector, options){
 				
 			} else if(firstChar === ":"){
 				//if(selector.charAt(0) === ":"){} //TODO pseudo-element
-				name = getLCName();
+				name = getName().toLowerCase();
 				data = null;
 				
 				if(selector.charAt(0) === "("){
