@@ -6,7 +6,7 @@ var re_ws = /^\s/,
     re_name = /^(?:\\.|[\w\-\u00c0-\uFFFF])+/,
     re_escape = /\\([\da-f]{1,6}\s?|(\s)|.)/ig,
     //modified version of https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L87
-    re_attr = /^\s*((?:\\.|[\w\u00c0-\uFFFF\-])+)\s*(?:(\S?)=\s*(?:(['"])(.*?)\3|(#?(?:\\.|[\w\u00c0-\uFFFF\-])*)|)|)\s*(i)?\]/;
+    re_attr = /^(\s*)((?:\\.|[\w\u00c0-\uFFFF\-])+)(\s*)(?:(\S?)=(\s*)(?:(['"])(.*?)\6|(#?(?:\\.|[\w\u00c0-\uFFFF\-])*)|)|)(\s*)(i)?\]/;
 
 var actionTypes = {
 	__proto__: null,
@@ -65,6 +65,11 @@ function getClosingPos(selector){
 }
 
 function parse(selector, options){
+  var value,
+    escaped_name,
+    selectorette = [],
+    selectors = [];
+
 	selector = (selector + "").trimLeft();
 
 	var subselects = [],
@@ -73,7 +78,7 @@ function parse(selector, options){
 	    data, firstChar, name;
 	
 	function getName(){
-		var sub = selector.match(re_name)[0];
+		var sub = escaped_name = selector.match(re_name)[0];
 		selector = selector.substr(sub.length);
 		return unescapeCSS(sub);
 	}
@@ -81,11 +86,13 @@ function parse(selector, options){
 	while(selector !== ""){
 		if(re_name.test(selector)){
 			if(sawWS){
+        selectorette.push(' ');
 				tokens.push({type: "descendant"});
 				sawWS = false;
 			}
 
 			name = getName();
+      selectorette.push(escaped_name);
 
 			if(!options || ("lowerCaseTags" in options ? options.lowerCaseTags : !options.xmlMode)){
 				name = name.toLowerCase();
@@ -100,7 +107,13 @@ function parse(selector, options){
 			selector = selector.substr(1);
 
 			if(firstChar in simpleSelectors){
-				tokens.push({type: simpleSelectors[firstChar]});
+        sawWS && selectorette.push(' ');
+        selectorette.push(firstChar);
+        tokens.push({type: simpleSelectors[firstChar]});
+
+        if(re_ws.test(selector)){
+          selectorette.push(' ');
+        }
 				selector = selector.trimLeft();
 				sawWS = false;
 				continue;
@@ -108,34 +121,41 @@ function parse(selector, options){
 				if(tokens.length === 0){
 					throw new SyntaxError("empty sub-selector");
 				}
-				subselects.push(tokens);
+
+        subselects.push(tokens);
 				tokens = [];
 
-				selector = selector.trimLeft();
+        selectors.push(selectorette.join(''));
+        selectorette = [];
+
+        selector = selector.trimLeft();
 				sawWS = false;
 				continue;
 			} else if(sawWS){
-				tokens.push({type: "descendant"});
+        selectorette.push(' ');
+        tokens.push({type: "descendant"});
 				sawWS = false;
 			}
 
 			if(firstChar === "*"){
-				tokens.push({type: "universal"});
+        selectorette.push(firstChar);
+        tokens.push({type: "universal"});
 			} else if(firstChar in attribSelectors){
-				tokens.push({
+        tokens.push({
 					type: "attribute",
 					name: attribSelectors[firstChar][0],
 					action: attribSelectors[firstChar][1],
 					value: getName(),
 					ignoreCase: false
 				});
+        selectorette.push(firstChar + escaped_name);
 			} else if(firstChar === "["){
 				data = selector.match(re_attr);
 				if(!data){
 					throw new SyntaxError("Malformed attribute selector: " + selector);
 				}
 				selector = selector.substr(data[0].length);
-				name = unescapeCSS(data[1]);
+				name = unescapeCSS(data[2]);
 
 				if(
 					!options || (
@@ -147,14 +167,28 @@ function parse(selector, options){
 					name = name.toLowerCase();
 				}
 
+        value = data[7] || data[8] || "";
 				tokens.push({
 					type: "attribute",
 					name: name,
-					action: actionTypes[data[2]],
-					value: unescapeCSS(data[4] || data[5] || ""),
-					ignoreCase: !!data[6]
+					action: actionTypes[data[4]],
+					value: unescapeCSS(value),
+					ignoreCase: !!data[10]
 				});
-				
+
+        // reconstruct selector from data
+        data[4] = data[4] !== undefined ? data[4] + '=' : '';
+        data[5] = data[5] || "";
+        data[6] = data[6] || "";
+
+        selectorette.push(                    // "[ href *= 'google' i]"
+            firstChar                         // [
+          + data[1] + data[2] + data[3]       // \s href \s
+          + data[4] + data[5]                 // *= \s
+          + data[6] + value + data[6]         // \'(google || undefined || '')\'
+          + data[9] + (data[10] || '')        // \s i
+          + ']');                             // ]
+
 			} else if(firstChar === ":"){
 				//if(selector.charAt(0) === ":"){} //TODO pseudo-element
 				name = getName().toLowerCase();
@@ -167,6 +201,7 @@ function parse(selector, options){
 				}
 				
 				tokens.push({type: "pseudo", name: name, data: data});
+        selectorette.push(firstChar + escaped_name + (data ? '(' + data + ')' : ''));
 			} else {
 				//otherwise, the parser needs to throw or it would enter an infinite loop
 				throw new SyntaxError("Unmatched selector: " + firstChar + selector);
@@ -177,6 +212,11 @@ function parse(selector, options){
 	if(subselects.length > 0 && tokens.length === 0){
 		throw new SyntaxError("empty sub-selector");
 	}
-	subselects.push(tokens);
+
+  selectors.push(selectorette.join(''));
+  options && (options.selectors = selectors);
+
+  subselects.push(tokens);
+
 	return subselects;
 }
