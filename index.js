@@ -78,7 +78,8 @@ function parse(selector, options){
 	    data, firstChar, name;
 	
 	function getName(){
-		var sub = escaped_name = selector.match(re_name)[0];
+		var sub =  selector.match(re_name)[0];
+    escaped_name = sub;
 		selector = selector.substr(sub.length);
 		return unescapeCSS(sub);
 	}
@@ -86,7 +87,7 @@ function parse(selector, options){
 	while(selector !== ""){
 		if(re_name.test(selector)){
 			if(sawWS){
-        selectorette.push(' ');
+        selectorette.push(" ");
 				tokens.push({type: "descendant"});
 				sawWS = false;
 			}
@@ -107,12 +108,14 @@ function parse(selector, options){
 			selector = selector.substr(1);
 
 			if(firstChar in simpleSelectors){
-        sawWS && selectorette.push(' ');
+        if (sawWS){
+          selectorette.push(" ");
+        }
         selectorette.push(firstChar);
         tokens.push({type: simpleSelectors[firstChar]});
 
         if(re_ws.test(selector)){
-          selectorette.push(' ');
+          selectorette.push(" ");
         }
 				selector = selector.trimLeft();
 				sawWS = false;
@@ -125,14 +128,14 @@ function parse(selector, options){
         subselects.push(tokens);
 				tokens = [];
 
-        selectors.push(selectorette.join(''));
+        selectors.push(selectorette.join(""));
         selectorette = [];
 
         selector = selector.trimLeft();
 				sawWS = false;
 				continue;
 			} else if(sawWS){
-        selectorette.push(' ');
+        selectorette.push(" ");
         tokens.push({type: "descendant"});
 				sawWS = false;
 			}
@@ -177,17 +180,17 @@ function parse(selector, options){
 				});
 
         // reconstruct selector from data
-        data[4] = data[4] !== undefined ? data[4] + '=' : '';
+        data[4] = data[4] !== undefined ? data[4] + "=" : "";
         data[5] = data[5] || "";
         data[6] = data[6] || "";
 
-        selectorette.push(                    // "[ href *= 'google' i]"
-            firstChar                         // [
-          + data[1] + data[2] + data[3]       // \s href \s
-          + data[4] + data[5]                 // *= \s
-          + data[6] + value + data[6]         // \'(google || undefined || '')\'
-          + data[9] + (data[10] || '')        // \s i
-          + ']');                             // ]
+        selectorette.push(                   // "[ href *= 'google' i]"
+          firstChar +                        // [
+          data[1] + data[2] + data[3] +      // \s href \s
+          data[4] + data[5] +                // *= \s
+          data[6] + value + data[6] +        // \'(google || undefined || '')\'
+          data[9] + (data[10] || "") +       // \s i
+          "]");                              // ]
 
 			} else if(firstChar === ":"){
 				//if(selector.charAt(0) === ":"){} //TODO pseudo-element
@@ -201,7 +204,7 @@ function parse(selector, options){
 				}
 				
 				tokens.push({type: "pseudo", name: name, data: data});
-        selectorette.push(firstChar + escaped_name + (data ? '(' + data + ')' : ''));
+        selectorette.push(firstChar + escaped_name + (data ? "(" + data + ")" : ""));
 			} else {
 				//otherwise, the parser needs to throw or it would enter an infinite loop
 				throw new SyntaxError("Unmatched selector: " + firstChar + selector);
@@ -213,8 +216,10 @@ function parse(selector, options){
 		throw new SyntaxError("empty sub-selector");
 	}
 
-  selectors.push(selectorette.join(''));
-  options && (options.selectors = selectors);
+  selectors.push(selectorette.join(""));
+  if (options) {
+    options.selectors = selectors;
+  }
 
   subselects.push(tokens);
 
