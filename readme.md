@@ -20,9 +20,10 @@ require('CSSwhat')('foo[bar]:baz')
 
 ##API
 
-__`CSSwhat(selector, options)` - Parses `str`, with the passed `options`.__
+__`CSSwhat(selector, options)` - Parses `selector` string, with the passed `options`.__
 
-The function returns a two-dimensional array. The first array represents subselects separated by commas (eg. `sub1, sub2`), the second contains the relevant tokens for that selector. Possible token types are:
+The function returns an array of tokenized selector arrays, one for each comma-separated subselector (eg. `sub1, sub2`).
+The tokenized selector array contains the relevant token objects for that selector. Possible token types are:
 
 name | attributes | example | output
 ---- | ---------- | ------- | ------
@@ -40,6 +41,34 @@ name | attributes | example | output
 __Options:__
 
 - `xmlMode`: When enabled, tagnames will be case-sensitive (ie. the output won't be lowercased).
+
+- `selectors` : This is an **output** placeholder.  When `options` is given, `options.selectors` receives an array of normalized selector strings, one for each subselector. 
+
+```javascript
+ var opt = {};
+ CSSwhat(' #main [ src ]  ,  div.thumbs ', opt);
+ /* 
+    [ [
+        { type: 'attribute', name: 'id', action: 'equals', value: 'main', ignoreCase: false },
+        { type: 'descendant' }, { type: 'attribute', name: 'src', action: 'exists', value: '', ignoreCase: false } 
+      ], [ 
+        { type: 'tag', name: 'div' },
+        { type: 'attribute', name: 'class', action: 'element', value: 'thumbs', ignoreCase: false } 
+      ] 
+    ] 
+ */
+     
+ console.log(opt.selectors)
+ /* 
+    [ 
+      '#main [ src ]', 
+      'div.thumbs' 
+    ]
+  */
+```
+
+Note that returned selector strings are normalized (trimmed left & right with extra spacing in between removed).  Spaces within attribute `[ ]` selector is left intact.
+
 
 ---
 
