@@ -423,11 +423,11 @@ var out = require("./out.json"),
     return str.trim();
   };
 
-// special cases where shouldn't split selectpr by comma (ie, comma is part of expression, not a separator)
+// special cases where shouldn't split selector by comma (ie, comma is part of expression, not a separator)
 // Number refers to 0-based index in out.json.
 var dontSplit = [96,248,272,276,277,457,463,659,660,732,733,735];
 
-// Fixes for complex selectors in out.json.  key is the test key, value is the expected tokenized 'selectors' array
+// Fixes for complex selectors in out.json.  key is the test key, value is the expected normalized 'selectors' array
 var fixes = {
   // test 453
   ":has(*,:contains(!)),:contains(!)"
@@ -446,7 +446,7 @@ var fixes = {
 
 coll.forEach(function(s, i){
   var options = {},
-    selectors;
+      selectors;
 
   if (dontSplit.indexOf(i) !== -1) {
     selectors = [s];

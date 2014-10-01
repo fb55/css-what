@@ -66,7 +66,10 @@ __Options:__
     ]
   */
 ```
+
 Note that returned selector strings are normalized (trimmed left & right with extra spacing in between removed).  Spaces within attribute `[ ]` selector is left intact.
+
+
 ---
 
 License: BSD-like

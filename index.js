@@ -66,9 +66,9 @@ function getClosingPos(selector){
 
 function parse(selector, options){
   var value,
-    escaped_name,
-    selectorette = [],
-    selectors = [];
+      escaped_name,
+      selectorette = [],
+      selectors = [];
 
 	selector = (selector + "").trimLeft();
 
