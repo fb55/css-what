@@ -7,6 +7,9 @@
     "url": "https://github.com/FB55/CSSwhat"
   },
   "main": "./index.js",
+  "files": [
+    "index.js"
+  ],
   "scripts": {
     "test": "node tests/test.js && jshint *.js"
   },
