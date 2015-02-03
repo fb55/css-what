@@ -1,11 +1,11 @@
-#CSSwhat [![Build Status](https://secure.travis-ci.org/fb55/CSSwhat.svg?branch=master)](http://travis-ci.org/fb55/CSSwhat)
+# css-what [![Build Status](https://secure.travis-ci.org/fb55/css-what.svg?branch=master)](http://travis-ci.org/fb55/css-what)
 
 a CSS selector parser
 
-##Example
+## Example
 
 ```js
-require('CSSwhat')('foo[bar]:baz')
+require('css-what')('foo[bar]:baz')
 
 ~> [ [ { type: 'tag', name: 'foo' },
     { type: 'attribute',
@@ -18,11 +18,11 @@ require('CSSwhat')('foo[bar]:baz')
       data: null } ] ]
 ```
 
-##API
+## API
 
 __`CSSwhat(selector, options)` - Parses `str`, with the passed `options`.__
 
-The function returns a two-dimensional array. The first array represents subselects separated by commas (eg. `sub1, sub2`), the second contains the relevant tokens for that selector. Possible token types are:
+The function returns a two-dimensional array. The first array represents selectors separated by commas (eg. `sub1, sub2`), the second contains the relevant tokens for that selector. Possible token types are:
 
 name | attributes | example | output
 ---- | ---------- | ------- | ------
@@ -39,7 +39,7 @@ name | attributes | example | output
 
 __Options:__
 
-- `xmlMode`: When enabled, tagnames will be case-sensitive (ie. the output won't be lowercased).
+- `xmlMode`: When enabled, tag names will be case-sensitive (meaning they won't be lowercased).
 
 ---
 

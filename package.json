@@ -1,10 +1,10 @@
 {
   "author": "Felix Böhm <me@feedic.com> (http://feedic.com)",
-  "name": "CSSwhat",
+  "name": "css-what",
   "description": "a CSS selector parser",
-  "version": "0.4.7",
+  "version": "1.0.0",
   "repository": {
-    "url": "https://github.com/FB55/CSSwhat"
+    "url": "https://github.com/fb55/css-what"
   },
   "main": "./index.js",
   "files": [
