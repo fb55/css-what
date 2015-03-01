@@ -347,7 +347,7 @@ var tests = [
 				{
 					'type': 'pseudo',
 					'name': 'contains',
-					'data': '\'(foo)\''
+					"data": "(foo)"
 				}
 			]
 		],
