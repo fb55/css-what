@@ -34,6 +34,19 @@ var attribSelectors = {
 	".": ["class", "element"]
 };
 
+//pseudos, whose data-property is parsed as well
+var unpackPseudos = {
+    __proto__: null,
+    "has": true,
+    "not": true,
+    "matches": true
+};
+
+var stripQuotesFromPseudos = {
+    __proto__: unpackPseudos,
+    "contains": true
+};
+
 //unescape function taken from https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L139
 function funescape( _, escaped, escapedWhitespace ) {
 	var high = "0x" + escaped - 0x10000;
@@ -71,7 +84,7 @@ function parse(selector, options){
 	    tokens = [],
 	    sawWS = false,
 	    data, firstChar, name;
-	
+
 	function getName(){
 		var sub = selector.match(re_name)[0];
 		selector = selector.substr(sub.length);
@@ -154,18 +167,30 @@ function parse(selector, options){
 					value: unescapeCSS(data[4] || data[5] || ""),
 					ignoreCase: !!data[6]
 				});
-				
+
 			} else if(firstChar === ":"){
 				//if(selector.charAt(0) === ":"){} //TODO pseudo-element
 				name = getName().toLowerCase();
 				data = null;
-				
+
 				if(selector.charAt(0) === "("){
 					var pos = getClosingPos(selector);
 					data = selector.substr(1, pos - 2);
 					selector = selector.substr(pos);
+
+                    if(name in stripQuotesFromPseudos){
+                        var quot = data.charAt(0);
+
+                    	if(quot === data.slice(-1) && (quot === "'" || quot === "\"")){
+                    		data = data.slice(1, -1);
+                    	}
+
+                        if(name in unpackPseudos){
+                            data = parse(data, options);
+                        }
+                    }
 				}
-				
+
 				tokens.push({type: "pseudo", name: name, data: data});
 			} else {
 				//otherwise, the parser needs to throw or it would enter an infinite loop
@@ -173,7 +198,7 @@ function parse(selector, options){
 			}
 		}
 	}
-	
+
 	if(subselects.length > 0 && tokens.length === 0){
 		throw new SyntaxError("empty sub-selector");
 	}

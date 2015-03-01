@@ -428,7 +428,13 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": "*"
+        "data": [
+          [
+            {
+              "type": "universal"
+            }
+          ]
+        ]
       }
     ],
     [
@@ -442,7 +448,13 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": "*"
+        "data": [
+          [
+            {
+              "type": "universal"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -1397,7 +1409,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ".blog"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "class",
+              "action": "element",
+              "value": "blog",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -1420,7 +1442,24 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ".blog.link"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "class",
+              "action": "element",
+              "value": "blog",
+              "ignoreCase": false
+            },
+            {
+              "type": "attribute",
+              "name": "class",
+              "action": "element",
+              "value": "link",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -1443,7 +1482,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ".link"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "class",
+              "action": "element",
+              "value": "link",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -1477,7 +1526,15 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":input"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "input",
+              "data": null
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -1982,7 +2039,31 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":contains(Nothing),#option1b,:selected"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "contains",
+              "data": "Nothing"
+            }
+          ],
+          [
+            {
+              "type": "attribute",
+              "name": "id",
+              "action": "equals",
+              "value": "option1b",
+              "ignoreCase": false
+            }
+          ],
+          [
+            {
+              "type": "pseudo",
+              "name": "selected",
+              "data": null
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -2005,7 +2086,23 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":not(:selected)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "not",
+              "data": [
+                [
+                  {
+                    "type": "pseudo",
+                    "name": "selected",
+                    "data": null
+                  }
+                ]
+              ]
+            }
+          ]
+        ]
       },
       {
         "type": "attribute",
@@ -2058,7 +2155,24 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": "option:first-child:contains('o')"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "option"
+            },
+            {
+              "type": "pseudo",
+              "name": "first-child",
+              "data": null
+            },
+            {
+              "type": "pseudo",
+              "name": "contains",
+              "data": "o"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -2081,7 +2195,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ".select1"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "class",
+              "action": "element",
+              "value": "select1",
+              "ignoreCase": false
+            }
+          ]
+        ]
       },
       {
         "type": "pseudo",
@@ -2098,7 +2222,14 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "option"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "option"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -2121,7 +2252,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[multiple]"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "multiple",
+              "action": "exists",
+              "value": "",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -2144,7 +2285,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[name='select1']"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "name",
+              "action": "equals",
+              "value": "select1",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -2167,7 +2318,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[name=select1]"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "name",
+              "action": "equals",
+              "value": "select1",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -2190,7 +2351,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "#uncle"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "id",
+              "action": "equals",
+              "value": "uncle",
+              "ignoreCase": false
+            }
+          ]
+        ]
       },
       {
         "type": "descendant"
@@ -3045,7 +3216,15 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":first-child"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "first-child",
+              "data": null
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -3069,7 +3248,15 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":last-child"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "last-child",
+              "data": null
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -3366,12 +3553,32 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "#item_1"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "id",
+              "action": "equals",
+              "value": "item_1",
+              "ignoreCase": false
+            }
+          ]
+        ]
       },
       {
         "type": "pseudo",
         "name": "not",
-        "data": "#item_3"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "id",
+              "action": "equals",
+              "value": "item_3",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -3430,7 +3637,7 @@
       {
         "type": "pseudo",
         "name": "contains",
-        "data": "'1'"
+        "data": "1"
       }
     ]
   ],
@@ -3504,7 +3711,13 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": "*"
+        "data": [
+          [
+            {
+              "type": "universal"
+            }
+          ]
+        ]
       }
     ],
     [
@@ -3518,7 +3731,13 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": "*"
+        "data": [
+          [
+            {
+              "type": "universal"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -3641,7 +3860,15 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":first-of-type"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "first-of-type",
+              "data": null
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -3664,7 +3891,15 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":last-of-type"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "last-of-type",
+              "data": null
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -3687,7 +3922,15 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":nth-last-of-type(1)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "nth-last-of-type",
+              "data": "1"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -3710,7 +3953,15 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":nth-of-type(1)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "nth-of-type",
+              "data": "1"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -3733,7 +3984,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[rel$=\"nofollow\"]"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "rel",
+              "action": "end",
+              "value": "nofollow",
+              "ignoreCase": false
+            }
+          ]
+        ]
       },
       {
         "type": "child"
@@ -3763,7 +4024,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[rel$=\"nofollow\"]"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "rel",
+              "action": "end",
+              "value": "nofollow",
+              "ignoreCase": false
+            }
+          ]
+        ]
       },
       {
         "type": "descendant"
@@ -3793,7 +4064,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[rel$=\"nofollow\"]"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "rel",
+              "action": "end",
+              "value": "nofollow",
+              "ignoreCase": false
+            }
+          ]
+        ]
       },
       {
         "type": "child"
@@ -3823,7 +4104,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[rel$=nofollow]"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "rel",
+              "action": "end",
+              "value": "nofollow",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -3846,7 +4137,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[rel^=external]"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "rel",
+              "action": "start",
+              "value": "external",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -3869,7 +4170,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[rel~=nofollow]"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "rel",
+              "action": "element",
+              "value": "nofollow",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -4715,7 +5026,29 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":has(:has(*))"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "has",
+              "data": [
+                [
+                  {
+                    "type": "pseudo",
+                    "name": "has",
+                    "data": [
+                      [
+                        {
+                          "type": "universal"
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5221,7 +5554,41 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": "div:has(div:not([id]))"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "div"
+            },
+            {
+              "type": "pseudo",
+              "name": "has",
+              "data": [
+                [
+                  {
+                    "type": "tag",
+                    "name": "div"
+                  },
+                  {
+                    "type": "pseudo",
+                    "name": "not",
+                    "data": [
+                      [
+                        {
+                          "type": "attribute",
+                          "name": "id",
+                          "action": "exists",
+                          "value": "",
+                          "ignoreCase": false
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5251,12 +5618,47 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":has(div, span)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "has",
+              "data": [
+                [
+                  {
+                    "type": "tag",
+                    "name": "div"
+                  }
+                ],
+                [
+                  {
+                    "type": "tag",
+                    "name": "span"
+                  }
+                ]
+              ]
+            }
+          ]
+        ]
       },
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":has(*)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "has",
+              "data": [
+                [
+                  {
+                    "type": "universal"
+                  }
+                ]
+              ]
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5355,12 +5757,30 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[action$='formaction']"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "action",
+              "action": "end",
+              "value": "formaction",
+              "ignoreCase": false
+            }
+          ]
+        ]
       },
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":button"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "button",
+              "data": null
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5390,12 +5810,30 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[action='form:action']"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "action",
+              "action": "equals",
+              "value": "form:action",
+              "ignoreCase": false
+            }
+          ]
+        ]
       },
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":button"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "button",
+              "data": null
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5425,12 +5863,35 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[action='form:action']:button"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "action",
+              "action": "equals",
+              "value": "form:action",
+              "ignoreCase": false
+            },
+            {
+              "type": "pseudo",
+              "name": "button",
+              "data": null
+            }
+          ]
+        ]
       },
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":input"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "input",
+              "data": null
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5723,12 +6184,27 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": ":contains(mark)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "contains",
+              "data": "mark"
+            }
+          ]
+        ]
       },
       {
         "type": "pseudo",
         "name": "has",
-        "data": "code"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "code"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5751,12 +6227,27 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": ":contains(mark)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "contains",
+              "data": "mark"
+            }
+          ]
+        ]
       },
       {
         "type": "pseudo",
         "name": "has",
-        "data": "code"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "code"
+            }
+          ]
+        ]
       },
       {
         "type": "pseudo",
@@ -5784,7 +6275,14 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": " a "
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "a"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5807,7 +6305,14 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": " p "
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "p"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5830,7 +6335,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "#blargh"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "id",
+              "action": "equals",
+              "value": "blargh",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5853,7 +6368,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ".foo"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "class",
+              "action": "element",
+              "value": "foo",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5876,7 +6401,29 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":has(a), :nth-child(1)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "has",
+              "data": [
+                [
+                  {
+                    "type": "tag",
+                    "name": "a"
+                  }
+                ]
+              ]
+            }
+          ],
+          [
+            {
+              "type": "pseudo",
+              "name": "nth-child",
+              "data": "1"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5899,7 +6446,15 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":nth-child(1)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "nth-child",
+              "data": "1"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5922,7 +6477,15 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":nth-last-child(1)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "nth-last-child",
+              "data": "1"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5945,7 +6508,14 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "a"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "a"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5968,7 +6538,20 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "a, b"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "a"
+            }
+          ],
+          [
+            {
+              "type": "tag",
+              "name": "b"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -5991,7 +6574,26 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "a, b, div"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "a"
+            }
+          ],
+          [
+            {
+              "type": "tag",
+              "name": "b"
+            }
+          ],
+          [
+            {
+              "type": "tag",
+              "name": "div"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -6014,7 +6616,21 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "div#blargh"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "div"
+            },
+            {
+              "type": "attribute",
+              "name": "id",
+              "action": "equals",
+              "value": "blargh",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -6037,7 +6653,21 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "div.foo"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "div"
+            },
+            {
+              "type": "attribute",
+              "name": "class",
+              "action": "element",
+              "value": "foo",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -6060,7 +6690,21 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "p#blargh"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "p"
+            },
+            {
+              "type": "attribute",
+              "name": "id",
+              "action": "equals",
+              "value": "blargh",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -6083,7 +6727,21 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "p.foo"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "p"
+            },
+            {
+              "type": "attribute",
+              "name": "class",
+              "action": "element",
+              "value": "foo",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -7535,7 +8193,7 @@
       {
         "type": "pseudo",
         "name": "contains",
-        "data": "'x'"
+        "data": "x"
       },
       {
         "type": "adjacent"
@@ -8183,7 +8841,13 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "*"
+        "data": [
+          [
+            {
+              "type": "universal"
+            }
+          ]
+        ]
       },
       {
         "type": "descendant"
@@ -8600,7 +9264,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ".excluded"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "class",
+              "action": "element",
+              "value": "excluded",
+              "ignoreCase": false
+            }
+          ]
+        ]
       },
       {
         "type": "descendant"
@@ -8992,7 +9666,14 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "div"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "div"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -9598,7 +10279,13 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": "*"
+        "data": [
+          [
+            {
+              "type": "universal"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -9607,7 +10294,20 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": "*,:contains(!)"
+        "data": [
+          [
+            {
+              "type": "universal"
+            }
+          ],
+          [
+            {
+              "type": "pseudo",
+              "name": "contains",
+              "data": "!"
+            }
+          ]
+        ]
       }
     ],
     [
@@ -9623,7 +10323,21 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": ":has(*)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "has",
+              "data": [
+                [
+                  {
+                    "type": "universal"
+                  }
+                ]
+              ]
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -9632,7 +10346,15 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": ":nth-child(-1n-1)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "nth-child",
+              "data": "-1n-1"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -9641,7 +10363,14 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": "a"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "a"
+            }
+          ]
+        ]
       }
     ],
     [
@@ -9657,7 +10386,20 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": "div,span"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "div"
+            }
+          ],
+          [
+            {
+              "type": "tag",
+              "name": "span"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -9666,7 +10408,14 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": "option"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "option"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -9730,7 +10479,29 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":image,:input,:submit"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "image",
+              "data": null
+            }
+          ],
+          [
+            {
+              "type": "pseudo",
+              "name": "input",
+              "data": null
+            }
+          ],
+          [
+            {
+              "type": "pseudo",
+              "name": "submit",
+              "data": null
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -9791,7 +10562,13 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "*"
+        "data": [
+          [
+            {
+              "type": "universal"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -9800,7 +10577,21 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":not(*)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "not",
+              "data": [
+                [
+                  {
+                    "type": "universal"
+                  }
+                ]
+              ]
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -9809,7 +10600,29 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":not(:not(*))"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "not",
+              "data": [
+                [
+                  {
+                    "type": "pseudo",
+                    "name": "not",
+                    "data": [
+                      [
+                        {
+                          "type": "universal"
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -9818,7 +10631,15 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":nth-child(-1n-1)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "nth-child",
+              "data": "-1n-1"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -9827,7 +10648,15 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":selected"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "selected",
+              "data": null
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -9836,7 +10665,14 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "code"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "code"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -10288,7 +11124,15 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":last-child"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "last-child",
+              "data": null
+            }
+          ]
+        ]
       }
     ],
     [
@@ -10308,7 +11152,15 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":last-child"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "last-child",
+              "data": null
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -10723,7 +11575,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ".link"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "class",
+              "action": "element",
+              "value": "link",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -10861,7 +11723,7 @@
       {
         "type": "pseudo",
         "name": "contains",
-        "data": "\"(Link)\""
+        "data": "(Link)"
       }
     ]
   ],
@@ -10874,7 +11736,7 @@
       {
         "type": "pseudo",
         "name": "contains",
-        "data": "''"
+        "data": ""
       }
     ]
   ],
@@ -10887,7 +11749,7 @@
       {
         "type": "pseudo",
         "name": "contains",
-        "data": "'Google Groups (Link)'"
+        "data": "Google Groups (Link)"
       }
     ]
   ],
@@ -10952,7 +11814,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[href=\"#\"]"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "href",
+              "action": "equals",
+              "value": "#",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -10972,7 +11844,35 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":has(*, :contains(!)), :contains(!)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "has",
+              "data": [
+                [
+                  {
+                    "type": "universal"
+                  }
+                ],
+                [
+                  {
+                    "type": "pseudo",
+                    "name": "contains",
+                    "data": "!"
+                  }
+                ]
+              ]
+            }
+          ],
+          [
+            {
+              "type": "pseudo",
+              "name": "contains",
+              "data": "!"
+            }
+          ]
+        ]
       }
     ],
     [
@@ -11001,12 +11901,28 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":empty"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "empty",
+              "data": null
+            }
+          ]
+        ]
       },
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":parent"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "parent",
+              "data": null
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -11041,7 +11957,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[href=\"#\"]"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "href",
+              "action": "equals",
+              "value": "#",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -12072,7 +12998,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ".brothers"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "class",
+              "action": "element",
+              "value": "brothers",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -12129,7 +13065,29 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": "div:not([id])"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "div"
+            },
+            {
+              "type": "pseudo",
+              "name": "not",
+              "data": [
+                [
+                  {
+                    "type": "attribute",
+                    "name": "id",
+                    "action": "exists",
+                    "value": "",
+                    "ignoreCase": false
+                  }
+                ]
+              ]
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -12142,7 +13100,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ".brothers"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "class",
+              "action": "element",
+              "value": "brothers",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -12155,7 +13123,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[class~=brothers]"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "class",
+              "action": "element",
+              "value": "brothers",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -12168,7 +13146,17 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "[id]"
+        "data": [
+          [
+            {
+              "type": "attribute",
+              "name": "id",
+              "action": "exists",
+              "value": "",
+              "ignoreCase": false
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -12293,7 +13281,21 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":has(*)"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "has",
+              "data": [
+                [
+                  {
+                    "type": "universal"
+                  }
+                ]
+              ]
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -13278,7 +14280,15 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": ":first-child"
+        "data": [
+          [
+            {
+              "type": "pseudo",
+              "name": "first-child",
+              "data": null
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -13560,7 +14570,7 @@
       {
         "type": "pseudo",
         "name": "contains",
-        "data": "'o'"
+        "data": "o"
       }
     ]
   ],
@@ -13950,7 +14960,14 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": " a "
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "a"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -13963,7 +14980,14 @@
       {
         "type": "pseudo",
         "name": "has",
-        "data": "a"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "a"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -13989,7 +15013,20 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "a,p"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "a"
+            }
+          ],
+          [
+            {
+              "type": "tag",
+              "name": "p"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -14002,7 +15039,26 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "a,p,b"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "a"
+            }
+          ],
+          [
+            {
+              "type": "tag",
+              "name": "p"
+            }
+          ],
+          [
+            {
+              "type": "tag",
+              "name": "b"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -14015,7 +15071,14 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "p"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "p"
+            }
+          ]
+        ]
       }
     ]
   ],
@@ -14028,7 +15091,20 @@
       {
         "type": "pseudo",
         "name": "not",
-        "data": "p,a"
+        "data": [
+          [
+            {
+              "type": "tag",
+              "name": "p"
+            }
+          ],
+          [
+            {
+              "type": "tag",
+              "name": "a"
+            }
+          ]
+        ]
       }
     ]
   ],
