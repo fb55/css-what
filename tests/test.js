@@ -1,382 +1,382 @@
 var assert = require("assert"),
-    CSSwhat = require("../");
+    parse = require("../");
 
 var tests = [
 	//tag names
 	[
-		'div',
+		"div",
 		[
 			[
 				{
-					'type': 'tag',
-					'name': 'div'
+					"type": "tag",
+					"name": "div"
 				}
 			]
 		],
-		'simple tag'
+		"simple tag"
 	],
 	[
-		'*',
+		"*",
 		[
 			[
 				{
-					'type': 'universal'
+					"type": "universal"
 				}
 			]
 		],
-		'universal'
+		"universal"
 	],
 
 	//traversal
 	[
-		'div div',
+		"div div",
 		[
 			[
 				{
-					'type': 'tag',
-					'name': 'div'
+					"type": "tag",
+					"name": "div"
 				},
 				{
-					'type': 'descendant'
+					"type": "descendant"
 				},
 				{
-					'type': 'tag',
-					'name': 'div'
+					"type": "tag",
+					"name": "div"
 				}
 			]
 		],
-		'descendant'
+		"descendant"
 	],
 	[
-		'div\t \n \tdiv',
+		"div\t \n \tdiv",
 		[
 			[
 				{
-					'type': 'tag',
-					'name': 'div'
+					"type": "tag",
+					"name": "div"
 				},
 				{
-					'type': 'descendant'
+					"type": "descendant"
 				},
 				{
-					'type': 'tag',
-					'name': 'div'
+					"type": "tag",
+					"name": "div"
 				}
 			]
 		],
-		'descendant /w whitespace'
+		"descendant /w whitespace"
 	],
 	[
-		'div + div',
+		"div + div",
 		[
 			[
 				{
-					'type': 'tag',
-					'name': 'div'
+					"type": "tag",
+					"name": "div"
 				},
 				{
-					'type': 'adjacent'
+					"type": "adjacent"
 				},
 				{
-					'type': 'tag',
-					'name': 'div'
+					"type": "tag",
+					"name": "div"
 				}
 			]
 		],
-		'adjacent'
+		"adjacent"
 	],
 	[
-		'div ~ div',
+		"div ~ div",
 		[
 			[
 				{
-					'type': 'tag',
-					'name': 'div'
+					"type": "tag",
+					"name": "div"
 				},
 				{
-					'type': 'sibling'
+					"type": "sibling"
 				},
 				{
-					'type': 'tag',
-					'name': 'div'
+					"type": "tag",
+					"name": "div"
 				}
 			]
 		],
-		'sibling'
+		"sibling"
 	],
 	[
-		'p < div',
+		"p < div",
 		[
 			[
 				{
-					'type': 'tag',
-					'name': 'p'
+					"type": "tag",
+					"name": "p"
 				},
 				{
-					'type': 'parent'
+					"type": "parent"
 				},
 				{
-					'type': 'tag',
-					'name': 'div'
+					"type": "tag",
+					"name": "div"
 				}
 			]
 		],
-		'parent'
+		"parent"
 	],
 
 
 	//Escaped whitespace
 	[
-		'#\\  > a ',
+		"#\\  > a ",
 		[
 			[
 				{
-					'type': 'attribute',
-					'action': 'equals',
-					'name': 'id',
-					'value': ' ',
-					'ignoreCase': false
+					"type": "attribute",
+					"action": "equals",
+					"name": "id",
+					"value": " ",
+					"ignoreCase": false
 				},
 				{
-					'type': 'child'
+					"type": "child"
 				},
 				{
-					'type': 'tag',
-					'name': 'a'
+					"type": "tag",
+					"name": "a"
 				}
 			]
 		],
-		'Space between escaped space and combinator'
+		"Space between escaped space and combinator"
 	],
 	[
-		'.\\  ',
+		".\\  ",
 		[
 			[
 				{
-					'type': 'attribute',
-					'name': 'class',
-					'action': 'element',
-					'value': ' ',
-					'ignoreCase': false
+					"type": "attribute",
+					"name": "class",
+					"action": "element",
+					"value": " ",
+					"ignoreCase": false
 				}
 			]
 		],
-		'Space after escaped space'
+		"Space after escaped space"
 	],
 	[
-		'\\61 ',
+		"\\61 ",
 		[
 			[
 				{
-					'type': 'tag',
-					'name': 'a'
+					"type": "tag",
+					"name": "a"
 				}
 			]
 		],
-		'Numeric escape with space (BMP)'
+		"Numeric escape with space (BMP)"
 	],
 	[
-		'\\1d306\\01d306',
+		"\\1d306\\01d306",
 		[
 			[
 				{
-					'type': 'tag',
-					'name': '\uD834\uDF06\uD834\uDF06'
+					"type": "tag",
+					"name": "\uD834\uDF06\uD834\uDF06"
 				}
 			]
 		],
-		'Numeric escape (outside BMP)'
+		"Numeric escape (outside BMP)"
 	],
 
 
 	//attributes
 	[
-		'[name^=\'foo[\']',
+		"[name^=\"foo[\"]",
 		[
 			[
 				{
-					'type': 'attribute',
-					'name': 'name',
-					'action': 'start',
-					'value': 'foo[',
-					'ignoreCase': false
+					"type": "attribute",
+					"name": "name",
+					"action": "start",
+					"value": "foo[",
+					"ignoreCase": false
 				}
 			]
 		],
-		'quoted attribute'
+		"quoted attribute"
 	],
 	[
-		'[name^=\'foo[bar]\']',
+		"[name^=\"foo[bar]\"]",
 		[
 			[
 				{
-					'type': 'attribute',
-					'name': 'name',
-					'action': 'start',
-					'value': 'foo[bar]',
-					'ignoreCase': false
+					"type": "attribute",
+					"name": "name",
+					"action": "start",
+					"value": "foo[bar]",
+					"ignoreCase": false
 				}
 			]
 		],
-		'quoted attribute'
+		"quoted attribute"
 	],
 	[
-		'[name$=\'[bar]\']',
+		"[name$=\"[bar]\"]",
 		[
 			[
 				{
-					'type': 'attribute',
-					'name': 'name',
-					'action': 'end',
-					'value': '[bar]',
-					'ignoreCase': false
+					"type": "attribute",
+					"name": "name",
+					"action": "end",
+					"value": "[bar]",
+					"ignoreCase": false
 				}
 			]
 		],
-		'quoted attribute'
+		"quoted attribute"
 	],
 	[
-		'[href *= \'google\']',
+		"[href *= \"google\"]",
 		[
 			[
 				{
-					'type': 'attribute',
-					'name': 'href',
-					'action': 'any',
-					'value': 'google',
-					'ignoreCase': false
+					"type": "attribute",
+					"name": "href",
+					"action": "any",
+					"value": "google",
+					"ignoreCase": false
 				}
 			]
 		],
-		'quoted attribute with spaces'
+		"quoted attribute with spaces"
 	],
 	[
-		'[name=foo\\.baz]',
+		"[name=foo\\.baz]",
 		[
 			[
 				{
-					'type': 'attribute',
-					'name': 'name',
-					'action': 'equals',
-					'value': 'foo.baz',
-					'ignoreCase': false
+					"type": "attribute",
+					"name": "name",
+					"action": "equals",
+					"value": "foo.baz",
+					"ignoreCase": false
 				}
 			]
 		],
-		'attribute with escaped dot'
+		"attribute with escaped dot"
 	],
 	[
-		'[name=foo\\[bar\\]]',
+		"[name=foo\\[bar\\]]",
 		[
 			[
 				{
-					'type': 'attribute',
-					'name': 'name',
-					'action': 'equals',
-					'value': 'foo[bar]',
-					'ignoreCase': false
+					"type": "attribute",
+					"name": "name",
+					"action": "equals",
+					"value": "foo[bar]",
+					"ignoreCase": false
 				}
 			]
 		],
-		'attribute with escaped square brackets'
+		"attribute with escaped square brackets"
 	],
 	[
-		'[xml\\:test]',
+		"[xml\\:test]",
 		[
 			[
 				{
-					'type': 'attribute',
-					'name': 'xml:test',
-					'action': 'exists',
-					'value': '',
-					'ignoreCase': false
+					"type": "attribute",
+					"name": "xml:test",
+					"action": "exists",
+					"value": "",
+					"ignoreCase": false
 				}
 			]
 		],
-		'escaped attribute'
+		"escaped attribute"
 	],
 	[
-		'[name="foo ~ < > , bar" i]',
+		"[name='foo ~ < > , bar' i]",
 		[
 			[
 				{
-					'type': 'attribute',
-					'name': 'name',
-					'action': 'equals',
-					'value': 'foo ~ < > , bar',
-					'ignoreCase': true
+					"type": "attribute",
+					"name": "name",
+					"action": "equals",
+					"value": "foo ~ < > , bar",
+					"ignoreCase": true
 				}
 			]
 		],
-		'attribute with previously normalized characters'
+		"attribute with previously normalized characters"
 	],
 
 
 
 	//pseudo selectors
 	[
-		':foo',
+		":foo",
 		[
 			[
 				{
-					'type': 'pseudo',
-					'name': 'foo',
-					'data': null
+					"type": "pseudo",
+					"name": "foo",
+					"data": null
 				}
 			]
 		],
-		'pseudo selector without any data'
+		"pseudo selector without any data"
 	],
 	[
-		':bar(baz)',
+		":bar(baz)",
 		[
 			[
 				{
-					'type': 'pseudo',
-					'name': 'bar',
-					'data': 'baz'
+					"type": "pseudo",
+					"name": "bar",
+					"data": "baz"
 				}
 			]
 		],
-		'pseudo selector with data'
+		"pseudo selector with data"
 	],
 	[
-		':contains(\'(foo)\')',
+		":contains(\"(foo)\")",
 		[
 			[
 				{
-					'type': 'pseudo',
-					'name': 'contains',
+					"type": "pseudo",
+					"name": "contains",
 					"data": "(foo)"
 				}
 			]
 		],
-		'pseudo selector with data'
+		"pseudo selector with data"
 	],
 
 	//multiple selectors
 	[
-		'a , b',
+		"a , b",
 		[
 			[
 				{
-					'type': 'tag',
-					'name': 'a'
+					"type": "tag",
+					"name": "a"
 				}
 			],
 			[
 				{
-					'type': 'tag',
-					'name': 'b'
+					"type": "tag",
+					"name": "b"
 				}
 			]
 		],
-		'multiple selectors'
+		"multiple selectors"
 	]
 ];
 
 tests.forEach(function(arr, i){
-	arr[0] = CSSwhat(arr[0]);
+	arr[0] = parse(arr[0]);
 	assert.deepEqual.apply(null, arr);
 	console.log("\t%d: '%s' passed", i + 1, arr[2]);
 });
@@ -386,7 +386,7 @@ console.log("\nCollected selectors (qwery, sizzle, nwmatcher)...");
 var out = require("./out.json");
 
 Object.keys(out).forEach(function(s){
-	assert.deepEqual(CSSwhat(s), out[s], s);
+	assert.deepEqual(parse(s), out[s], s);
 });
 
 console.log("Passed!");
