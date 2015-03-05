@@ -43,8 +43,14 @@ var unpackPseudos = {
 };
 
 var stripQuotesFromPseudos = {
-    __proto__: unpackPseudos,
+    __proto__: null,
     "contains": true
+};
+
+var quotes = {
+    __proto__: null,
+    "\"": true,
+    "'": true
 };
 
 //unescape function taken from https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L139
@@ -66,24 +72,24 @@ function unescapeCSS(str){
 	return str.replace(re_escape, funescape);
 }
 
-function getClosingPos(selector){
-	var pos = 1, counter = 1, len = selector.length;
+function parse(selector, options){
+	var subselects = [];
 
-	for(; counter > 0 && pos < len; pos++){
-		if(selector.charAt(pos) === "(") counter++;
-		else if(selector.charAt(pos) === ")") counter--;
-	}
+    selector = parseSelector(subselects, selector + "", options);
 
-	return pos;
+    if(selector !== ""){
+        throw new SyntaxError("Unmatched selector: " + selector);
+    }
+
+    return subselects;
 }
 
-function parse(selector, options){
-	selector = (selector + "").trimLeft();
+function parseSelector(subselects, selector, options){
+    var tokens = [],
+        sawWS = false,
+        data, firstChar, name, quot;
 
-	var subselects = [],
-	    tokens = [],
-	    sawWS = false,
-	    data, firstChar, name;
+    selector = selector.trimLeft();
 
 	function getName(){
 		var sub = selector.match(re_name)[0];
@@ -174,34 +180,77 @@ function parse(selector, options){
 				data = null;
 
 				if(selector.charAt(0) === "("){
-					var pos = getClosingPos(selector);
-					data = selector.substr(1, pos - 2);
-					selector = selector.substr(pos);
+                    if(name in unpackPseudos){
+                        quot = selector.charAt(1);
+                        var quoted = quot in quotes;
 
-                    if(name in stripQuotesFromPseudos){
-                        var quot = data.charAt(0);
+                        selector = selector.substr(quoted + 1);
 
-                    	if(quot === data.slice(-1) && (quot === "'" || quot === "\"")){
-                    		data = data.slice(1, -1);
-                    	}
+                        data = [];
+                        selector = parseSelector(data, selector, options);
 
-                        if(name in unpackPseudos){
-                            data = parse(data, options);
+                        if(quoted){
+                            if(selector.charAt(0) !== quot){
+                                throw new SyntaxError("unmatched quotes in :" + name);
+                            } else {
+                                selector = selector.substr(1);
+                            }
+                        }
+
+                        if(selector.charAt(0) !== ")"){
+                            throw new SyntaxError("missing closing parenthesis in :" + name + " " + selector);
+                        }
+
+                        selector = selector.substr(1);
+                    } else {
+                        var pos = 1, counter = 1;
+
+                        for(; counter > 0 && pos < selector.length; pos++){
+                            if(selector.charAt(pos) === "(") counter++;
+                            else if(selector.charAt(pos) === ")") counter--;
+                        }
+
+                        if(counter){
+                            throw new SyntaxError("parenthesis not matched");
+                        }
+
+    					data = selector.substr(1, pos - 2);
+    					selector = selector.substr(pos);
+
+                        if(name in stripQuotesFromPseudos){
+                            quot = data.charAt(0);
+
+                        	if(quot === data.slice(-1) && quot in quotes){
+                        		data = data.slice(1, -1);
+                        	}
+
+                            if(name in unpackPseudos){
+                                data = parse(data, options);
+                            }
                         }
                     }
 				}
 
 				tokens.push({type: "pseudo", name: name, data: data});
 			} else {
-				//otherwise, the parser needs to throw or it would enter an infinite loop
-				throw new SyntaxError("Unmatched selector: " + firstChar + selector);
+                if(tokens.length && tokens[tokens.length - 1].type === "descendant"){
+                    tokens.pop();
+                }
+                addToken(subselects, tokens);
+                return firstChar + selector;
 			}
 		}
 	}
 
-	if(subselects.length > 0 && tokens.length === 0){
-		throw new SyntaxError("empty sub-selector");
-	}
+    addToken(subselects, tokens);
+
+	return selector;
+}
+
+function addToken(subselects, tokens){
+    if(subselects.length > 0 && tokens.length === 0){
+    	throw new SyntaxError("empty sub-selector");
+    }
+
 	subselects.push(tokens);
-	return subselects;
 }
