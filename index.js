@@ -89,7 +89,8 @@ function parseSelector(subselects, selector, options){
         sawWS = false,
         data, firstChar, name, quot;
 
-    selector = selector.trimLeft();
+    var trim = String.prototype.trimLeft || String.prototype.trim;
+    selector = trim.call(selector);
 
 	function getName(){
 		var sub = selector.match(re_name)[0];
@@ -113,14 +114,14 @@ function parseSelector(subselects, selector, options){
 			tokens.push({type: "tag", name: name});
 		} else if(re_ws.test(selector)){
 			sawWS = true;
-			selector = selector.trimLeft();
+			selector = trim.call(selector);
 		} else {
 			firstChar = selector.charAt(0);
 			selector = selector.substr(1);
 
 			if(firstChar in simpleSelectors){
 				tokens.push({type: simpleSelectors[firstChar]});
-				selector = selector.trimLeft();
+				selector = trim.call(selector);
 				sawWS = false;
 				continue;
 			} else if(firstChar === ","){
@@ -130,7 +131,7 @@ function parseSelector(subselects, selector, options){
 				subselects.push(tokens);
 				tokens = [];
 
-				selector = selector.trimLeft();
+				selector = trim.call(selector);
 				sawWS = false;
 				continue;
 			} else if(sawWS){
