@@ -2,8 +2,7 @@
 
 module.exports = parse;
 
-var re_ws = /^\s/,
-    re_name = /^(?:\\.|[\w\-\u00c0-\uFFFF])+/,
+var re_name = /^(?:\\.|[\w\-\u00c0-\uFFFF])+/,
     re_escape = /\\([\da-f]{1,6}\s?|(\s)|.)/ig,
     //modified version of https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L87
     re_attr = /^\s*((?:\\.|[\w\u00c0-\uFFFF\-])+)\s*(?:(\S?)=\s*(?:(['"])(.*?)\3|(#?(?:\\.|[\w\u00c0-\uFFFF\-])*)|)|)\s*(i)?\]/;
@@ -72,6 +71,10 @@ function unescapeCSS(str){
 	return str.replace(re_escape, funescape);
 }
 
+function isWhitespace(c){
+    return c === " " || c === "\n" || c === "\t" || c === "\f" || c === "\r";
+}
+
 function parse(selector, options){
 	var subselects = [];
 
@@ -89,58 +92,51 @@ function parseSelector(subselects, selector, options){
         sawWS = false,
         data, firstChar, name, quot;
 
-    selector = selector.trimLeft();
-
 	function getName(){
 		var sub = selector.match(re_name)[0];
 		selector = selector.substr(sub.length);
 		return unescapeCSS(sub);
 	}
 
+    function stripWhitespace(start){
+        while(isWhitespace(selector.charAt(start))) start++;
+        selector = selector.substr(start);
+    }
+
+    stripWhitespace(0);
+
 	while(selector !== ""){
-		if(re_name.test(selector)){
-			if(sawWS){
-				tokens.push({type: "descendant"});
-				sawWS = false;
-			}
+        firstChar = selector.charAt(0);
 
-			name = getName();
-
-			if(!options || ("lowerCaseTags" in options ? options.lowerCaseTags : !options.xmlMode)){
-				name = name.toLowerCase();
-			}
-
-			tokens.push({type: "tag", name: name});
-		} else if(re_ws.test(selector)){
+        if(isWhitespace(firstChar)){
 			sawWS = true;
-			selector = selector.trimLeft();
-		} else {
-			firstChar = selector.charAt(0);
-			selector = selector.substr(1);
+            stripWhitespace(1);
+		} else if(firstChar in simpleSelectors){
+            tokens.push({type: simpleSelectors[firstChar]});
+            sawWS = false;
 
-			if(firstChar in simpleSelectors){
-				tokens.push({type: simpleSelectors[firstChar]});
-				selector = selector.trimLeft();
-				sawWS = false;
-				continue;
-			} else if(firstChar === ","){
-				if(tokens.length === 0){
-					throw new SyntaxError("empty sub-selector");
-				}
-				subselects.push(tokens);
-				tokens = [];
-
-				selector = selector.trimLeft();
-				sawWS = false;
-				continue;
-			} else if(sawWS){
-				tokens.push({type: "descendant"});
+            stripWhitespace(1);
+        } else if(firstChar === ","){
+            if(tokens.length === 0){
+                throw new SyntaxError("empty sub-selector");
+            }
+            subselects.push(tokens);
+            tokens = [];
+            sawWS = false;
+            stripWhitespace(1);
+        } else {
+			if(sawWS){
+                if(tokens.length > 0){
+                    tokens.push({type: "descendant"});
+                }
 				sawWS = false;
 			}
 
-			if(firstChar === "*"){
+            if(firstChar === "*"){
+                selector = selector.substr(1);
 				tokens.push({type: "universal"});
 			} else if(firstChar in attribSelectors){
+                selector = selector.substr(1);
 				tokens.push({
 					type: "attribute",
 					name: attribSelectors[firstChar][0],
@@ -149,6 +145,7 @@ function parseSelector(subselects, selector, options){
 					ignoreCase: false
 				});
 			} else if(firstChar === "["){
+                selector = selector.substr(1);
 				data = selector.match(re_attr);
 				if(!data){
 					throw new SyntaxError("Malformed attribute selector: " + selector);
@@ -175,7 +172,10 @@ function parseSelector(subselects, selector, options){
 				});
 
 			} else if(firstChar === ":"){
-				//if(selector.charAt(0) === ":"){} //TODO pseudo-element
+				//if(selector.charAt(1) === ":"){} //TODO pseudo-element
+
+                selector = selector.substr(1);
+
 				name = getName().toLowerCase();
 				data = null;
 
@@ -232,12 +232,20 @@ function parseSelector(subselects, selector, options){
 				}
 
 				tokens.push({type: "pseudo", name: name, data: data});
-			} else {
+			} else if(re_name.test(selector)){
+    			name = getName();
+
+    			if(!options || ("lowerCaseTags" in options ? options.lowerCaseTags : !options.xmlMode)){
+    				name = name.toLowerCase();
+    			}
+
+    			tokens.push({type: "tag", name: name});
+    		} else {
                 if(tokens.length && tokens[tokens.length - 1].type === "descendant"){
                     tokens.pop();
                 }
                 addToken(subselects, tokens);
-                return firstChar + selector;
+                return selector;
 			}
 		}
 	}
