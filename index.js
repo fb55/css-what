@@ -89,6 +89,12 @@ function parseSelector(subselects, selector, options){
         sawWS = false,
         data, firstChar, name, quot;
 
+    if (!String.prototype.trimLeft) {
+        String.prototype.trimLeft = function(){
+            return this.replace(/^\s+/, "");
+        }
+    }
+
     selector = selector.trimLeft();
 
 	function getName(){
