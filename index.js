@@ -224,9 +224,7 @@ function parseSelector(subselects, selector, options){
                         		data = data.slice(1, -1);
                         	}
 
-                            if(name in unpackPseudos){
-                                data = parse(data, options);
-                            }
+                            data = unescapeCSS(data);
                         }
                     }
 				}
