@@ -328,6 +328,19 @@ var tests = [
 		"pseudo selector without any data"
 	],
 	[
+		"::foo",
+		[
+			[
+				{
+					"type": "pseudo",
+					"name": "foo",
+					"data": null
+				}
+			]
+		],
+		"pseudo selector CSS 3 style without any data"
+	],
+	[
 		":bar(baz)",
 		[
 			[
