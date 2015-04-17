@@ -172,7 +172,11 @@ function parseSelector(subselects, selector, options){
 				});
 
 			} else if(firstChar === ":"){
-				//if(selector.charAt(1) === ":"){} //TODO pseudo-element
+				if(selector.charAt(1) === ":"){
+					selector = selector.substr(2);
+					tokens.push({type: "pseudo-element", name: getName().toLowerCase()});
+					continue;
+				}
 
 				selector = selector.substr(1);
 
