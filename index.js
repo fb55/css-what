@@ -35,21 +35,21 @@ var attribSelectors = {
 
 //pseudos, whose data-property is parsed as well
 var unpackPseudos = {
-    __proto__: null,
-    "has": true,
-    "not": true,
-    "matches": true
+	__proto__: null,
+	"has": true,
+	"not": true,
+	"matches": true
 };
 
 var stripQuotesFromPseudos = {
-    __proto__: null,
-    "contains": true
+	__proto__: null,
+	"contains": true
 };
 
 var quotes = {
-    __proto__: null,
-    "\"": true,
-    "'": true
+	__proto__: null,
+	"\"": true,
+	"'": true
 };
 
 //unescape function taken from https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L139
@@ -72,25 +72,25 @@ function unescapeCSS(str){
 }
 
 function isWhitespace(c){
-    return c === " " || c === "\n" || c === "\t" || c === "\f" || c === "\r";
+	return c === " " || c === "\n" || c === "\t" || c === "\f" || c === "\r";
 }
 
 function parse(selector, options){
 	var subselects = [];
 
-    selector = parseSelector(subselects, selector + "", options);
+	selector = parseSelector(subselects, selector + "", options);
 
-    if(selector !== ""){
-        throw new SyntaxError("Unmatched selector: " + selector);
-    }
+	if(selector !== ""){
+		throw new SyntaxError("Unmatched selector: " + selector);
+	}
 
-    return subselects;
+	return subselects;
 }
 
 function parseSelector(subselects, selector, options){
-    var tokens = [],
-        sawWS = false,
-        data, firstChar, name, quot;
+	var tokens = [],
+		sawWS = false,
+		data, firstChar, name, quot;
 
 	function getName(){
 		var sub = selector.match(re_name)[0];
@@ -98,45 +98,45 @@ function parseSelector(subselects, selector, options){
 		return unescapeCSS(sub);
 	}
 
-    function stripWhitespace(start){
-        while(isWhitespace(selector.charAt(start))) start++;
-        selector = selector.substr(start);
-    }
+	function stripWhitespace(start){
+		while(isWhitespace(selector.charAt(start))) start++;
+		selector = selector.substr(start);
+	}
 
-    stripWhitespace(0);
+	stripWhitespace(0);
 
 	while(selector !== ""){
-        firstChar = selector.charAt(0);
+		firstChar = selector.charAt(0);
 
-        if(isWhitespace(firstChar)){
+		if(isWhitespace(firstChar)){
 			sawWS = true;
-            stripWhitespace(1);
+			stripWhitespace(1);
 		} else if(firstChar in simpleSelectors){
-            tokens.push({type: simpleSelectors[firstChar]});
-            sawWS = false;
+			tokens.push({type: simpleSelectors[firstChar]});
+			sawWS = false;
 
-            stripWhitespace(1);
-        } else if(firstChar === ","){
-            if(tokens.length === 0){
-                throw new SyntaxError("empty sub-selector");
-            }
-            subselects.push(tokens);
-            tokens = [];
-            sawWS = false;
-            stripWhitespace(1);
-        } else {
+			stripWhitespace(1);
+		} else if(firstChar === ","){
+			if(tokens.length === 0){
+				throw new SyntaxError("empty sub-selector");
+			}
+			subselects.push(tokens);
+			tokens = [];
+			sawWS = false;
+			stripWhitespace(1);
+		} else {
 			if(sawWS){
-                if(tokens.length > 0){
-                    tokens.push({type: "descendant"});
-                }
+				if(tokens.length > 0){
+					tokens.push({type: "descendant"});
+				}
 				sawWS = false;
 			}
 
-            if(firstChar === "*"){
-                selector = selector.substr(1);
+			if(firstChar === "*"){
+				selector = selector.substr(1);
 				tokens.push({type: "universal"});
 			} else if(firstChar in attribSelectors){
-                selector = selector.substr(1);
+				selector = selector.substr(1);
 				tokens.push({
 					type: "attribute",
 					name: attribSelectors[firstChar][0],
@@ -145,7 +145,7 @@ function parseSelector(subselects, selector, options){
 					ignoreCase: false
 				});
 			} else if(firstChar === "["){
-                selector = selector.substr(1);
+				selector = selector.substr(1);
 				data = selector.match(re_attr);
 				if(!data){
 					throw new SyntaxError("Malformed attribute selector: " + selector);
@@ -174,89 +174,89 @@ function parseSelector(subselects, selector, options){
 			} else if(firstChar === ":"){
 				//if(selector.charAt(1) === ":"){} //TODO pseudo-element
 
-                selector = selector.substr(1);
+				selector = selector.substr(1);
 
 				name = getName().toLowerCase();
 				data = null;
 
 				if(selector.charAt(0) === "("){
-                    if(name in unpackPseudos){
-                        quot = selector.charAt(1);
-                        var quoted = quot in quotes;
+					if(name in unpackPseudos){
+						quot = selector.charAt(1);
+						var quoted = quot in quotes;
 
-                        selector = selector.substr(quoted + 1);
+						selector = selector.substr(quoted + 1);
 
-                        data = [];
-                        selector = parseSelector(data, selector, options);
+						data = [];
+						selector = parseSelector(data, selector, options);
 
-                        if(quoted){
-                            if(selector.charAt(0) !== quot){
-                                throw new SyntaxError("unmatched quotes in :" + name);
-                            } else {
-                                selector = selector.substr(1);
-                            }
-                        }
+						if(quoted){
+							if(selector.charAt(0) !== quot){
+								throw new SyntaxError("unmatched quotes in :" + name);
+							} else {
+								selector = selector.substr(1);
+							}
+						}
 
-                        if(selector.charAt(0) !== ")"){
-                            throw new SyntaxError("missing closing parenthesis in :" + name + " " + selector);
-                        }
+						if(selector.charAt(0) !== ")"){
+							throw new SyntaxError("missing closing parenthesis in :" + name + " " + selector);
+						}
 
-                        selector = selector.substr(1);
-                    } else {
-                        var pos = 1, counter = 1;
+						selector = selector.substr(1);
+					} else {
+						var pos = 1, counter = 1;
 
-                        for(; counter > 0 && pos < selector.length; pos++){
-                            if(selector.charAt(pos) === "(") counter++;
-                            else if(selector.charAt(pos) === ")") counter--;
-                        }
+						for(; counter > 0 && pos < selector.length; pos++){
+							if(selector.charAt(pos) === "(") counter++;
+							else if(selector.charAt(pos) === ")") counter--;
+						}
 
-                        if(counter){
-                            throw new SyntaxError("parenthesis not matched");
-                        }
+						if(counter){
+							throw new SyntaxError("parenthesis not matched");
+						}
 
-    					data = selector.substr(1, pos - 2);
-    					selector = selector.substr(pos);
+						data = selector.substr(1, pos - 2);
+						selector = selector.substr(pos);
 
-                        if(name in stripQuotesFromPseudos){
-                            quot = data.charAt(0);
+						if(name in stripQuotesFromPseudos){
+							quot = data.charAt(0);
 
-                        	if(quot === data.slice(-1) && quot in quotes){
-                        		data = data.slice(1, -1);
-                        	}
+							if(quot === data.slice(-1) && quot in quotes){
+								data = data.slice(1, -1);
+							}
 
-                            data = unescapeCSS(data);
-                        }
-                    }
+							data = unescapeCSS(data);
+						}
+					}
 				}
 
 				tokens.push({type: "pseudo", name: name, data: data});
 			} else if(re_name.test(selector)){
-    			name = getName();
+				name = getName();
 
-    			if(!options || ("lowerCaseTags" in options ? options.lowerCaseTags : !options.xmlMode)){
-    				name = name.toLowerCase();
-    			}
+				if(!options || ("lowerCaseTags" in options ? options.lowerCaseTags : !options.xmlMode)){
+					name = name.toLowerCase();
+				}
 
-    			tokens.push({type: "tag", name: name});
-    		} else {
-                if(tokens.length && tokens[tokens.length - 1].type === "descendant"){
-                    tokens.pop();
-                }
-                addToken(subselects, tokens);
-                return selector;
+				tokens.push({type: "tag", name: name});
+			} else {
+				if(tokens.length && tokens[tokens.length - 1].type === "descendant"){
+					tokens.pop();
+				}
+				addToken(subselects, tokens);
+				return selector;
 			}
 		}
 	}
 
-    addToken(subselects, tokens);
+	addToken(subselects, tokens);
 
 	return selector;
 }
 
 function addToken(subselects, tokens){
-    if(subselects.length > 0 && tokens.length === 0){
-    	throw new SyntaxError("empty sub-selector");
-    }
+	if(subselects.length > 0 && tokens.length === 0){
+		throw new SyntaxError("empty sub-selector");
+	}
 
 	subselects.push(tokens);
 }
