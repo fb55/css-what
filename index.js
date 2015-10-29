@@ -43,7 +43,8 @@ var unpackPseudos = {
 
 var stripQuotesFromPseudos = {
 	__proto__: null,
-	"contains": true
+	"contains": true,
+	"icontains": true
 };
 
 var quotes = {
