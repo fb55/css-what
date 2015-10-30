@@ -353,6 +353,32 @@ var tests = [
 		],
 		"pseudo selector with data"
 	],
+	[
+		":icontains('')",
+		[
+			[
+				{
+					"type": "pseudo",
+					"name": "icontains",
+					"data": ""
+				}
+			]
+		],
+		"pseudo selector with quote-stripped data"
+	],
+	[
+		":contains(\"(foo)\")",
+		[
+			[
+				{
+					"type": "pseudo",
+					"name": "contains",
+					"data": "(foo)"
+				}
+			]
+		],
+		"pseudo selector with data"
+	],
 
 	//multiple selectors
 	[
