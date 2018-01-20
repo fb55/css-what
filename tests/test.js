@@ -251,6 +251,21 @@ var tests = [
 		"quoted attribute with spaces"
 	],
 	[
+		"[value=\"\nsome text\n\"]",
+		[
+			[
+				{
+					"type": "attribute",
+					"name": "value",
+					"action": "equals",
+					"value": "\nsome text\n",
+					"ignoreCase": false
+				}
+			]
+		],
+		"quoted attribute with internal newline"
+	],
+	[
 		"[name=foo\\.baz]",
 		[
 			[
