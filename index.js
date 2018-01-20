@@ -211,8 +211,8 @@ function parseSelector(subselects, selector, options){
 						var pos = 1, counter = 1;
 
 						for(; counter > 0 && pos < selector.length; pos++){
-							if(selector.charAt(pos) === "(") counter++;
-							else if(selector.charAt(pos) === ")") counter--;
+							if(selector.charAt(pos) === "(" && selector.charAt(pos-1) !== "\\") counter++;
+							else if(selector.charAt(pos) === ")" && selector.charAt(pos-1) !== "\\") counter--;
 						}
 
 						if(counter){
