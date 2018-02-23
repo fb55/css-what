@@ -104,6 +104,13 @@ function parseSelector(subselects, selector, options){
 		selector = selector.substr(start);
 	}
 
+	function isEscaped(pos) {
+		var slashCount = 0;
+
+		while (selector.charAt(--pos) === "\\") slashCount++;
+		return (slashCount & 1) === 1;
+	}
+
 	stripWhitespace(0);
 
 	while(selector !== ""){
@@ -211,8 +218,8 @@ function parseSelector(subselects, selector, options){
 						var pos = 1, counter = 1;
 
 						for(; counter > 0 && pos < selector.length; pos++){
-							if(selector.charAt(pos) === "(") counter++;
-							else if(selector.charAt(pos) === ")") counter--;
+							if(selector.charAt(pos) === "(" && !isEscaped(pos)) counter++;
+							else if(selector.charAt(pos) === ")" && !isEscaped(pos)) counter--;
 						}
 
 						if(counter){
