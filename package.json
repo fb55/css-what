@@ -21,7 +21,7 @@
   "engines": {
     "node": "*"
   },
-  "license": "BSD-like",
+  "license": "BSD-2-Clause",
   "jshintConfig": {
     "eqeqeq": true,
     "freeze": true,

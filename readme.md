@@ -43,4 +43,4 @@ __Options:__
 
 ---
 
-License: BSD-like
+License: BSD-2-Clause
