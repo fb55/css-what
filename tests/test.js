@@ -163,6 +163,21 @@ var tests = [
         "Space after escaped space"
     ],
     [
+        ".m™²³",
+        [
+            [
+                {
+                    type: "attribute",
+                    name: "class",
+                    action: "element",
+                    value: "m™²³",
+                    ignoreCase: false
+                }
+            ]
+        ],
+        "Special charecters in selector"
+    ],
+    [
         "\\61 ",
         [
             [
