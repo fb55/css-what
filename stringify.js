@@ -32,6 +32,7 @@ function stringifyToken(token){
     if(token.type in simpleSelectors) return simpleSelectors[token.type];
 
     if(token.type === "tag") return escapeName(token.name);
+    if (token.type === "pseudo-element") return "::" + escapeName(token.name);
 
     if(token.type === "attribute"){
         if(token.action === "exists") return "[" + escapeName(token.name) + "]";
