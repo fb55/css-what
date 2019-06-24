@@ -49,3 +49,10 @@ __Options:__
 ---
 
 License: BSD-2-Clause
+
+[Get supported css-what with the Tidelift Subscription](https://tidelift.com/subscription/pkg/npm-css-what?utm_source=npm-css-what&utm_medium=referral&utm_campaign=readme)
+
+## Security contact information
+
+To report a security vulnerability, please use the [Tidelift security contact](https://tidelift.com/security).
+Tidelift will coordinate the fix and disclosure.
