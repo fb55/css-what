@@ -1,6 +1,6 @@
 import assert from "assert";
 import { readFileSync } from "fs";
-import parse, { Selector } from "../src";
+import { parse, Selector } from "../src";
 
 const tests: [string, Selector[][], string][] = [
     //tag names
