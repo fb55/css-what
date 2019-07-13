@@ -1,7 +1,8 @@
-var assert = require("assert"),
-    parse = require("../");
+import assert from "assert";
+import { readFileSync } from "fs";
+import { parse, Selector } from "../src";
 
-var tests = [
+const tests: [string, Selector[][], string][] = [
     //tag names
     [
         "div",
@@ -427,15 +428,24 @@ var tests = [
     ]
 ];
 
-tests.forEach(function(arr, i) {
-    arr[0] = parse(arr[0]);
-    assert.deepEqual.apply(null, arr);
-    console.log("\t%d: '%s' passed", i + 1, arr[2]);
+tests.forEach(function([selector, expected, message], i) {
+    const actual = parse(selector);
+    assert.deepEqual(
+        actual,
+        expected,
+        `${message} failed:
+            Selector ${selector}
+            Expected ${JSON.stringify(expected, null, 2)}
+            Found ${JSON.stringify(actual, null, 2)}
+        `
+    );
+    const position = (i + 1).toString().padStart(5);
+    console.log(`${position}: '${message}' passed`);
 });
 
 console.log("\nCollected selectors (qwery, sizzle, nwmatcher)...");
 
-var out = require("./out.json");
+const out = JSON.parse(readFileSync(`${__dirname}/out.json`).toString());
 
 Object.keys(out).forEach(function(s) {
     assert.deepEqual(parse(s), out[s], s);

@@ -1,44 +1,41 @@
 {
-  "author": "Felix Böhm <me@feedic.com> (http://feedic.com)",
-  "name": "css-what",
-  "description": "a CSS selector parser",
-  "version": "2.1.3",
-  "repository": {
-    "url": "https://github.com/fb55/css-what"
-  },
-  "main": "./index.js",
-  "files": [
-    "index.js"
-  ],
-  "scripts": {
-    "test": "node tests/test.js && jshint *.js"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "jshint": "2"
-  },
-  "optionalDependencies": {},
-  "engines": {
-    "node": "*"
-  },
-  "license": "BSD-2-Clause",
-  "jshintConfig": {
-    "eqeqeq": true,
-    "freeze": true,
-    "latedef": "nofunc",
-    "noarg": true,
-    "nonbsp": true,
-    "undef": true,
-    "unused": true,
-    "eqnull": true,
-    "proto": true,
-    "node": true,
-    "globals": {
-      "describe": true,
-      "it": true
+    "author": "Felix Böhm <me@feedic.com> (http://feedic.com)",
+    "name": "css-what",
+    "description": "a CSS selector parser",
+    "version": "2.1.3",
+    "repository": {
+        "url": "https://github.com/fb55/css-what"
+    },
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "files": [
+        "lib/**/*"
+    ],
+    "scripts": {
+        "test": "npm run ts-test && npm run eslint && npm run format -- --check",
+        "ts-test": "ts-node tests/test.ts",
+        "eslint": "eslint '**/*.ts'",
+        "format": "prettier --write **/*.{ts,json,md}",
+        "build": "tsc",
+        "prepare": "npm run build"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "@types/node": "^12.6.2",
+        "@typescript-eslint/eslint-plugin": "^1.12.0",
+        "@typescript-eslint/parser": "^1.12.0",
+        "eslint": "^6.0.1",
+        "eslint-config-prettier": "^6.0.0",
+        "prettier": "^1.18.2",
+        "ts-node": "^8.3.0",
+        "typescript": "^3.5.3"
+    },
+    "optionalDependencies": {},
+    "engines": {
+        "node": ">= 6"
+    },
+    "license": "BSD-2-Clause",
+    "prettier": {
+        "tabWidth": 4
     }
-  },
-  "prettier": {
-    "tabWidth": 4
-  }
 }
