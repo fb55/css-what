@@ -5,7 +5,8 @@ a CSS selector parser
 ## Example
 
 ```js
-require("css-what")("foo[bar]:baz")
+const { parse } = require("css-what")
+parse("foo[bar]:baz")
 
 ~> [
     [
