@@ -5,8 +5,8 @@ a CSS selector parser
 ## Example
 
 ```js
-const { parse } = require("css-what")
-parse("foo[bar]:baz")
+const CSSwhat = require("css-what")
+CSSwhat.parse("foo[bar]:baz")
 
 ~> [
     [
@@ -25,7 +25,7 @@ parse("foo[bar]:baz")
 
 ## API
 
-**`CSSwhat(selector, options)` - Parses `str`, with the passed `options`.**
+**`CSSwhat.parse(str, options)` - Parses `str`, optionally with the passed `options`.**
 
 The function returns a two-dimensional array. The first array represents selectors separated by commas (eg. `sub1, sub2`), the second contains the relevant tokens for that selector. Possible token types are:
 
@@ -51,6 +51,8 @@ The function returns a two-dimensional array. The first array represents selecto
 -   `lowerCaseTags`: When false, tag names will not be lowercased. Defaults to `true`.
 -   `lowerCaseAttributeNames`: When false, attribute names will not be lowercased. Defaults to `true`.
 -   `xmlMode`: When `true`, `xmlMode` implies both `lowerCaseTags` and `lowerCaseAttributeNames` are set to `false`.
+
+**`CSSwhat.stringify(selector)` - Turns `selector` back into a string.**
 
 ---
 
