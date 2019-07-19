@@ -9,8 +9,8 @@ export interface Options {
 }
 
 export type Selector =
-    | PseodoSelector
-    | PseodoElement
+    | PseudoSelector
+    | PseudoElement
     | AttributeSelector
     | TagSelector
     | UniversalSelector
@@ -26,13 +26,13 @@ interface AttributeSelector {
 
 type DataType = Selector[][] | null | string;
 
-interface PseodoSelector {
+interface PseudoSelector {
     type: "pseudo";
     name: string;
     data: DataType;
 }
 
-interface PseodoElement {
+interface PseudoElement {
     type: "pseudo-element";
     name: string;
 }
