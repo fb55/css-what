@@ -1,2 +1,2 @@
-export { default as parse, Selector } from "./parse";
+export { default as parse, Selector, Options } from "./parse";
 export { default as stringify } from "./stringify";
