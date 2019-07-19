@@ -2,7 +2,7 @@
 
 export default parse;
 
-interface Options {
+export interface Options {
     lowerCaseAttributeNames?: boolean;
     lowerCaseTags?: boolean;
     xmlMode?: boolean;
