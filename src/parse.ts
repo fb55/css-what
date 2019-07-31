@@ -16,41 +16,41 @@ export type Selector =
     | UniversalSelector
     | Traversal;
 
-interface AttributeSelector {
+export interface AttributeSelector {
     type: "attribute";
     name: string;
-    action: Action;
+    action: AttributeAction;
     value: string;
     ignoreCase: boolean;
 }
 
 type DataType = Selector[][] | null | string;
 
-interface PseudoSelector {
+export interface PseudoSelector {
     type: "pseudo";
     name: string;
     data: DataType;
 }
 
-interface PseudoElement {
+export interface PseudoElement {
     type: "pseudo-element";
     name: string;
 }
 
-interface TagSelector {
+export interface TagSelector {
     type: "tag";
     name: string;
 }
 
-interface UniversalSelector {
+export interface UniversalSelector {
     type: "universal";
 }
 
-interface Traversal {
+export interface Traversal {
     type: TraversalType;
 }
 
-type Action =
+export type AttributeAction =
     | "any"
     | "element"
     | "end"
@@ -60,14 +60,19 @@ type Action =
     | "not"
     | "start";
 
-type TraversalType = "adjacent" | "child" | "descendant" | "parent" | "sibling";
+export type TraversalType =
+    | "adjacent"
+    | "child"
+    | "descendant"
+    | "parent"
+    | "sibling";
 
 const reName = /^(?:\\.|[\w\-\u00b0-\uFFFF])+/,
     reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi,
     //modified version of https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L87
     reAttr = /^\s*((?:\\.|[\w\u00b0-\uFFFF-])+)\s*(?:(\S?)=\s*(?:(['"])([^]*?)\3|(#?(?:\\.|[\w\u00b0-\uFFFF-])*)|)|)\s*(i)?\]/;
 
-const actionTypes: { [key: string]: Action } = {
+const actionTypes: { [key: string]: AttributeAction } = {
     undefined: "exists",
     "": "equals",
     "~": "element",
@@ -85,7 +90,7 @@ const Traversals: { [key: string]: TraversalType } = {
     "+": "adjacent"
 };
 
-const attribSelectors: { [key: string]: [string, Action] } = {
+const attribSelectors: { [key: string]: [string, AttributeAction] } = {
     "#": ["id", "equals"],
     ".": ["class", "element"]
 };
