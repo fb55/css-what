@@ -12,22 +12,24 @@
         "lib/**/*"
     ],
     "scripts": {
-        "test": "npm run ts-test && npm run eslint && npm run format -- --check",
-        "ts-test": "ts-node tests/test.ts",
-        "eslint": "eslint '**/*.ts'",
-        "format": "prettier --write **/*.{ts,json,md}",
+        "test": "jest --coverage -u && npm run lint",
+        "coverage": "cat coverage/lcov.info | coveralls",
+        "lint": "eslint --ext=js,ts src",
+        "format": "prettier --write '**/*.{ts,md,json}'",
         "build": "tsc",
         "prepare": "npm run build"
     },
     "dependencies": {},
     "devDependencies": {
+        "@types/jest": "^24.0.16",
         "@types/node": "^12.6.2",
         "@typescript-eslint/eslint-plugin": "^1.12.0",
         "@typescript-eslint/parser": "^1.12.0",
         "eslint": "^6.0.1",
         "eslint-config-prettier": "^6.0.0",
+        "jest": "^24.8.0",
         "prettier": "^1.18.2",
-        "ts-node": "^8.3.0",
+        "ts-jest": "^24.0.2",
         "typescript": "^3.5.3"
     },
     "optionalDependencies": {},
@@ -35,6 +37,10 @@
         "node": ">= 6"
     },
     "license": "BSD-2-Clause",
+    "jest": {
+        "preset": "ts-jest",
+        "testEnvironment": "node"
+    },
     "prettier": {
         "tabWidth": 4
     }

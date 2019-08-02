@@ -34,29 +34,29 @@ function stringifyToken(token: Selector): string {
     if (token.type === "pseudo-element") return `::${escapeName(token.name)}`;
 
     if (token.type === "attribute") {
-        if (token.action === "exists") return `[${escapeName(token.name)}]`;
+        if (token.action === "exists") {
+            return `[${escapeName(token.name)}]`;
+        }
         if (
             token.name === "id" &&
             token.action === "equals" &&
             !token.ignoreCase
-        )
+        ) {
             return `#${escapeName(token.value)}`;
+        }
         if (
             token.name === "class" &&
             token.action === "element" &&
             !token.ignoreCase
-        )
+        ) {
             return `.${escapeName(token.value)}`;
-        return (
-            "[" +
-            escapeName(token.name) +
-            actionTypes[token.action] +
-            "='" +
-            escapeName(token.value) +
-            "'" +
-            (token.ignoreCase ? "i" : "") +
-            "]"
-        );
+        }
+
+        const atributeName = escapeName(token.name);
+        const action = actionTypes[token.action];
+        const value = escapeName(token.value);
+        const ignoreCase = token.ignoreCase ? "i" : "";
+        return `[${atributeName}${action}='${value}'${ignoreCase}]`;
     }
 
     if (token.type === "pseudo") {
