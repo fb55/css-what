@@ -200,6 +200,21 @@ export const tests: [string, Selector[][], string][] = [
         ],
         "Numeric escape (outside BMP)"
     ],
+    [
+        "#\\26 B",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "id",
+                    value: "&B",
+                    ignoreCase: false
+                },
+            ]
+        ],
+        "id selector with escape sequence"
+    ],
 
     //attributes
     [
