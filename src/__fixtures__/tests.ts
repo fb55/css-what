@@ -8,22 +8,22 @@ export const tests: [string, Selector[][], string][] = [
             [
                 {
                     type: "tag",
-                    name: "div"
-                }
-            ]
+                    name: "div",
+                },
+            ],
         ],
-        "simple tag"
+        "simple tag",
     ],
     [
         "*",
         [
             [
                 {
-                    type: "universal"
-                }
-            ]
+                    type: "universal",
+                },
+            ],
         ],
-        "universal"
+        "universal",
     ],
 
     //traversal
@@ -33,18 +33,18 @@ export const tests: [string, Selector[][], string][] = [
             [
                 {
                     type: "tag",
-                    name: "div"
+                    name: "div",
                 },
                 {
-                    type: "descendant"
+                    type: "descendant",
                 },
                 {
                     type: "tag",
-                    name: "div"
-                }
-            ]
+                    name: "div",
+                },
+            ],
         ],
-        "descendant"
+        "descendant",
     ],
     [
         "div\t \n \tdiv",
@@ -52,18 +52,18 @@ export const tests: [string, Selector[][], string][] = [
             [
                 {
                     type: "tag",
-                    name: "div"
+                    name: "div",
                 },
                 {
-                    type: "descendant"
+                    type: "descendant",
                 },
                 {
                     type: "tag",
-                    name: "div"
-                }
-            ]
+                    name: "div",
+                },
+            ],
         ],
-        "descendant /w whitespace"
+        "descendant /w whitespace",
     ],
     [
         "div + div",
@@ -71,18 +71,18 @@ export const tests: [string, Selector[][], string][] = [
             [
                 {
                     type: "tag",
-                    name: "div"
+                    name: "div",
                 },
                 {
-                    type: "adjacent"
+                    type: "adjacent",
                 },
                 {
                     type: "tag",
-                    name: "div"
-                }
-            ]
+                    name: "div",
+                },
+            ],
         ],
-        "adjacent"
+        "adjacent",
     ],
     [
         "div ~ div",
@@ -90,18 +90,18 @@ export const tests: [string, Selector[][], string][] = [
             [
                 {
                     type: "tag",
-                    name: "div"
+                    name: "div",
                 },
                 {
-                    type: "sibling"
+                    type: "sibling",
                 },
                 {
                     type: "tag",
-                    name: "div"
-                }
-            ]
+                    name: "div",
+                },
+            ],
         ],
-        "sibling"
+        "sibling",
     ],
     [
         "p < div",
@@ -109,18 +109,18 @@ export const tests: [string, Selector[][], string][] = [
             [
                 {
                     type: "tag",
-                    name: "p"
+                    name: "p",
                 },
                 {
-                    type: "parent"
+                    type: "parent",
                 },
                 {
                     type: "tag",
-                    name: "div"
-                }
-            ]
+                    name: "div",
+                },
+            ],
         ],
-        "parent"
+        "parent",
     ],
 
     //Escaped whitespace
@@ -133,18 +133,18 @@ export const tests: [string, Selector[][], string][] = [
                     action: "equals",
                     name: "id",
                     value: " ",
-                    ignoreCase: false
+                    ignoreCase: false,
                 },
                 {
-                    type: "child"
+                    type: "child",
                 },
                 {
                     type: "tag",
-                    name: "a"
-                }
-            ]
+                    name: "a",
+                },
+            ],
         ],
-        "Space between escaped space and combinator"
+        "Space between escaped space and combinator",
     ],
     [
         ".\\  ",
@@ -155,11 +155,11 @@ export const tests: [string, Selector[][], string][] = [
                     name: "class",
                     action: "element",
                     value: " ",
-                    ignoreCase: false
-                }
-            ]
+                    ignoreCase: false,
+                },
+            ],
         ],
-        "Space after escaped space"
+        "Space after escaped space",
     ],
     [
         ".m™²³",
@@ -170,11 +170,11 @@ export const tests: [string, Selector[][], string][] = [
                     name: "class",
                     action: "element",
                     value: "m™²³",
-                    ignoreCase: false
-                }
-            ]
+                    ignoreCase: false,
+                },
+            ],
         ],
-        "Special charecters in selector"
+        "Special charecters in selector",
     ],
     [
         "\\61 ",
@@ -182,11 +182,11 @@ export const tests: [string, Selector[][], string][] = [
             [
                 {
                     type: "tag",
-                    name: "a"
-                }
-            ]
+                    name: "a",
+                },
+            ],
         ],
-        "Numeric escape with space (BMP)"
+        "Numeric escape with space (BMP)",
     ],
     [
         "\\1d306\\01d306",
@@ -194,11 +194,11 @@ export const tests: [string, Selector[][], string][] = [
             [
                 {
                     type: "tag",
-                    name: "\uD834\uDF06\uD834\uDF06"
-                }
-            ]
+                    name: "\uD834\uDF06\uD834\uDF06",
+                },
+            ],
         ],
-        "Numeric escape (outside BMP)"
+        "Numeric escape (outside BMP)",
     ],
     [
         "#\\26 B",
@@ -209,11 +209,11 @@ export const tests: [string, Selector[][], string][] = [
                     action: "equals",
                     name: "id",
                     value: "&B",
-                    ignoreCase: false
+                    ignoreCase: false,
                 },
-            ]
+            ],
         ],
-        "id selector with escape sequence"
+        "id selector with escape sequence",
     ],
 
     //attributes
@@ -226,11 +226,11 @@ export const tests: [string, Selector[][], string][] = [
                     name: "name",
                     action: "start",
                     value: "foo[",
-                    ignoreCase: false
-                }
-            ]
+                    ignoreCase: false,
+                },
+            ],
         ],
-        "quoted attribute"
+        "quoted attribute",
     ],
     [
         '[name^="foo[bar]"]',
@@ -241,11 +241,11 @@ export const tests: [string, Selector[][], string][] = [
                     name: "name",
                     action: "start",
                     value: "foo[bar]",
-                    ignoreCase: false
-                }
-            ]
+                    ignoreCase: false,
+                },
+            ],
         ],
-        "quoted attribute"
+        "quoted attribute",
     ],
     [
         '[name$="[bar]"]',
@@ -256,11 +256,11 @@ export const tests: [string, Selector[][], string][] = [
                     name: "name",
                     action: "end",
                     value: "[bar]",
-                    ignoreCase: false
-                }
-            ]
+                    ignoreCase: false,
+                },
+            ],
         ],
-        "quoted attribute"
+        "quoted attribute",
     ],
     [
         '[href *= "google"]',
@@ -271,11 +271,11 @@ export const tests: [string, Selector[][], string][] = [
                     name: "href",
                     action: "any",
                     value: "google",
-                    ignoreCase: false
-                }
-            ]
+                    ignoreCase: false,
+                },
+            ],
         ],
-        "quoted attribute with spaces"
+        "quoted attribute with spaces",
     ],
     [
         '[value="\nsome text\n"]',
@@ -286,11 +286,11 @@ export const tests: [string, Selector[][], string][] = [
                     name: "value",
                     action: "equals",
                     value: "\nsome text\n",
-                    ignoreCase: false
-                }
-            ]
+                    ignoreCase: false,
+                },
+            ],
         ],
-        "quoted attribute with internal newline"
+        "quoted attribute with internal newline",
     ],
     [
         "[name=foo\\.baz]",
@@ -301,11 +301,11 @@ export const tests: [string, Selector[][], string][] = [
                     name: "name",
                     action: "equals",
                     value: "foo.baz",
-                    ignoreCase: false
-                }
-            ]
+                    ignoreCase: false,
+                },
+            ],
         ],
-        "attribute with escaped dot"
+        "attribute with escaped dot",
     ],
     [
         "[name=foo\\[bar\\]]",
@@ -316,11 +316,11 @@ export const tests: [string, Selector[][], string][] = [
                     name: "name",
                     action: "equals",
                     value: "foo[bar]",
-                    ignoreCase: false
-                }
-            ]
+                    ignoreCase: false,
+                },
+            ],
         ],
-        "attribute with escaped square brackets"
+        "attribute with escaped square brackets",
     ],
     [
         "[xml\\:test]",
@@ -331,11 +331,11 @@ export const tests: [string, Selector[][], string][] = [
                     name: "xml:test",
                     action: "exists",
                     value: "",
-                    ignoreCase: false
-                }
-            ]
+                    ignoreCase: false,
+                },
+            ],
         ],
-        "escaped attribute"
+        "escaped attribute",
     ],
     [
         "[name='foo ~ < > , bar' i]",
@@ -346,11 +346,11 @@ export const tests: [string, Selector[][], string][] = [
                     name: "name",
                     action: "equals",
                     value: "foo ~ < > , bar",
-                    ignoreCase: true
-                }
-            ]
+                    ignoreCase: true,
+                },
+            ],
         ],
-        "attribute with previously normalized characters"
+        "attribute with previously normalized characters",
     ],
 
     //pseudo selectors
@@ -361,11 +361,11 @@ export const tests: [string, Selector[][], string][] = [
                 {
                     type: "pseudo",
                     name: "foo",
-                    data: null
-                }
-            ]
+                    data: null,
+                },
+            ],
         ],
-        "pseudo selector without any data"
+        "pseudo selector without any data",
     ],
     [
         ":bar(baz)",
@@ -374,11 +374,11 @@ export const tests: [string, Selector[][], string][] = [
                 {
                     type: "pseudo",
                     name: "bar",
-                    data: "baz"
-                }
-            ]
+                    data: "baz",
+                },
+            ],
         ],
-        "pseudo selector with data"
+        "pseudo selector with data",
     ],
     [
         ':contains("(foo)")',
@@ -387,11 +387,11 @@ export const tests: [string, Selector[][], string][] = [
                 {
                     type: "pseudo",
                     name: "contains",
-                    data: "(foo)"
-                }
-            ]
+                    data: "(foo)",
+                },
+            ],
         ],
-        "pseudo selector with data"
+        "pseudo selector with data",
     ],
     [
         ":icontains('')",
@@ -400,11 +400,11 @@ export const tests: [string, Selector[][], string][] = [
                 {
                     type: "pseudo",
                     name: "icontains",
-                    data: ""
-                }
-            ]
+                    data: "",
+                },
+            ],
         ],
-        "pseudo selector with quote-stripped data"
+        "pseudo selector with quote-stripped data",
     ],
     [
         ':contains("(foo)")',
@@ -413,11 +413,11 @@ export const tests: [string, Selector[][], string][] = [
                 {
                     type: "pseudo",
                     name: "contains",
-                    data: "(foo)"
-                }
-            ]
+                    data: "(foo)",
+                },
+            ],
         ],
-        "pseudo selector with data"
+        "pseudo selector with data",
     ],
 
     //multiple selectors
@@ -427,16 +427,16 @@ export const tests: [string, Selector[][], string][] = [
             [
                 {
                     type: "tag",
-                    name: "a"
-                }
+                    name: "a",
+                },
             ],
             [
                 {
                     type: "tag",
-                    name: "b"
-                }
-            ]
+                    name: "b",
+                },
+            ],
         ],
-        "multiple selectors"
-    ]
+        "multiple selectors",
+    ],
 ];

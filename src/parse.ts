@@ -80,19 +80,19 @@ const actionTypes: { [key: string]: AttributeAction } = {
     $: "end",
     "*": "any",
     "!": "not",
-    "|": "hyphen"
+    "|": "hyphen",
 };
 
 const Traversals: { [key: string]: TraversalType } = {
     ">": "child",
     "<": "parent",
     "~": "sibling",
-    "+": "adjacent"
+    "+": "adjacent",
 };
 
 const attribSelectors: { [key: string]: [string, AttributeAction] } = {
     "#": ["id", "equals"],
-    ".": ["class", "element"]
+    ".": ["class", "element"],
 };
 
 //pseudos, whose data-property is parsed as well
@@ -141,8 +141,8 @@ function parseSelector(
     selector: string,
     options?: Options
 ): string {
-    let tokens: Selector[] = [],
-        sawWS = false;
+    let tokens: Selector[] = [];
+    let sawWS = false;
 
     function getName(): string {
         const match = selector.match(reName);
@@ -208,7 +208,7 @@ function parseSelector(
                     name,
                     action,
                     value: getName(),
-                    ignoreCase: false
+                    ignoreCase: false,
                 });
             } else if (firstChar === "[") {
                 selector = selector.substr(1);
@@ -235,14 +235,14 @@ function parseSelector(
                     name: name,
                     action: actionTypes[data[2]],
                     value: unescapeCSS(data[4] || data[5] || ""),
-                    ignoreCase: !!data[6]
+                    ignoreCase: !!data[6],
                 });
             } else if (firstChar === ":") {
                 if (selector.charAt(1) === ":") {
                     selector = selector.substr(2);
                     tokens.push({
                         type: "pseudo-element",
-                        name: getName().toLowerCase()
+                        name: getName().toLowerCase(),
                     });
                     continue;
                 }
