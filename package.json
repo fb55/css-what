@@ -22,7 +22,7 @@
     "dependencies": {},
     "devDependencies": {
         "@types/jest": "^25.1.4",
-        "@types/node": "^13.9.1",
+        "@types/node": "^14.0.5",
         "@typescript-eslint/eslint-plugin": "^2.31.0",
         "@typescript-eslint/parser": "^2.31.0",
         "coveralls": "^3.0.5",
@@ -30,7 +30,7 @@
         "eslint-config-prettier": "^6.0.0",
         "jest": "^26.0.1",
         "prettier": "^2.0.5",
-        "ts-jest": "^25.3.1",
+        "ts-jest": "^26.0.0",
         "typescript": "^3.5.3"
     },
     "optionalDependencies": {},
