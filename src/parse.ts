@@ -68,7 +68,7 @@ export type TraversalType =
     | "sibling";
 
 const reName = /^[^\\]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\-\u00b0-\uFFFF])+/;
-const reEscape = /\\([\da-f]{1,6}\s?|.)/gi;
+const reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi;
 //modified version of https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L87
 const reAttr = /^\s*((?:\\.|[\w\u00b0-\uFFFF-])+)\s*(?:(\S?)=\s*(?:(['"])([^]*?)\3|(#?(?:\\.|[\w\u00b0-\uFFFF-])*)|)|)\s*(i)?\]/;
 
