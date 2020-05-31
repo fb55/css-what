@@ -67,10 +67,10 @@ export type TraversalType =
     | "parent"
     | "sibling";
 
-const reName = /^(?:\\([\da-f]{1,6}\s?|(\s)|.)|[\w\-\u00b0-\uFFFF])+/,
-    reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi,
-    //modified version of https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L87
-    reAttr = /^\s*((?:\\.|[\w\u00b0-\uFFFF-])+)\s*(?:(\S?)=\s*(?:(['"])([^]*?)\3|(#?(?:\\.|[\w\u00b0-\uFFFF-])*)|)|)\s*(i)?\]/;
+const reName = /^[^\\]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\-\u00b0-\uFFFF])+/;
+const reEscape = /\\([\da-f]{1,6}\s?|.)/gi;
+//modified version of https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L87
+const reAttr = /^\s*((?:\\.|[\w\u00b0-\uFFFF-])+)\s*(?:(\S?)=\s*(?:(['"])([^]*?)\3|(#?(?:\\.|[\w\u00b0-\uFFFF-])*)|)|)\s*(i)?\]/;
 
 const actionTypes: { [key: string]: AttributeAction } = {
     undefined: "exists",
@@ -127,7 +127,7 @@ function isWhitespace(c: string) {
 function parse(selector: string, options?: Options): Selector[][] {
     const subselects: Selector[][] = [];
 
-    selector = parseSelector(subselects, selector + "", options);
+    selector = parseSelector(subselects, `${selector}`, options);
 
     if (selector !== "") {
         throw new Error(`Unmatched selector: ${selector}`);
@@ -232,7 +232,7 @@ function parseSelector(
 
                 tokens.push({
                     type: "attribute",
-                    name: name,
+                    name,
                     action: actionTypes[data[2]],
                     value: unescapeCSS(data[4] || data[5] || ""),
                     ignoreCase: !!data[6],
@@ -278,8 +278,8 @@ function parseSelector(
 
                         selector = selector.substr(1);
                     } else {
-                        let pos = 1,
-                            counter = 1;
+                        let pos = 1;
+                        let counter = 1;
 
                         for (; counter > 0 && pos < selector.length; pos++) {
                             if (selector.charAt(pos) === "(" && !isEscaped(pos))
@@ -310,7 +310,7 @@ function parseSelector(
                     }
                 }
 
-                tokens.push({ type: "pseudo", name: name, data: data });
+                tokens.push({ type: "pseudo", name, data });
             } else if (reName.test(selector)) {
                 let name = getName();
 
@@ -323,7 +323,7 @@ function parseSelector(
                     name = name.toLowerCase();
                 }
 
-                tokens.push({ type: "tag", name: name });
+                tokens.push({ type: "tag", name });
             } else {
                 if (
                     tokens.length &&

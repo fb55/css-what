@@ -353,6 +353,23 @@ export const tests: [string, Selector[][], string][] = [
         "attribute with previously normalized characters",
     ],
 
+    // ID starting with a dot
+    [
+        "#.identifier",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "id",
+                    value: ".identifier",
+                    ignoreCase: false,
+                },
+            ],
+        ],
+        "ID starting with a dot",
+    ],
+
     //pseudo selectors
     [
         ":foo",
