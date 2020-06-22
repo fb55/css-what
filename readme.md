@@ -2,7 +2,7 @@
 
 a CSS selector parser
 
-## Example
+## Node Example
 
 ```js
 const CSSwhat = require("css-what")
@@ -22,6 +22,14 @@ CSSwhat.parse("foo[bar]:baz")
     ]
 ]
 ```
+## Deno Example
+
+```js
+import { parse } from 'https://raw.githubusercontent.com/fb55/css-what/master/src/index.ts';
+
+parse("foo[bar]:baz");
+```
+
 
 ## API
 

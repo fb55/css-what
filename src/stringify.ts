@@ -1,4 +1,5 @@
-import { Selector } from "./parse";
+// @ts-ignore
+import { Selector } from "./parse.ts";
 
 const actionTypes: { [key: string]: string } = {
     equals: "",
