@@ -139,7 +139,7 @@ function parse(selector: string, options?: Options): Selector[][] {
 function parseSelector(
     subselects: Selector[][],
     selector: string,
-    options?: Options
+    options: Options = {}
 ): string {
     let tokens: Selector[] = [];
     let sawWS = false;
@@ -212,30 +212,36 @@ function parseSelector(
                 });
             } else if (firstChar === "[") {
                 selector = selector.substr(1);
-                const data = selector.match(reAttr);
-                if (!data) {
+                const attributeMatch = selector.match(reAttr);
+                if (!attributeMatch) {
                     throw new Error(
                         `Malformed attribute selector: ${selector}`
                     );
                 }
-                selector = selector.substr(data[0].length);
-                let name = unescapeCSS(data[1]);
 
-                if (
-                    !options ||
-                    ("lowerCaseAttributeNames" in options
-                        ? options.lowerCaseAttributeNames
-                        : !options.xmlMode)
-                ) {
+                const [
+                    completeSelector,
+                    baseName,
+                    actionType,
+                    ,
+                    quotedValue = "",
+                    value = quotedValue,
+                    ignoreCase,
+                ] = attributeMatch;
+
+                selector = selector.substr(completeSelector.length);
+                let name = unescapeCSS(baseName);
+
+                if (options.lowerCaseAttributeNames ?? !options.xmlMode) {
                     name = name.toLowerCase();
                 }
 
                 tokens.push({
                     type: "attribute",
                     name,
-                    action: actionTypes[data[2]],
-                    value: unescapeCSS(data[4] || data[5] || ""),
-                    ignoreCase: !!data[6],
+                    action: actionTypes[actionType],
+                    value: unescapeCSS(value),
+                    ignoreCase: !!ignoreCase,
                 });
             } else if (firstChar === ":") {
                 if (selector.charAt(1) === ":") {
@@ -318,12 +324,7 @@ function parseSelector(
             } else if (reName.test(selector)) {
                 let name = getName();
 
-                if (
-                    !options ||
-                    ("lowerCaseTags" in options
-                        ? options.lowerCaseTags
-                        : !options.xmlMode)
-                ) {
+                if (options.lowerCaseTags ?? !options.xmlMode) {
                     name = name.toLowerCase();
                 }
 
