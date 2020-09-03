@@ -69,13 +69,10 @@ function stringifyToken(token: Selector): string {
             return `[${escapeName(token.name)}${
                 actionTypes[token.action]
             }='${escapeName(token.value)}'${token.ignoreCase ? "i" : ""}]`;
-
-        default:
-            throw new Error("Unknown type");
     }
 }
 
 function escapeName(str: string): string {
-    //TODO
+    // TODO
     return str;
 }

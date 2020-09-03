@@ -69,7 +69,7 @@ export type TraversalType =
 
 const reName = /^[^\\]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\-\u00b0-\uFFFF])+/;
 const reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi;
-//modified version of https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L87
+// Modified version of https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L87
 const reAttr = /^\s*((?:\\.|[\w\u00b0-\uFFFF-])+)\s*(?:(\S?)=\s*(?:(['"])([^]*?)\3|(#?(?:\\.|[\w\u00b0-\uFFFF-])*)|)|)\s*(i)?\]/;
 
 const actionTypes: { [key: string]: AttributeAction } = {
@@ -95,14 +95,14 @@ const attribSelectors: { [key: string]: [string, AttributeAction] } = {
     ".": ["class", "element"],
 };
 
-//pseudos, whose data-property is parsed as well
-const unpackPseudos = new Set(["has", "not", "matches"]);
+// Pseudos, whose data property is parsed as well.
+const unpackPseudos = new Set(["has", "not", "matches", "is"]);
 
 const stripQuotesFromPseudos = new Set(["contains", "icontains"]);
 
 const quotes = new Set(['"', "'"]);
 
-//unescape function taken from https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L152
+// Unescape function taken from https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L152
 function funescape(_: string, escaped: string, escapedWhitespace?: string) {
     const high = parseInt(escaped, 16) - 0x10000;
 
@@ -252,7 +252,7 @@ function parseSelector(
                 const name = getName().toLowerCase();
                 let data: DataType = null;
 
-                if (selector.charAt(0) === "(") {
+                if (selector.startsWith("(")) {
                     if (unpackPseudos.has(name)) {
                         const quot = selector.charAt(1);
                         const quoted = quotes.has(quot);
@@ -263,14 +263,14 @@ function parseSelector(
                         selector = parseSelector(data, selector, options);
 
                         if (quoted) {
-                            if (selector.charAt(0) !== quot) {
+                            if (!selector.startsWith(quot)) {
                                 throw new Error(`Unmatched quotes in :${name}`);
                             } else {
                                 selector = selector.substr(1);
                             }
                         }
 
-                        if (selector.charAt(0) !== ")") {
+                        if (!selector.startsWith(")")) {
                             throw new Error(
                                 `Missing closing parenthesis in :${name} (${selector})`
                             );
@@ -282,13 +282,17 @@ function parseSelector(
                         let counter = 1;
 
                         for (; counter > 0 && pos < selector.length; pos++) {
-                            if (selector.charAt(pos) === "(" && !isEscaped(pos))
+                            if (
+                                selector.charAt(pos) === "(" &&
+                                !isEscaped(pos)
+                            ) {
                                 counter++;
-                            else if (
+                            } else if (
                                 selector.charAt(pos) === ")" &&
                                 !isEscaped(pos)
-                            )
+                            ) {
                                 counter--;
+                            }
                         }
 
                         if (counter) {

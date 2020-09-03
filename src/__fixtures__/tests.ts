@@ -1,7 +1,7 @@
 import { Selector } from "..";
 
 export const tests: [string, Selector[][], string][] = [
-    //tag names
+    // Tag names
     [
         "div",
         [
@@ -26,7 +26,7 @@ export const tests: [string, Selector[][], string][] = [
         "universal",
     ],
 
-    //traversal
+    // Traversal
     [
         "div div",
         [
@@ -123,7 +123,7 @@ export const tests: [string, Selector[][], string][] = [
         "parent",
     ],
 
-    //Escaped whitespace
+    // Escaped whitespace
     [
         "#\\  > a ",
         [
@@ -216,7 +216,7 @@ export const tests: [string, Selector[][], string][] = [
         "id selector with escape sequence",
     ],
 
-    //attributes
+    // Attributes
     [
         '[name^="foo["]',
         [
@@ -370,7 +370,7 @@ export const tests: [string, Selector[][], string][] = [
         "ID starting with a dot",
     ],
 
-    //pseudo selectors
+    // Pseudo selectors
     [
         ":foo",
         [
@@ -437,7 +437,7 @@ export const tests: [string, Selector[][], string][] = [
         "pseudo selector with data",
     ],
 
-    //multiple selectors
+    // Multiple selectors
     [
         "a , b",
         [
