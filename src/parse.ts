@@ -96,7 +96,7 @@ const attribSelectors: { [key: string]: [string, AttributeAction] } = {
 };
 
 // Pseudos, whose data property is parsed as well.
-const unpackPseudos = new Set(["has", "not", "matches", "is"]);
+const unpackPseudos = new Set(["has", "not", "matches", "is", "host", "host-context"]);
 
 const stripQuotesFromPseudos = new Set(["contains", "icontains"]);
 
