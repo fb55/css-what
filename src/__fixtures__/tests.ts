@@ -456,4 +456,31 @@ export const tests: [string, Selector[][], string][] = [
         ],
         "multiple selectors",
     ],
+
+    [
+        ':host(h1, p)',
+        [
+            [
+                {
+                    type: "pseudo",
+                    name: "host",
+                    data: [
+                        [
+                            {
+                                "type":"tag",
+                                "name":"h1"
+                            }
+                        ],
+                        [
+                            {
+                                "type":"tag",
+                                "name":"p"
+                            }
+                        ]
+                    ]
+                },
+            ],
+        ],
+        "pseudo selector with data",
+    ]
 ];
