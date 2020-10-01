@@ -458,7 +458,7 @@ export const tests: [string, Selector[][], string][] = [
     ],
 
     [
-        ':host(h1, p)',
+        ":host(h1, p)",
         [
             [
                 {
@@ -467,20 +467,20 @@ export const tests: [string, Selector[][], string][] = [
                     data: [
                         [
                             {
-                                "type":"tag",
-                                "name":"h1"
-                            }
+                                type: "tag",
+                                name: "h1",
+                            },
                         ],
                         [
                             {
-                                "type":"tag",
-                                "name":"p"
-                            }
-                        ]
-                    ]
+                                type: "tag",
+                                name: "p",
+                            },
+                        ],
+                    ],
                 },
             ],
         ],
         "pseudo selector with data",
-    ]
+    ],
 ];
