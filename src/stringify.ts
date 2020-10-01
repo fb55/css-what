@@ -16,6 +16,7 @@ const charsToEscape = new Set([
     "[",
     "]",
     " ",
+    "\\",
 ]);
 
 export default function stringify(token: Selector[][]): string {

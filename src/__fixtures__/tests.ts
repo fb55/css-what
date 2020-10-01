@@ -483,4 +483,219 @@ export const tests: [string, Selector[][], string][] = [
         ],
         "pseudo selector with data",
     ],
+
+    /*
+     * Bad attributes (taken from Sizzle)
+     * https://github.com/jquery/sizzle/blob/af163873d7cdfc57f18b16c04b1915209533f0b1/test/unit/selector.js#L602-L651
+     */
+    [
+        "[id=types_all]",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "id",
+                    value: "types_all",
+                    ignoreCase: false,
+                },
+            ],
+        ],
+        "Underscores don't need escaping",
+    ],
+    [
+        "[name=foo\\ bar]",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "name",
+                    value: "foo bar",
+                    ignoreCase: false,
+                },
+            ],
+        ],
+        "Escaped space",
+    ],
+    [
+        "[name=foo\\.baz]",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "name",
+                    value: "foo.baz",
+                    ignoreCase: false,
+                },
+            ],
+        ],
+        "Escaped dot",
+    ],
+    [
+        "[name=foo\\[baz\\]]",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "name",
+                    value: "foo[baz]",
+                    ignoreCase: false,
+                },
+            ],
+        ],
+        "Escaped brackets",
+    ],
+    [
+        "[data-attr='foo_baz\\']']",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "data-attr",
+                    value: "foo_baz']",
+                    ignoreCase: false,
+                },
+            ],
+        ],
+        "Escaped quote + right bracket",
+    ],
+    [
+        "[data-attr='\\'']",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "data-attr",
+                    value: "'",
+                    ignoreCase: false,
+                },
+            ],
+        ],
+        "Quoted quote",
+    ],
+    [
+        "[data-attr='\\\\']",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "data-attr",
+                    value: "\\",
+                    ignoreCase: false,
+                },
+            ],
+        ],
+        "Quoted backslash",
+    ],
+    [
+        "[data-attr='\\\\\\'']",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "data-attr",
+                    value: "\\'",
+                    ignoreCase: false,
+                },
+            ],
+        ],
+        "Quoted backslash quote",
+    ],
+    [
+        "[data-attr='\\\\\\\\']",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "data-attr",
+                    value: "\\\\",
+                    ignoreCase: false,
+                },
+            ],
+        ],
+        "Quoted backslash backslash",
+    ],
+    [
+        "[data-attr='\\5C\\\\']",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "data-attr",
+                    value: "\\\\",
+                    ignoreCase: false,
+                },
+            ],
+        ],
+        "Quoted backslash backslash (numeric escape)",
+    ],
+    [
+        "[data-attr='\\5C \\\\']",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "data-attr",
+                    value: "\\\\",
+                    ignoreCase: false,
+                },
+            ],
+        ],
+        "Quoted backslash backslash (numeric escape with trailing space)",
+    ],
+    [
+        "[data-attr='\\5C\t\\\\']",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "data-attr",
+                    value: "\\\\",
+                    ignoreCase: false,
+                },
+            ],
+        ],
+        "Quoted backslash backslash (numeric escape with trailing tab)",
+    ],
+    [
+        "[data-attr='\\04e00']",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "data-attr",
+                    value: "\u4e00",
+                    ignoreCase: false,
+                },
+            ],
+        ],
+        "Long numeric escape (BMP)",
+    ],
+    [
+        "[data-attr='\\01D306A']",
+        [
+            [
+                {
+                    type: "attribute",
+                    action: "equals",
+                    name: "data-attr",
+                    value: "\uD834\uDF06A",
+                    ignoreCase: false,
+                },
+            ],
+        ],
+        "Long numeric escape (non-BMP)",
+    ],
 ];
