@@ -10,6 +10,14 @@ const actionTypes: { [key: string]: string } = {
     hyphen: "|",
 };
 
+const charsToEscape = new Set([
+    ...Object.values(actionTypes).filter(Boolean),
+    ":",
+    "[",
+    "]",
+    " ",
+]);
+
 export default function stringify(token: Selector[][]): string {
     return token.map(stringifySubselector).join(", ");
 }
@@ -73,6 +81,8 @@ function stringifyToken(token: Selector): string {
 }
 
 function escapeName(str: string): string {
-    // TODO
-    return str;
+    return str
+        .split("")
+        .map((c) => (charsToEscape.has(c) ? `\\${c}` : c))
+        .join("");
 }
