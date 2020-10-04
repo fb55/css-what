@@ -11,7 +11,9 @@ const actionTypes: { [key: string]: string } = {
 };
 
 const charsToEscape = new Set([
-    ...Object.values(actionTypes).filter(Boolean),
+    ...Object.keys(actionTypes)
+        .map((typeKey) => actionTypes[typeKey])
+        .filter(Boolean),
     ":",
     "[",
     "]",
