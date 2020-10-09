@@ -21,8 +21,13 @@ const charsToEscape = new Set([
     "\\",
 ]);
 
-export default function stringify(token: Selector[][]): string {
-    return token.map(stringifySubselector).join(", ");
+/**
+ * Turns `selector` back into a string.
+ *
+ * @param selector Selector to stringify.
+ */
+export default function stringify(selector: Selector[][]): string {
+    return selector.map(stringifySubselector).join(", ");
 }
 
 function stringifySubselector(token: Selector[]): string {

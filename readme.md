@@ -25,11 +25,11 @@ CSSwhat.parse("foo[bar]:baz")
 
 ## API
 
-**`CSSwhat.parse(str, options)` - Parses `str`, optionally with the passed `options`.**
+**`CSSwhat.parse(selector, options)` - Parses `selector`, optionally with the passed `options`.**
 
 The function returns a two-dimensional array. The first array represents selectors separated by commas (eg. `sub1, sub2`), the second contains the relevant tokens for that selector. Possible token types are:
 
-| name             | attributes                              | example       | output                                                                                   |
+| name             | properties                              | example       | output                                                                                   |
 | ---------------- | --------------------------------------- | ------------- | ---------------------------------------------------------------------------------------- |
 | `tag`            | `name`                                  | `div`         | `{ type: 'tag', name: 'div' }`                                                           |
 | `universal`      | -                                       | `*`           | `{ type: 'universal' }`                                                                  |

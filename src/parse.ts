@@ -1,10 +1,18 @@
-"use strict";
-
-export default parse;
-
 export interface Options {
+    /**
+     * When false, tag names will not be lowercased.
+     * @default true
+     */
     lowerCaseAttributeNames?: boolean;
+    /**
+     * When false, attribute names will not be lowercased.
+     * @default true
+     */
     lowerCaseTags?: boolean;
+    /**
+     * When `true`, `xmlMode` implies both `lowerCaseTags` and `lowerCaseAttributeNames` are set to `false`.
+     * @default false
+     */
     xmlMode?: boolean;
 }
 
@@ -131,7 +139,19 @@ function isWhitespace(c: string) {
     return c === " " || c === "\n" || c === "\t" || c === "\f" || c === "\r";
 }
 
-function parse(selector: string, options?: Options): Selector[][] {
+/**
+ * Parses `selector`, optionally with the passed `options`.
+ *
+ * @param selector Selector to parse.
+ * @param options Options for parsing.
+ * @returns Returns a two-dimensional array.
+ * The first dimension represents selectors separated by commas (eg. `sub1, sub2`),
+ * the second contains the relevant tokens for that selector.
+ */
+export default function parse(
+    selector: string,
+    options?: Options
+): Selector[][] {
     const subselects: Selector[][] = [];
 
     selector = parseSelector(subselects, `${selector}`, options);
