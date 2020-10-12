@@ -113,6 +113,22 @@ const unpackPseudos = new Set([
     "host-context",
 ]);
 
+const traversalNames = new Set<TraversalType>([
+    "descendant",
+    ...Object.keys(Traversals).map((k) => Traversals[k]),
+]);
+
+/**
+ * Checks whether a specific selector is a traversal.
+ * This is useful eg. in swapping the order of elements that
+ * are not traversals.
+ *
+ * @param selector Selector to check.
+ */
+export function isTraversal(selector: Selector): selector is Traversal {
+    return traversalNames.has(selector.type as TraversalType);
+}
+
 const stripQuotesFromPseudos = new Set(["contains", "icontains"]);
 
 const quotes = new Set(['"', "'"]);
