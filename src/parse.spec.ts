@@ -3,8 +3,10 @@ import { parse } from ".";
 import { tests } from "./__fixtures__/tests";
 
 describe("parse own tests", () => {
-    for (const [selector, expected, message] of tests) {
-        test(message, () => expect(parse(selector)).toStrictEqual(expected));
+    for (const [selector, expected, message, options] of tests) {
+        test(message, () =>
+            expect(parse(selector, options)).toStrictEqual(expected)
+        );
     }
 });
 
@@ -33,6 +35,9 @@ const broken = [
     "input[name=foo.baz]",
     "input[name=foo[baz]]",
     ':has("p")',
+    ":has(p",
+    ":foo(p()",
+    "#",
 ];
 
 describe("Broken selectors", () => {

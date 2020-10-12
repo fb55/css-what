@@ -19,6 +19,8 @@ const charsToEscape = new Set([
     "]",
     " ",
     "\\",
+    "(",
+    ")",
 ]);
 
 /**
@@ -59,7 +61,7 @@ function stringifyToken(token: Selector): string {
         case "pseudo":
             if (token.data === null) return `:${escapeName(token.name)}`;
             if (typeof token.data === "string") {
-                return `:${escapeName(token.name)}(${token.data})`;
+                return `:${escapeName(token.name)}(${escapeName(token.data)})`;
             }
             return `:${escapeName(token.name)}(${stringify(token.data)})`;
 

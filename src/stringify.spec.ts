@@ -4,9 +4,11 @@ import { tests } from "./__fixtures__/tests";
 
 describe("Stringify & re-parse", () => {
     describe("Own tests", () => {
-        for (const [selector, expected, message] of tests) {
+        for (const [selector, expected, message, options] of tests) {
             test(`${message} (${selector})`, () => {
-                expect(parse(stringify(expected))).toStrictEqual(expected);
+                expect(parse(stringify(expected), options)).toStrictEqual(
+                    expected
+                );
             });
         }
     });

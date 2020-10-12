@@ -1,6 +1,11 @@
-import { Selector } from "..";
+import { Selector, Options } from "..";
 
-export const tests: [string, Selector[][], string][] = [
+export const tests: [
+    selector: string,
+    expected: Selector[][],
+    message: string,
+    options?: Options
+][] = [
     // Tag names
     [
         "div",
@@ -370,6 +375,20 @@ export const tests: [string, Selector[][], string][] = [
         "ID starting with a dot",
     ],
 
+    // Pseudo elements
+    [
+        "::foo",
+        [
+            [
+                {
+                    type: "pseudo-element",
+                    name: "foo",
+                },
+            ],
+        ],
+        "pseudo-element",
+    ],
+
     // Pseudo selectors
     [
         ":foo",
@@ -409,6 +428,19 @@ export const tests: [string, Selector[][], string][] = [
             ],
         ],
         "pseudo selector with data",
+    ],
+    [
+        ':contains("(a((foo\\\\\\))))")',
+        [
+            [
+                {
+                    type: "pseudo",
+                    name: "contains",
+                    data: "(a((foo\\))))",
+                },
+            ],
+        ],
+        "pseudo selector with escaped data",
     ],
     [
         ":icontains('')",
@@ -697,5 +729,67 @@ export const tests: [string, Selector[][], string][] = [
             ],
         ],
         "Long numeric escape (non-BMP)",
+    ],
+
+    // Options
+    [
+        "fOo[baR]",
+        [
+            [
+                {
+                    name: "fOo",
+                    type: "tag",
+                },
+                {
+                    action: "exists",
+                    ignoreCase: false,
+                    name: "baR",
+                    type: "attribute",
+                    value: "",
+                },
+            ],
+        ],
+        "XML mode",
+        { xmlMode: true },
+    ],
+    [
+        "fOo[baR]",
+        [
+            [
+                {
+                    name: "foo",
+                    type: "tag",
+                },
+                {
+                    action: "exists",
+                    ignoreCase: false,
+                    name: "baR",
+                    type: "attribute",
+                    value: "",
+                },
+            ],
+        ],
+        "`lowerCaseAttributeNames` option",
+        { lowerCaseAttributeNames: false },
+    ],
+    [
+        "fOo[baR]",
+        [
+            [
+                {
+                    name: "fOo",
+                    type: "tag",
+                },
+                {
+                    action: "exists",
+                    ignoreCase: false,
+                    name: "bar",
+                    type: "attribute",
+                    value: "",
+                },
+            ],
+        ],
+        "`lowerCaseTags` option",
+        { lowerCaseTags: false },
     ],
 ];

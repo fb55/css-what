@@ -241,10 +241,8 @@ function parseSelector(
             stripWhitespace(1);
         } else {
             if (sawWS) {
-                if (tokens.length > 0) {
-                    ensureNotTraversal();
-                    tokens.push({ type: "descendant" });
-                }
+                ensureNotTraversal();
+                tokens.push({ type: "descendant" });
                 sawWS = false;
             }
 
