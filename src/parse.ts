@@ -170,9 +170,9 @@ export default function parse(
 ): Selector[][] {
     const subselects: Selector[][] = [];
 
-    selector = parseSelector(subselects, `${selector}`, options);
+    const endIndex = parseSelector(subselects, `${selector}`, options, 0);
 
-    if (selector !== "") {
+    if (endIndex < selector.length) {
         throw new Error(`Unmatched selector: ${selector}`);
     }
 
@@ -182,26 +182,29 @@ export default function parse(
 function parseSelector(
     subselects: Selector[][],
     selector: string,
-    options: Options = {}
-): string {
+    options: Options = {},
+    selectorIndex: number
+): number {
     let tokens: Selector[] = [];
     let sawWS = false;
 
-    function getName(): string {
-        const match = selector.match(reName);
+    function getName(offset: number): string {
+        const match = selector.slice(selectorIndex + offset).match(reName);
 
         if (!match) {
-            throw new Error(`Expected name, found ${selector}`);
+            throw new Error(
+                `Expected name, found ${selector.slice(selectorIndex)}`
+            );
         }
 
-        const [sub] = match;
-        selector = selector.substr(sub.length);
-        return unescapeCSS(sub);
+        const [name] = match;
+        selectorIndex += offset + name.length;
+        return unescapeCSS(name);
     }
 
-    function stripWhitespace(start: number) {
-        while (isWhitespace(selector.charAt(start))) start++;
-        selector = selector.substr(start);
+    function stripWhitespace(offset: number) {
+        while (isWhitespace(selector.charAt(selectorIndex + offset))) offset++;
+        selectorIndex += offset;
     }
 
     function isEscaped(pos: number): boolean {
@@ -220,7 +223,7 @@ function parseSelector(
     stripWhitespace(0);
 
     while (selector !== "") {
-        const firstChar = selector.charAt(0);
+        const firstChar = selector.charAt(selectorIndex);
 
         if (isWhitespace(firstChar)) {
             sawWS = true;
@@ -247,21 +250,22 @@ function parseSelector(
             }
 
             if (firstChar === "*") {
-                selector = selector.substr(1);
+                selectorIndex += 1;
                 tokens.push({ type: "universal" });
             } else if (firstChar in attribSelectors) {
                 const [name, action] = attribSelectors[firstChar];
-                selector = selector.substr(1);
                 tokens.push({
                     type: "attribute",
                     name,
                     action,
-                    value: getName(),
+                    value: getName(1),
                     ignoreCase: false,
                 });
             } else if (firstChar === "[") {
-                selector = selector.substr(1);
-                const attributeMatch = selector.match(reAttr);
+                const attributeMatch = selector
+                    .slice(selectorIndex + 1)
+                    .match(reAttr);
+
                 if (!attributeMatch) {
                     throw new Error(
                         `Malformed attribute selector: ${selector}`
@@ -278,7 +282,7 @@ function parseSelector(
                     ignoreCase,
                 ] = attributeMatch;
 
-                selector = selector.substr(completeSelector.length);
+                selectorIndex += completeSelector.length + 1;
                 let name = unescapeCSS(baseName);
 
                 if (options.lowerCaseAttributeNames ?? !options.xmlMode) {
@@ -293,53 +297,58 @@ function parseSelector(
                     ignoreCase: !!ignoreCase,
                 });
             } else if (firstChar === ":") {
-                if (selector.charAt(1) === ":") {
-                    selector = selector.substr(2);
+                if (selector.charAt(selectorIndex + 1) === ":") {
                     tokens.push({
                         type: "pseudo-element",
-                        name: getName().toLowerCase(),
+                        name: getName(2).toLowerCase(),
                     });
                     continue;
                 }
 
-                selector = selector.substr(1);
-
-                const name = getName().toLowerCase();
+                const name = getName(1).toLowerCase();
                 let data: DataType = null;
 
-                if (selector.startsWith("(")) {
+                if (selector.charAt(selectorIndex) === "(") {
                     if (unpackPseudos.has(name)) {
-                        if (quotes.has(selector.charAt(1))) {
+                        if (quotes.has(selector.charAt(selectorIndex + 1))) {
                             throw new Error(
                                 `Pseudo-selector ${name} cannot be quoted`
                             );
                         }
 
-                        selector = selector.substr(1);
-
                         data = [];
-                        selector = parseSelector(data, selector, options);
+                        selectorIndex = parseSelector(
+                            data,
+                            selector,
+                            options,
+                            selectorIndex + 1
+                        );
 
-                        if (!selector.startsWith(")")) {
+                        if (selector.charAt(selectorIndex) !== ")") {
                             throw new Error(
                                 `Missing closing parenthesis in :${name} (${selector})`
                             );
                         }
 
-                        selector = selector.substr(1);
+                        selectorIndex += 1;
                     } else {
-                        let pos = 1;
+                        selectorIndex += 1;
+                        const start = selectorIndex;
                         let counter = 1;
 
-                        for (; counter > 0 && pos < selector.length; pos++) {
+                        for (
+                            ;
+                            counter > 0 && selectorIndex < selector.length;
+                            selectorIndex++
+                        ) {
                             if (
-                                selector.charAt(pos) === "(" &&
-                                !isEscaped(pos)
+                                selector.charAt(selectorIndex) === "(" &&
+                                !isEscaped(selectorIndex)
                             ) {
                                 counter++;
                             } else if (
-                                selector.charAt(pos) === ")" &&
-                                !isEscaped(pos)
+                                selector.charAt(selectorIndex) === ")" &&
+                                !isEscaped(selectorIndex)
                             ) {
                                 counter--;
                             }
@@ -349,8 +358,7 @@ function parseSelector(
                             throw new Error("Parenthesis not matched");
                         }
 
-                        data = selector.substr(1, pos - 2);
-                        selector = selector.substr(pos);
+                        data = selector.slice(start, selectorIndex - 1);
 
                         if (stripQuotesFromPseudos.has(name)) {
                             const quot = data.charAt(0);
@@ -365,8 +373,8 @@ function parseSelector(
                 }
 
                 tokens.push({ type: "pseudo", name, data });
-            } else if (reName.test(selector)) {
-                let name = getName();
+            } else if (reName.test(selector.slice(selectorIndex))) {
+                let name = getName(0);
 
                 if (options.lowerCaseTags ?? !options.xmlMode) {
                     name = name.toLowerCase();
@@ -381,14 +389,14 @@ function parseSelector(
                     tokens.pop();
                 }
                 addToken(subselects, tokens);
-                return selector;
+                return selectorIndex;
             }
         }
     }
 
     addToken(subselects, tokens);
 
-    return selector;
+    return selectorIndex;
 }
 
 function addToken(subselects: Selector[][], tokens: Selector[]) {
