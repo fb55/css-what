@@ -311,21 +311,16 @@ function parseSelector(
 
                 if (selector.startsWith("(")) {
                     if (unpackPseudos.has(name)) {
-                        const quot = selector.charAt(1);
-                        const quoted = quotes.has(quot);
+                        if (quotes.has(selector.charAt(1))) {
+                            throw new Error(
+                                `Pseudo-selector ${name} cannot be quoted`
+                            );
+                        }
 
-                        selector = selector.substr(quoted ? 2 : 1);
+                        selector = selector.substr(1);
 
                         data = [];
                         selector = parseSelector(data, selector, options);
-
-                        if (quoted) {
-                            if (!selector.startsWith(quot)) {
-                                throw new Error(`Unmatched quotes in :${name}`);
-                            } else {
-                                selector = selector.substr(1);
-                            }
-                        }
 
                         if (!selector.startsWith(")")) {
                             throw new Error(

@@ -32,6 +32,7 @@ const broken = [
     "[id=012345678901234567890123456789",
     "input[name=foo.baz]",
     "input[name=foo[baz]]",
+    ':has("p")',
 ];
 
 describe("Broken selectors", () => {
