@@ -211,6 +211,12 @@ function parseSelector(
         return (slashCount & 1) === 1;
     }
 
+    function ensureNotTraversal() {
+        if (tokens.length > 0 && isTraversal(tokens[tokens.length - 1])) {
+            throw new Error("Did not expect successive traversals.");
+        }
+    }
+
     stripWhitespace(0);
 
     while (selector !== "") {
@@ -220,6 +226,7 @@ function parseSelector(
             sawWS = true;
             stripWhitespace(1);
         } else if (firstChar in Traversals) {
+            ensureNotTraversal();
             tokens.push({ type: Traversals[firstChar] });
             sawWS = false;
 
@@ -235,6 +242,7 @@ function parseSelector(
         } else {
             if (sawWS) {
                 if (tokens.length > 0) {
+                    ensureNotTraversal();
                     tokens.push({ type: "descendant" });
                 }
                 sawWS = false;

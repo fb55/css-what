@@ -18,3 +18,26 @@ describe("Collected selectors", () => {
         }
     });
 });
+
+const broken = [
+    "[",
+    "(",
+    "{",
+    "()",
+    "<>",
+    "{}",
+    ",",
+    ",a",
+    "a,",
+    "[id=012345678901234567890123456789",
+    "input[name=foo.baz]",
+    "input[name=foo[baz]]",
+];
+
+describe("Broken selectors", () => {
+    for (const selector of broken) {
+        it(`should not parse — ${selector}`, () => {
+            expect(() => parse(selector)).toThrow(Error);
+        });
+    }
+});
