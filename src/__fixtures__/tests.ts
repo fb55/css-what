@@ -26,6 +26,7 @@ export const tests: [
             [
                 {
                     type: "universal",
+                    namespace: null,
                 },
             ],
         ],
@@ -871,6 +872,18 @@ export const tests: [
             ],
         ],
         "star tag namespace",
+    ],
+    [
+        "*|*",
+        [
+            [
+                {
+                    type: "universal",
+                    namespace: "*",
+                },
+            ],
+        ],
+        "universal with namespace",
     ],
     [
         "[foo|bar]",

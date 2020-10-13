@@ -50,7 +50,7 @@ function stringifyToken(token: Selector): string {
         case "descendant":
             return " ";
         case "universal":
-            return "*";
+            return `${getNamespace(token.namespace)}*`;
 
         case "tag":
             return getNamespacedName(token);
@@ -100,11 +100,13 @@ function getNamespacedName(token: {
     name: string;
     namespace: string | null;
 }): string {
-    return token.namespace
-        ? `${
-              token.namespace === "*" ? "*" : escapeName(token.namespace)
-          }|${escapeName(token.name)}`
-        : escapeName(token.name);
+    return `${getNamespace(token.namespace)}${escapeName(token.name)}`;
+}
+
+function getNamespace(namespace: string | null): string {
+    return namespace
+        ? `${namespace === "*" ? "*" : escapeName(namespace)}|`
+        : "";
 }
 
 function escapeName(str: string): string {

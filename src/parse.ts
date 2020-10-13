@@ -54,6 +54,7 @@ export interface TagSelector {
 
 export interface UniversalSelector {
     type: "universal";
+    namespace: string | null;
 }
 
 export interface Traversal {
@@ -405,12 +406,16 @@ function parseSelector(
 
                 if (selector.charAt(selectorIndex) === "|") {
                     namespace = name;
-                    name = getName(1);
+                    if (selector.charAt(selectorIndex + 1) === "*") {
+                        name = "*";
+                        selectorIndex += 2;
+                    } else {
+                        name = getName(1);
+                    }
                 }
 
                 if (name === "*") {
-                    // We cannot have a namespace at this point.
-                    tokens.push({ type: "universal" });
+                    tokens.push({ type: "universal", namespace });
                 } else {
                     if (options.lowerCaseTags ?? !options.xmlMode) {
                         name = name.toLowerCase();

@@ -456,7 +456,8 @@
                 "data": [
                     [
                         {
-                            "type": "universal"
+                            "type": "universal",
+                            "namespace": null
                         }
                     ]
                 ]
@@ -477,7 +478,8 @@
                 "data": [
                     [
                         {
-                            "type": "universal"
+                            "type": "universal",
+                            "namespace": null
                         }
                     ]
                 ]
@@ -912,7 +914,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
@@ -1376,7 +1379,8 @@
                 "type": "child"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
@@ -1460,7 +1464,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
@@ -1510,7 +1515,8 @@
                 "type": "child"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
@@ -2888,7 +2894,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "pseudo",
@@ -2911,7 +2918,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "pseudo",
@@ -2934,7 +2942,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "pseudo",
@@ -2957,7 +2966,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "attribute",
@@ -2983,7 +2993,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "attribute",
@@ -3009,7 +3020,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "attribute",
@@ -3035,7 +3047,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "attribute",
@@ -3061,7 +3074,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "attribute",
@@ -3191,7 +3205,8 @@
                 "type": "child"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "pseudo",
@@ -3214,7 +3229,8 @@
                 "type": "child"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "pseudo",
@@ -3237,7 +3253,8 @@
                 "type": "child"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "pseudo",
@@ -3355,7 +3372,8 @@
                 "type": "adjacent"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
@@ -3393,7 +3411,8 @@
                 "type": "child"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
@@ -3411,7 +3430,8 @@
                 "type": "sibling"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
@@ -3575,7 +3595,8 @@
                 "type": "adjacent"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
@@ -3693,7 +3714,8 @@
                 "type": "adjacent"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
@@ -3711,7 +3733,8 @@
                 "type": "sibling"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
@@ -4038,7 +4061,8 @@
                 "data": [
                     [
                         {
-                            "type": "universal"
+                            "type": "universal",
+                            "namespace": null
                         }
                     ]
                 ]
@@ -4059,7 +4083,8 @@
                 "data": [
                     [
                         {
-                            "type": "universal"
+                            "type": "universal",
+                            "namespace": null
                         }
                     ]
                 ]
@@ -4115,7 +4140,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "pseudo",
@@ -5424,7 +5450,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "attribute",
@@ -5465,7 +5492,8 @@
                                         "data": [
                                             [
                                                 {
-                                                    "type": "universal"
+                                                    "type": "universal",
+                                                    "namespace": null
                                                 }
                                             ]
                                         ]
@@ -6139,7 +6167,8 @@
                             "data": [
                                 [
                                     {
-                                        "type": "universal"
+                                        "type": "universal",
+                                        "namespace": null
                                     }
                                 ]
                             ]
@@ -6179,7 +6208,8 @@
                 "type": "child"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "pseudo",
@@ -7384,7 +7414,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "pseudo",
@@ -8886,7 +8917,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
@@ -8994,7 +9026,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
@@ -9308,7 +9341,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "pseudo",
@@ -9331,7 +9365,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "attribute",
@@ -9357,7 +9392,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "attribute",
@@ -9391,7 +9427,8 @@
                 "type": "child"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "pseudo",
@@ -9604,14 +9641,16 @@
     "*": [
         [
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
     "* :not(*) foo": [
         [
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "descendant"
@@ -9622,7 +9661,8 @@
                 "data": [
                     [
                         {
-                            "type": "universal"
+                            "type": "universal",
+                            "namespace": null
                         }
                     ]
                 ]
@@ -9640,20 +9680,23 @@
     "* < *": [
         [
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "parent"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
     "*, foo": [
         [
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ],
         [
@@ -9667,7 +9710,8 @@
     "*,:contains(!)": [
         [
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ],
         [
@@ -9681,7 +9725,8 @@
     "*:contains(humans)": [
         [
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "pseudo",
@@ -9693,7 +9738,8 @@
     "*[id]": [
         [
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "attribute",
@@ -9708,7 +9754,8 @@
     "*[name=iframe]": [
         [
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "attribute",
@@ -9723,7 +9770,8 @@
     "*[type=checkbox]": [
         [
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "attribute",
@@ -11187,7 +11235,8 @@
                 "data": [
                     [
                         {
-                            "type": "universal"
+                            "type": "universal",
+                            "namespace": null
                         }
                     ]
                 ]
@@ -11202,7 +11251,8 @@
                 "data": [
                     [
                         {
-                            "type": "universal"
+                            "type": "universal",
+                            "namespace": null
                         }
                     ],
                     [
@@ -11236,7 +11286,8 @@
                             "data": [
                                 [
                                     {
-                                        "type": "universal"
+                                        "type": "universal",
+                                        "namespace": null
                                     }
                                 ]
                             ]
@@ -11475,7 +11526,8 @@
                 "data": [
                     [
                         {
-                            "type": "universal"
+                            "type": "universal",
+                            "namespace": null
                         }
                     ]
                 ]
@@ -11495,7 +11547,8 @@
                             "data": [
                                 [
                                     {
-                                        "type": "universal"
+                                        "type": "universal",
+                                        "namespace": null
                                     }
                                 ]
                             ]
@@ -11523,7 +11576,8 @@
                                         "data": [
                                             [
                                                 {
-                                                    "type": "universal"
+                                                    "type": "universal",
+                                                    "namespace": null
                                                 }
                                             ]
                                         ]
@@ -12051,7 +12105,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "pseudo",
@@ -12080,7 +12135,8 @@
                 "type": "descendant"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "pseudo",
@@ -12859,7 +12915,8 @@
                             "data": [
                                 [
                                     {
-                                        "type": "universal"
+                                        "type": "universal",
+                                        "namespace": null
                                     }
                                 ],
                                 [
@@ -13309,7 +13366,8 @@
                 "type": "child"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
@@ -14467,7 +14525,8 @@
                             "data": [
                                 [
                                     {
-                                        "type": "universal"
+                                        "type": "universal",
+                                        "namespace": null
                                     }
                                 ]
                             ]
@@ -15984,13 +16043,15 @@
                 "type": "child"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             },
             {
                 "type": "child"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
@@ -16829,7 +16890,8 @@
                 "type": "child"
             },
             {
-                "type": "universal"
+                "type": "universal",
+                "namespace": null
             }
         ]
     ],
