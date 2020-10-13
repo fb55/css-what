@@ -53,7 +53,7 @@ function stringifyToken(token: Selector): string {
             return "*";
 
         case "tag":
-            return escapeName(token.name);
+            return getNamespacedName(token);
 
         case "pseudo-element":
             return `::${escapeName(token.name)}`;
@@ -65,29 +65,46 @@ function stringifyToken(token: Selector): string {
             }
             return `:${escapeName(token.name)}(${stringify(token.data)})`;
 
-        case "attribute":
-            if (token.action === "exists") {
-                return `[${escapeName(token.name)}]`;
-            }
+        case "attribute": {
             if (
                 token.name === "id" &&
                 token.action === "equals" &&
-                !token.ignoreCase
+                !token.ignoreCase &&
+                !token.namespace
             ) {
                 return `#${escapeName(token.value)}`;
             }
             if (
                 token.name === "class" &&
                 token.action === "element" &&
-                !token.ignoreCase
+                !token.ignoreCase &&
+                !token.namespace
             ) {
                 return `.${escapeName(token.value)}`;
             }
 
-            return `[${escapeName(token.name)}${
-                actionTypes[token.action]
-            }='${escapeName(token.value)}'${token.ignoreCase ? "i" : ""}]`;
+            const name = getNamespacedName(token);
+
+            if (token.action === "exists") {
+                return `[${name}]`;
+            }
+
+            return `[${name}${actionTypes[token.action]}='${escapeName(
+                token.value
+            )}'${token.ignoreCase ? "i" : ""}]`;
+        }
     }
+}
+
+function getNamespacedName(token: {
+    name: string;
+    namespace: string | null;
+}): string {
+    return token.namespace
+        ? `${
+              token.namespace === "*" ? "*" : escapeName(token.namespace)
+          }|${escapeName(token.name)}`
+        : escapeName(token.name);
 }
 
 function escapeName(str: string): string {

@@ -30,6 +30,7 @@ export interface AttributeSelector {
     action: AttributeAction;
     value: string;
     ignoreCase: boolean;
+    namespace: string | null;
 }
 
 type DataType = Selector[][] | null | string;
@@ -48,6 +49,7 @@ export interface PseudoElement {
 export interface TagSelector {
     type: "tag";
     name: string;
+    namespace: string | null;
 }
 
 export interface UniversalSelector {
@@ -78,7 +80,7 @@ export type TraversalType =
 const reName = /^[^\\]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\-\u00b0-\uFFFF])+/;
 const reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi;
 // Modified version of https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L87
-const reAttr = /^\s*((?:\\.|[\w\u00b0-\uFFFF-])+)\s*(?:(\S?)=\s*(?:(['"])((?:[^\\]|\\[^])*?)\3|(#?(?:\\.|[\w\u00b0-\uFFFF-])*)|)|)\s*(i)?\]/;
+const reAttr = /^\s*(?:(\*|[-\w]*)\|)?((?:\\.|[\w\u00b0-\uFFFF-])+)\s*(?:(\S?)=\s*(?:(['"])((?:[^\\]|\\[^])*?)\4|(#?(?:\\.|[\w\u00b0-\uFFFF-])*)|)|)\s*([iI])?\]/;
 
 const actionTypes: { [key: string]: AttributeAction } = {
     undefined: "exists",
@@ -173,7 +175,7 @@ export default function parse(
     const endIndex = parseSelector(subselects, `${selector}`, options, 0);
 
     if (endIndex < selector.length) {
-        throw new Error(`Unmatched selector: ${selector}`);
+        throw new Error(`Unmatched selector: ${selector.slice(endIndex)}`);
     }
 
     return subselects;
@@ -249,10 +251,7 @@ function parseSelector(
                 sawWS = false;
             }
 
-            if (firstChar === "*") {
-                selectorIndex += 1;
-                tokens.push({ type: "universal" });
-            } else if (firstChar in attribSelectors) {
+            if (firstChar in attribSelectors) {
                 const [name, action] = attribSelectors[firstChar];
                 tokens.push({
                     type: "attribute",
@@ -260,6 +259,7 @@ function parseSelector(
                     action,
                     value: getName(1),
                     ignoreCase: false,
+                    namespace: null,
                 });
             } else if (firstChar === "[") {
                 const attributeMatch = selector
@@ -268,12 +268,15 @@ function parseSelector(
 
                 if (!attributeMatch) {
                     throw new Error(
-                        `Malformed attribute selector: ${selector}`
+                        `Malformed attribute selector: ${selector.slice(
+                            selectorIndex
+                        )}`
                     );
                 }
 
                 const [
                     completeSelector,
+                    namespace = null,
                     baseName,
                     actionType,
                     ,
@@ -294,6 +297,7 @@ function parseSelector(
                     name,
                     action: actionTypes[actionType],
                     value: unescapeCSS(value),
+                    namespace,
                     ignoreCase: !!ignoreCase,
                 });
             } else if (firstChar === ":") {
@@ -373,23 +377,47 @@ function parseSelector(
                 }
 
                 tokens.push({ type: "pseudo", name, data });
-            } else if (reName.test(selector.slice(selectorIndex))) {
-                let name = getName(0);
-
-                if (options.lowerCaseTags ?? !options.xmlMode) {
-                    name = name.toLowerCase();
-                }
-
-                tokens.push({ type: "tag", name });
             } else {
-                if (
-                    tokens.length &&
-                    tokens[tokens.length - 1].type === "descendant"
-                ) {
-                    tokens.pop();
+                let namespace = null;
+                let name: string;
+
+                if (firstChar === "*") {
+                    selectorIndex += 1;
+                    name = "*";
+                } else if (reName.test(selector.slice(selectorIndex))) {
+                    name = getName(0);
+                } else {
+                    /*
+                     * We have finished parsing the selector.
+                     * Remove descendant tokens at the end if they exist,
+                     * and return the last index, so that parsing can be
+                     * picked up from here.
+                     */
+                    if (
+                        tokens.length &&
+                        tokens[tokens.length - 1].type === "descendant"
+                    ) {
+                        tokens.pop();
+                    }
+                    addToken(subselects, tokens);
+                    return selectorIndex;
                 }
-                addToken(subselects, tokens);
-                return selectorIndex;
+
+                if (selector.charAt(selectorIndex) === "|") {
+                    namespace = name;
+                    name = getName(1);
+                }
+
+                if (name === "*") {
+                    // We cannot have a namespace at this point.
+                    tokens.push({ type: "universal" });
+                } else {
+                    if (options.lowerCaseTags ?? !options.xmlMode) {
+                        name = name.toLowerCase();
+                    }
+
+                    tokens.push({ type: "tag", name, namespace });
+                }
             }
         }
     }

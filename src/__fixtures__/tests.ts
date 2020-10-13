@@ -13,6 +13,7 @@ export const tests: [
             [
                 {
                     type: "tag",
+                    namespace: null,
                     name: "div",
                 },
             ],
@@ -38,6 +39,7 @@ export const tests: [
             [
                 {
                     type: "tag",
+                    namespace: null,
                     name: "div",
                 },
                 {
@@ -45,6 +47,7 @@ export const tests: [
                 },
                 {
                     type: "tag",
+                    namespace: null,
                     name: "div",
                 },
             ],
@@ -57,6 +60,7 @@ export const tests: [
             [
                 {
                     type: "tag",
+                    namespace: null,
                     name: "div",
                 },
                 {
@@ -64,6 +68,7 @@ export const tests: [
                 },
                 {
                     type: "tag",
+                    namespace: null,
                     name: "div",
                 },
             ],
@@ -76,6 +81,7 @@ export const tests: [
             [
                 {
                     type: "tag",
+                    namespace: null,
                     name: "div",
                 },
                 {
@@ -83,6 +89,7 @@ export const tests: [
                 },
                 {
                     type: "tag",
+                    namespace: null,
                     name: "div",
                 },
             ],
@@ -95,6 +102,7 @@ export const tests: [
             [
                 {
                     type: "tag",
+                    namespace: null,
                     name: "div",
                 },
                 {
@@ -102,6 +110,7 @@ export const tests: [
                 },
                 {
                     type: "tag",
+                    namespace: null,
                     name: "div",
                 },
             ],
@@ -114,6 +123,7 @@ export const tests: [
             [
                 {
                     type: "tag",
+                    namespace: null,
                     name: "p",
                 },
                 {
@@ -121,6 +131,7 @@ export const tests: [
                 },
                 {
                     type: "tag",
+                    namespace: null,
                     name: "div",
                 },
             ],
@@ -135,6 +146,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "id",
                     value: " ",
@@ -145,6 +157,7 @@ export const tests: [
                 },
                 {
                     type: "tag",
+                    namespace: null,
                     name: "a",
                 },
             ],
@@ -157,6 +170,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     name: "class",
                     action: "element",
                     value: " ",
@@ -172,6 +186,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     name: "class",
                     action: "element",
                     value: "m™²³",
@@ -187,6 +202,7 @@ export const tests: [
             [
                 {
                     type: "tag",
+                    namespace: null,
                     name: "a",
                 },
             ],
@@ -199,6 +215,7 @@ export const tests: [
             [
                 {
                     type: "tag",
+                    namespace: null,
                     name: "\uD834\uDF06\uD834\uDF06",
                 },
             ],
@@ -211,6 +228,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "id",
                     value: "&B",
@@ -228,6 +246,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     name: "name",
                     action: "start",
                     value: "foo[",
@@ -243,6 +262,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     name: "name",
                     action: "start",
                     value: "foo[bar]",
@@ -258,6 +278,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     name: "name",
                     action: "end",
                     value: "[bar]",
@@ -273,6 +294,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     name: "href",
                     action: "any",
                     value: "google",
@@ -288,6 +310,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     name: "value",
                     action: "equals",
                     value: "\nsome text\n",
@@ -303,6 +326,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     name: "name",
                     action: "equals",
                     value: "foo.baz",
@@ -318,6 +342,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     name: "name",
                     action: "equals",
                     value: "foo[bar]",
@@ -333,6 +358,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     name: "xml:test",
                     action: "exists",
                     value: "",
@@ -348,6 +374,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     name: "name",
                     action: "equals",
                     value: "foo ~ < > , bar",
@@ -365,6 +392,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "id",
                     value: ".identifier",
@@ -476,12 +504,14 @@ export const tests: [
             [
                 {
                     type: "tag",
+                    namespace: null,
                     name: "a",
                 },
             ],
             [
                 {
                     type: "tag",
+                    namespace: null,
                     name: "b",
                 },
             ],
@@ -500,12 +530,14 @@ export const tests: [
                         [
                             {
                                 type: "tag",
+                                namespace: null,
                                 name: "h1",
                             },
                         ],
                         [
                             {
                                 type: "tag",
+                                namespace: null,
                                 name: "p",
                             },
                         ],
@@ -526,6 +558,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "id",
                     value: "types_all",
@@ -541,6 +574,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "name",
                     value: "foo bar",
@@ -556,6 +590,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "name",
                     value: "foo.baz",
@@ -571,6 +606,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "name",
                     value: "foo[baz]",
@@ -586,6 +622,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "data-attr",
                     value: "foo_baz']",
@@ -601,6 +638,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "data-attr",
                     value: "'",
@@ -616,6 +654,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "data-attr",
                     value: "\\",
@@ -631,6 +670,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "data-attr",
                     value: "\\'",
@@ -646,6 +686,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "data-attr",
                     value: "\\\\",
@@ -661,6 +702,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "data-attr",
                     value: "\\\\",
@@ -676,6 +718,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "data-attr",
                     value: "\\\\",
@@ -691,6 +734,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "data-attr",
                     value: "\\\\",
@@ -706,6 +750,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "data-attr",
                     value: "\u4e00",
@@ -721,6 +766,7 @@ export const tests: [
             [
                 {
                     type: "attribute",
+                    namespace: null,
                     action: "equals",
                     name: "data-attr",
                     value: "\uD834\uDF06A",
@@ -739,12 +785,14 @@ export const tests: [
                 {
                     name: "fOo",
                     type: "tag",
+                    namespace: null,
                 },
                 {
                     action: "exists",
                     ignoreCase: false,
                     name: "baR",
                     type: "attribute",
+                    namespace: null,
                     value: "",
                 },
             ],
@@ -759,12 +807,14 @@ export const tests: [
                 {
                     name: "foo",
                     type: "tag",
+                    namespace: null,
                 },
                 {
                     action: "exists",
                     ignoreCase: false,
                     name: "baR",
                     type: "attribute",
+                    namespace: null,
                     value: "",
                 },
             ],
@@ -779,17 +829,95 @@ export const tests: [
                 {
                     name: "fOo",
                     type: "tag",
+                    namespace: null,
                 },
                 {
                     action: "exists",
                     ignoreCase: false,
                     name: "bar",
                     type: "attribute",
+                    namespace: null,
                     value: "",
                 },
             ],
         ],
         "`lowerCaseTags` option",
         { lowerCaseTags: false },
+    ],
+
+    // Namespaces
+    [
+        "foo|bar",
+        [
+            [
+                {
+                    name: "bar",
+                    type: "tag",
+                    namespace: "foo",
+                },
+            ],
+        ],
+        "basic tag namespace",
+    ],
+    [
+        "*|bar",
+        [
+            [
+                {
+                    name: "bar",
+                    type: "tag",
+                    namespace: "*",
+                },
+            ],
+        ],
+        "star tag namespace",
+    ],
+    [
+        "[foo|bar]",
+        [
+            [
+                {
+                    action: "exists",
+                    ignoreCase: false,
+                    name: "bar",
+                    type: "attribute",
+                    namespace: "foo",
+                    value: "",
+                },
+            ],
+        ],
+        "basic attribute namespace, existential",
+    ],
+    [
+        "[foo|bar='baz' i]",
+        [
+            [
+                {
+                    action: "equals",
+                    ignoreCase: true,
+                    name: "bar",
+                    type: "attribute",
+                    namespace: "foo",
+                    value: "baz",
+                },
+            ],
+        ],
+        "basic attribute namespace, equality",
+    ],
+    [
+        "[*|bar='baz' i]",
+        [
+            [
+                {
+                    action: "equals",
+                    ignoreCase: true,
+                    name: "bar",
+                    type: "attribute",
+                    namespace: "*",
+                    value: "baz",
+                },
+            ],
+        ],
+        "star attribute namespace",
     ],
 ];
