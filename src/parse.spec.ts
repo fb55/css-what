@@ -38,6 +38,7 @@ const broken = [
     ":has(p",
     ":foo(p()",
     "#",
+    "##foo",
 ];
 
 describe("Broken selectors", () => {
