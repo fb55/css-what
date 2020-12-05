@@ -33,7 +33,7 @@
         "@typescript-eslint/parser": "^4.1.0",
         "coveralls": "^3.0.5",
         "eslint": "^7.0.0",
-        "eslint-config-prettier": "^6.0.0",
+        "eslint-config-prettier": "^7.0.0",
         "eslint-plugin-node": "^11.1.0",
         "jest": "^26.0.1",
         "prettier": "^2.0.5",
