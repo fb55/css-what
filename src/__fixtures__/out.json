@@ -11430,6 +11430,18 @@
             }
         ]
     ],
+    "[ a=b i ]": [
+        [
+            {
+                "type": "attribute",
+                "namespace": null,
+                "name": "a",
+                "action": "equals",
+                "value": "b",
+                "ignoreCase": true
+            }
+        ]
+    ],
     "[id*=option1]": [
         [
             {
