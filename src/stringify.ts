@@ -91,7 +91,9 @@ function stringifyToken(token: Selector): string {
 
             return `[${name}${actionTypes[token.action]}='${escapeName(
                 token.value
-            )}'${token.ignoreCase ? "i" : ""}]`;
+            )}'${
+                token.ignoreCase ? "i" : token.ignoreCase === false ? "s" : ""
+            }]`;
         }
     }
 }

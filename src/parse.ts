@@ -29,7 +29,7 @@ export interface AttributeSelector {
     name: string;
     action: AttributeAction;
     value: string;
-    ignoreCase: boolean;
+    ignoreCase?: boolean;
     namespace: string | null;
 }
 
@@ -81,7 +81,7 @@ export type TraversalType =
 const reName = /^[^\\#]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\-\u00b0-\uFFFF])+/;
 const reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi;
 // Modified version of https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L87
-const reAttr = /^\s*(?:(\*|[-\w]*)\|)?((?:\\.|[\w\u00b0-\uFFFF-])+)\s*(?:(\S?)=\s*(?:(['"])((?:[^\\]|\\[^])*?)\4|(#?(?:\\.|[\w\u00b0-\uFFFF-])*)|)|)\s*([iI])?\]/;
+const reAttr = /^\s*(?:(\*|[-\w]*)\|)?((?:\\.|[\w\u00b0-\uFFFF-])+)\s*(?:(\S?)=\s*(?:(['"])((?:[^\\]|\\[^])*?)\4|(#?(?:\\.|[\w\u00b0-\uFFFF-])*)|)|)\s*([iIsS])?\]/;
 
 const actionTypes: { [key: string]: AttributeAction } = {
     undefined: "exists",
@@ -259,7 +259,6 @@ function parseSelector(
                     name,
                     action,
                     value: getName(1),
-                    ignoreCase: false,
                     namespace: null,
                 });
             } else if (firstChar === "[") {
@@ -293,14 +292,20 @@ function parseSelector(
                     name = name.toLowerCase();
                 }
 
-                tokens.push({
+                const attributeSelector: AttributeSelector = {
                     type: "attribute",
                     name,
                     action: actionTypes[actionType],
                     value: unescapeCSS(value),
                     namespace,
-                    ignoreCase: !!ignoreCase,
-                });
+                };
+
+                if (ignoreCase) {
+                    attributeSelector.ignoreCase =
+                        ignoreCase.toLowerCase() === "i";
+                }
+
+                tokens.push(attributeSelector);
             } else if (firstChar === ":") {
                 if (selector.charAt(selectorIndex + 1) === ":") {
                     tokens.push({
