@@ -106,7 +106,7 @@ function getNamespacedName(token: {
 }
 
 function getNamespace(namespace: string | null): string {
-    return namespace
+    return namespace !== null
         ? `${namespace === "*" ? "*" : escapeName(namespace)}|`
         : "";
 }

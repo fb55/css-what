@@ -391,6 +391,10 @@ function parseSelector(
                     selectorIndex += 1;
                     name = "*";
                 } else if (reName.test(selector.slice(selectorIndex))) {
+                    if (selector.charAt(selectorIndex) === "|") {
+                        namespace = "";
+                        selectorIndex += 1;
+                    }
                     name = getName(0);
                 } else {
                     /*
