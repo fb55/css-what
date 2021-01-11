@@ -844,6 +844,19 @@ export const tests: [
         "star tag namespace",
     ],
     [
+        "|bar",
+        [
+            [
+                {
+                    name: "bar",
+                    type: "tag",
+                    namespace: "",
+                },
+            ],
+        ],
+        "without namespace",
+    ],
+    [
         "*|*",
         [
             [
@@ -869,6 +882,21 @@ export const tests: [
             ],
         ],
         "basic attribute namespace, existential",
+    ],
+    [
+        "[|bar]",
+        [
+            [
+                {
+                    action: "exists",
+                    name: "bar",
+                    type: "attribute",
+                    namespace: "",
+                    value: "",
+                },
+            ],
+        ],
+        "without namespace, existential",
     ],
     [
         "[foo|bar='baz' i]",
