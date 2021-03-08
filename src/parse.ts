@@ -245,6 +245,17 @@ function parseSelector(
             tokens = [];
             sawWS = false;
             stripWhitespace(1);
+        } else if (
+            firstChar === "/" &&
+            selector.charAt(selectorIndex + 1) === "*"
+        ) {
+            const endIndex = selector.indexOf("*/", selectorIndex + 2);
+
+            if (endIndex < 0) {
+                throw new Error("Comment was not terminated");
+            }
+
+            selectorIndex = endIndex + 2;
         } else {
             if (sawWS) {
                 ensureNotTraversal();

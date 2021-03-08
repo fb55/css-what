@@ -47,4 +47,15 @@ describe("Broken selectors", () => {
             expect(() => parse(selector)).toThrow(Error);
         });
     }
+
+    it("should ignore comments", () => {
+        expect(parse("/* comment1 */ /**/ foo /*comment2*/")).toEqual([
+            [
+                { type: "descendant" },
+                { name: "foo", namespace: null, type: "tag" },
+            ],
+        ]);
+
+        expect(() => parse("/*/")).toThrowError("Comment was not terminated");
+    });
 });
