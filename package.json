@@ -25,7 +25,6 @@
         "build": "tsc",
         "prepare": "npm run build"
     },
-    "dependencies": {},
     "devDependencies": {
         "@types/jest": "^26.0.3",
         "@types/node": "^14.0.5",
