@@ -11,6 +11,7 @@ export interface Options {
     lowerCaseTags?: boolean;
     /**
      * When `true`, `xmlMode` implies both `lowerCaseTags` and `lowerCaseAttributeNames` are set to `false`.
+     * Also, `ignoreCase` on attributes will not be inferred based on HTML rules anymore.
      * @default false
      */
     xmlMode?: boolean;
@@ -29,7 +30,7 @@ export interface AttributeSelector {
     name: string;
     action: AttributeAction;
     value: string;
-    ignoreCase?: boolean;
+    ignoreCase: boolean | null;
     namespace: string | null;
 }
 
@@ -119,6 +120,61 @@ const unpackPseudos = new Set([
 const traversalNames = new Set<TraversalType>([
     "descendant",
     ...Object.keys(Traversals).map((k) => Traversals[k]),
+]);
+
+/**
+ * Attributes that are case-insensitive in HTML.
+ *
+ * @private
+ * @see https://html.spec.whatwg.org/multipage/semantics-other.html#case-sensitivity-of-selectors
+ */
+const caseInsensitiveAttributes = new Set([
+    "accept",
+    "accept-charset",
+    "align",
+    "alink",
+    "axis",
+    "bgcolor",
+    "charset",
+    "checked",
+    "clear",
+    "codetype",
+    "color",
+    "compact",
+    "declare",
+    "defer",
+    "dir",
+    "direction",
+    "disabled",
+    "enctype",
+    "face",
+    "frame",
+    "hreflang",
+    "http-equiv",
+    "lang",
+    "language",
+    "link",
+    "media",
+    "method",
+    "multiple",
+    "nohref",
+    "noresize",
+    "noshade",
+    "nowrap",
+    "readonly",
+    "rel",
+    "rev",
+    "rules",
+    "scope",
+    "scrolling",
+    "selected",
+    "shape",
+    "target",
+    "text",
+    "type",
+    "valign",
+    "valuetype",
+    "vlink",
 ]);
 
 /**
@@ -271,6 +327,8 @@ function parseSelector(
                     action,
                     value: getName(1),
                     namespace: null,
+                    // TODO: Add quirksMode option, which makes `ignoreCase` `true` for HTML.
+                    ignoreCase: options.xmlMode ? null : false,
                 });
             } else if (firstChar === "[") {
                 const attributeMatch = selector
@@ -293,7 +351,7 @@ function parseSelector(
                     ,
                     quotedValue = "",
                     value = quotedValue,
-                    ignoreCase,
+                    forceIgnore,
                 ] = attributeMatch;
 
                 selectorIndex += completeSelector.length + 1;
@@ -303,18 +361,24 @@ function parseSelector(
                     name = name.toLowerCase();
                 }
 
+                const ignoreCase =
+                    // If the forceIgnore flag is set (either `i` or `s`), use that value
+                    forceIgnore
+                        ? forceIgnore.toLowerCase() === "i"
+                        : // If `xmlMode` is set, there are no rules; return `null`.
+                        options.xmlMode
+                        ? null
+                        : // Otherwise, use the `caseInsensitiveAttributes` list.
+                          caseInsensitiveAttributes.has(name);
+
                 const attributeSelector: AttributeSelector = {
                     type: "attribute",
                     name,
                     action: actionTypes[actionType],
                     value: unescapeCSS(value),
                     namespace,
+                    ignoreCase,
                 };
-
-                if (ignoreCase) {
-                    attributeSelector.ignoreCase =
-                        ignoreCase.toLowerCase() === "i";
-                }
 
                 tokens.push(attributeSelector);
             } else if (firstChar === ":") {
