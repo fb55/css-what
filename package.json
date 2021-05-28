@@ -38,7 +38,7 @@
         "eslint-plugin-node": "^11.1.0",
         "jest": "^27.0.1",
         "prettier": "^2.0.5",
-        "ts-jest": "^26.0.0",
+        "ts-jest": "^27.0.1",
         "typescript": "^4.0.2"
     },
     "optionalDependencies": {},
@@ -47,8 +47,7 @@
     },
     "license": "BSD-2-Clause",
     "jest": {
-        "preset": "ts-jest",
-        "testEnvironment": "node"
+        "preset": "ts-jest"
     },
     "prettier": {
         "tabWidth": 4
