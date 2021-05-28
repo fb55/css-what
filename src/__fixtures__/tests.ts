@@ -802,6 +802,23 @@ export const tests: [
         { xmlMode: true },
     ],
     [
+        "#myID",
+        [
+            [
+                {
+                    action: "equals",
+                    name: "id",
+                    type: "attribute",
+                    namespace: null,
+                    value: "myID",
+                    ignoreCase: null,
+                },
+            ],
+        ],
+        "IDs in XML mode",
+        { xmlMode: true },
+    ],
+    [
         "fOo[baR]",
         [
             [

@@ -10,15 +10,15 @@ describe("parse own tests", () => {
     }
 });
 
-describe("Collected selectors", () => {
-    test("(qwery, sizzle, nwmatcher)", () => {
-        const out = JSON.parse(
-            readFileSync(`${__dirname}/__fixtures__/out.json`, "utf8")
-        );
-        for (const s of Object.keys(out)) {
+describe("Collected selectors (qwery, sizzle, nwmatcher)", () => {
+    const out = JSON.parse(
+        readFileSync(`${__dirname}/__fixtures__/out.json`, "utf8")
+    );
+    for (const s of Object.keys(out)) {
+        test(s, () => {
             expect(parse(s)).toStrictEqual(out[s]);
-        }
-    });
+        });
+    }
 });
 
 const broken = [
@@ -32,13 +32,17 @@ const broken = [
     ",a",
     "a,",
     "[id=012345678901234567890123456789",
-    "input[name=foo.baz]",
+    "input[name=foo b]",
+    "input[name!foo]",
+    "input[name|]",
+    "input[name=']",
     "input[name=foo[baz]]",
     ':has("p")',
     ":has(p",
     ":foo(p()",
     "#",
     "##foo",
+    "/*",
 ];
 
 describe("Broken selectors", () => {

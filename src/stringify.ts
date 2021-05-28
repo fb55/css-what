@@ -1,6 +1,6 @@
 import { Selector } from "./parse";
 
-const actionTypes: { [key: string]: string } = {
+const actionTypes: Record<string, string> = {
     equals: "",
     element: "~",
     start: "^",
@@ -21,6 +21,7 @@ const charsToEscape = new Set([
     "\\",
     "(",
     ")",
+    "'",
 ]);
 
 /**

@@ -81,29 +81,24 @@ export type TraversalType =
 
 const reName = /^[^\\#]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\-\u00b0-\uFFFF])+/;
 const reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi;
-// Modified version of https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L87
-const reAttr =
-    /^\s*(?:(\*|[-\w]*)\|)?((?:\\.|[\w\u00b0-\uFFFF-])+)\s*(?:(\S?)=\s*(?:(['"])((?:[^\\]|\\[^])*?)\4|(#?(?:\\.|[\w\u00b0-\uFFFF-])*)|)|)\s*([iIsS])?\s*\]/;
 
-const actionTypes: { [key: string]: AttributeAction } = {
-    undefined: "exists",
-    "": "equals",
-    "~": "element",
-    "^": "start",
-    $: "end",
-    "*": "any",
-    "!": "not",
-    "|": "hyphen",
-};
+const actionTypes = new Map<string, AttributeAction>([
+    ["~", "element"],
+    ["^", "start"],
+    ["$", "end"],
+    ["*", "any"],
+    ["!", "not"],
+    ["|", "hyphen"],
+]);
 
-const Traversals: { [key: string]: TraversalType } = {
+const Traversals: Record<string, TraversalType> = {
     ">": "child",
     "<": "parent",
     "~": "sibling",
     "+": "adjacent",
 };
 
-const attribSelectors: { [key: string]: [string, AttributeAction] } = {
+const attribSelectors: Record<string, [string, AttributeAction]> = {
     "#": ["id", "equals"],
     ".": ["class", "element"],
 };
@@ -302,10 +297,7 @@ function parseSelector(
             tokens = [];
             sawWS = false;
             stripWhitespace(1);
-        } else if (
-            firstChar === "/" &&
-            selector.charAt(selectorIndex + 1) === "*"
-        ) {
+        } else if (selector.startsWith("/*", selectorIndex)) {
             const endIndex = selector.indexOf("*/", selectorIndex + 2);
 
             if (endIndex < 0) {
@@ -332,51 +324,134 @@ function parseSelector(
                     ignoreCase: options.xmlMode ? null : false,
                 });
             } else if (firstChar === "[") {
-                const attributeMatch = selector
-                    .slice(selectorIndex + 1)
-                    .match(reAttr);
+                stripWhitespace(1);
 
-                if (!attributeMatch) {
-                    throw new Error(
-                        `Malformed attribute selector: ${selector.slice(
-                            selectorIndex
-                        )}`
-                    );
+                // Determine attribute name and namespace
+
+                let name;
+                let namespace: string | null = null;
+
+                if (selector.charAt(selectorIndex) === "|") {
+                    namespace = "";
+                    selectorIndex += 1;
                 }
 
-                const [
-                    completeSelector,
-                    namespace = null,
-                    baseName,
-                    actionType,
-                    ,
-                    quotedValue = "",
-                    value = quotedValue,
-                    forceIgnore,
-                ] = attributeMatch;
+                if (selector.startsWith("*|", selectorIndex)) {
+                    namespace = "*";
+                    selectorIndex += 2;
+                }
 
-                selectorIndex += completeSelector.length + 1;
-                let name = unescapeCSS(baseName);
+                name = getName(0);
+
+                if (
+                    namespace === null &&
+                    selector.charAt(selectorIndex) === "|" &&
+                    selector.charAt(selectorIndex + 1) !== "="
+                ) {
+                    namespace = name;
+                    name = getName(1);
+                }
 
                 if (options.lowerCaseAttributeNames ?? !options.xmlMode) {
                     name = name.toLowerCase();
                 }
 
-                const ignoreCase =
+                stripWhitespace(0);
+
+                // Determine comparison operation
+
+                let action: AttributeAction = "exists";
+                const possibleAction = actionTypes.get(
+                    selector.charAt(selectorIndex)
+                );
+
+                if (possibleAction) {
+                    action = possibleAction;
+
+                    if (selector.charAt(selectorIndex + 1) !== "=") {
+                        throw new Error("Expected `=`");
+                    }
+
+                    stripWhitespace(2);
+                } else if (selector.charAt(selectorIndex) === "=") {
+                    action = "equals";
+                    stripWhitespace(1);
+                }
+
+                // Determine value
+
+                let value = "";
+                let ignoreCase: boolean | null = null;
+
+                if (action !== "exists") {
+                    if (quotes.has(selector.charAt(selectorIndex))) {
+                        const quote = selector.charAt(selectorIndex);
+                        let sectionEnd = selectorIndex + 1;
+                        while (
+                            sectionEnd < selector.length &&
+                            (selector.charAt(sectionEnd) !== quote ||
+                                isEscaped(sectionEnd))
+                        ) {
+                            sectionEnd += 1;
+                        }
+
+                        if (selector.charAt(sectionEnd) !== quote) {
+                            throw new Error("Attribute value didn't end");
+                        }
+
+                        value = unescapeCSS(
+                            selector.slice(selectorIndex + 1, sectionEnd)
+                        );
+                        selectorIndex = sectionEnd + 1;
+                    } else {
+                        const valueStart = selectorIndex;
+
+                        while (
+                            selectorIndex < selector.length &&
+                            ((!isWhitespace(selector.charAt(selectorIndex)) &&
+                                selector.charAt(selectorIndex) !== "]") ||
+                                isEscaped(selectorIndex))
+                        ) {
+                            selectorIndex += 1;
+                        }
+
+                        value = unescapeCSS(
+                            selector.slice(valueStart, selectorIndex)
+                        );
+                    }
+
+                    stripWhitespace(0);
+
+                    // See if we have a force ignore flag
+
+                    const forceIgnore = selector.charAt(selectorIndex);
                     // If the forceIgnore flag is set (either `i` or `s`), use that value
-                    forceIgnore
-                        ? forceIgnore.toLowerCase() === "i"
-                        : // If `xmlMode` is set, there are no rules; return `null`.
-                        options.xmlMode
-                        ? null
-                        : // Otherwise, use the `caseInsensitiveAttributes` list.
-                          caseInsensitiveAttributes.has(name);
+                    if (forceIgnore === "s" || forceIgnore === "S") {
+                        ignoreCase = false;
+                        stripWhitespace(1);
+                    } else if (forceIgnore === "i" || forceIgnore === "I") {
+                        ignoreCase = true;
+                        stripWhitespace(1);
+                    }
+                }
+
+                // If `xmlMode` is set, there are no rules; otherwise, use the `caseInsensitiveAttributes` list.
+                if (!options.xmlMode) {
+                    // TODO: Skip this for `exists`, as there is no value to compare to.
+                    ignoreCase ??= caseInsensitiveAttributes.has(name);
+                }
+
+                if (selector.charAt(selectorIndex) !== "]") {
+                    throw new Error("Attribute selector didn't terminate");
+                }
+
+                selectorIndex += 1;
 
                 const attributeSelector: AttributeSelector = {
                     type: "attribute",
                     name,
-                    action: actionTypes[actionType],
-                    value: unescapeCSS(value),
+                    action,
+                    value,
                     namespace,
                     ignoreCase,
                 };
