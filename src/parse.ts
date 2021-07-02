@@ -328,7 +328,6 @@ function parseSelector(
 
                 // Determine attribute name and namespace
 
-                let name;
                 let namespace: string | null = null;
 
                 if (selector.charAt(selectorIndex) === "|") {
@@ -341,7 +340,7 @@ function parseSelector(
                     selectorIndex += 2;
                 }
 
-                name = getName(0);
+                let name = getName(0);
 
                 if (
                     namespace === null &&
