@@ -459,6 +459,27 @@ export const tests: [
         "pseudo selector with data",
     ],
     [
+        ":where(a)",
+        [
+            [
+                {
+                    type: "pseudo",
+                    name: "where",
+                    data: [
+                        [
+                            {
+                                type: "tag",
+                                namespace: null,
+                                name: "a",
+                            },
+                        ],
+                    ],
+                },
+            ],
+        ],
+        "pseudo selector with data",
+    ],
+    [
         ':contains("(a((foo\\\\\\))))")',
         [
             [

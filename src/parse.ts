@@ -109,6 +109,7 @@ const unpackPseudos = new Set([
     "not",
     "matches",
     "is",
+    "where",
     "host",
     "host-context",
 ]);
