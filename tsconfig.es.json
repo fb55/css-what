@@ -1,0 +1,9 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "target": "ES2019",
+        "module": "es2015",
+        "outDir": "lib/es",
+        "moduleResolution": "node"
+    }
+}

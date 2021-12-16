@@ -1,83 +1,12 @@
-export interface Options {
-    /**
-     * When false, tag names will not be lowercased.
-     * @default true
-     */
-    lowerCaseAttributeNames?: boolean;
-    /**
-     * When false, attribute names will not be lowercased.
-     * @default true
-     */
-    lowerCaseTags?: boolean;
-    /**
-     * When `true`, `xmlMode` implies both `lowerCaseTags` and `lowerCaseAttributeNames` are set to `false`.
-     * Also, `ignoreCase` on attributes will not be inferred based on HTML rules anymore.
-     * @default false
-     */
-    xmlMode?: boolean;
-}
-
-export type Selector =
-    | PseudoSelector
-    | PseudoElement
-    | AttributeSelector
-    | TagSelector
-    | UniversalSelector
-    | Traversal;
-
-export interface AttributeSelector {
-    type: "attribute";
-    name: string;
-    action: AttributeAction;
-    value: string;
-    ignoreCase: boolean | null;
-    namespace: string | null;
-}
-
-type DataType = Selector[][] | null | string;
-
-export interface PseudoSelector {
-    type: "pseudo";
-    name: string;
-    data: DataType;
-}
-
-export interface PseudoElement {
-    type: "pseudo-element";
-    name: string;
-}
-
-export interface TagSelector {
-    type: "tag";
-    name: string;
-    namespace: string | null;
-}
-
-export interface UniversalSelector {
-    type: "universal";
-    namespace: string | null;
-}
-
-export interface Traversal {
-    type: TraversalType;
-}
-
-export type AttributeAction =
-    | "any"
-    | "element"
-    | "end"
-    | "equals"
-    | "exists"
-    | "hyphen"
-    | "not"
-    | "start";
-
-export type TraversalType =
-    | "adjacent"
-    | "child"
-    | "descendant"
-    | "parent"
-    | "sibling";
+import {
+    Options,
+    Selector,
+    AttributeSelector,
+    Traversal,
+    AttributeAction,
+    TraversalType,
+    DataType,
+} from "./types";
 
 const reName = /^[^\\#]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\-\u00b0-\uFFFF])+/;
 const reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi;
@@ -220,10 +149,7 @@ function isWhitespace(c: string) {
  * The first dimension represents selectors separated by commas (eg. `sub1, sub2`),
  * the second contains the relevant tokens for that selector.
  */
-export default function parse(
-    selector: string,
-    options?: Options
-): Selector[][] {
+export function parse(selector: string, options?: Options): Selector[][] {
     const subselects: Selector[][] = [];
 
     const endIndex = parseSelector(subselects, `${selector}`, options, 0);

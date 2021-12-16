@@ -1,4 +1,4 @@
-import { Selector } from "./parse";
+import { Selector } from "./types";
 
 const actionTypes: Record<string, string> = {
     equals: "",
@@ -29,7 +29,7 @@ const charsToEscape = new Set([
  *
  * @param selector Selector to stringify.
  */
-export default function stringify(selector: Selector[][]): string {
+export function stringify(selector: Selector[][]): string {
     return selector.map(stringifySubselector).join(", ");
 }
 
