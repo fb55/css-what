@@ -1,4 +1,4 @@
-import {
+import type {
     Options,
     Selector,
     AttributeSelector,

@@ -1,4 +1,4 @@
-import { Selector } from "./types";
+import type { Selector } from "./types";
 
 const actionTypes: Record<string, string> = {
     equals: "",
