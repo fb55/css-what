@@ -25,8 +25,23 @@ export type Selector =
     | UniversalSelector
     | Traversal;
 
+export enum SelectorType {
+    Attribute = "attribute",
+    Pseudo = "pseudo",
+    PseudoElement = "pseudo-element",
+    Tag = "tag",
+    Universal = "universal",
+
+    // Traversals
+    Adjacent = "adjacent",
+    Child = "child",
+    Descendant = "descendant",
+    Parent = "parent",
+    Sibling = "sibling",
+}
+
 export interface AttributeSelector {
-    type: "attribute";
+    type: SelectorType.Attribute;
     name: string;
     action: AttributeAction;
     value: string;
@@ -37,24 +52,24 @@ export interface AttributeSelector {
 export type DataType = Selector[][] | null | string;
 
 export interface PseudoSelector {
-    type: "pseudo";
+    type: SelectorType.Pseudo;
     name: string;
     data: DataType;
 }
 
 export interface PseudoElement {
-    type: "pseudo-element";
+    type: SelectorType.PseudoElement;
     name: string;
 }
 
 export interface TagSelector {
-    type: "tag";
+    type: SelectorType.Tag;
     name: string;
     namespace: string | null;
 }
 
 export interface UniversalSelector {
-    type: "universal";
+    type: SelectorType.Universal;
     namespace: string | null;
 }
 
@@ -62,19 +77,20 @@ export interface Traversal {
     type: TraversalType;
 }
 
-export type AttributeAction =
-    | "any"
-    | "element"
-    | "end"
-    | "equals"
-    | "exists"
-    | "hyphen"
-    | "not"
-    | "start";
+export enum AttributeAction {
+    Any = "any",
+    Element = "element",
+    End = "end",
+    Equals = "equals",
+    Exists = "exists",
+    Hyphen = "hyphen",
+    Not = "not",
+    Start = "start",
+}
 
 export type TraversalType =
-    | "adjacent"
-    | "child"
-    | "descendant"
-    | "parent"
-    | "sibling";
+    | SelectorType.Adjacent
+    | SelectorType.Child
+    | SelectorType.Descendant
+    | SelectorType.Parent
+    | SelectorType.Sibling;

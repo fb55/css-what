@@ -1,6 +1,7 @@
-import type {
+import {
     Options,
     Selector,
+    SelectorType,
     AttributeSelector,
     Traversal,
     AttributeAction,
@@ -11,26 +12,62 @@ import type {
 const reName = /^[^\\#]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\-\u00b0-\uFFFF])+/;
 const reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi;
 
-const actionTypes = new Map<string, AttributeAction>([
-    ["~", "element"],
-    ["^", "start"],
-    ["$", "end"],
-    ["*", "any"],
-    ["!", "not"],
-    ["|", "hyphen"],
+const enum CharCode {
+    LeftParenthesis = 40,
+    RightParenthesis = 41,
+    LeftSquareBracket = 91,
+    RightSquareBracket = 93,
+    Comma = 44,
+    Dot = 46,
+    Colon = 58,
+    SingleQuote = 39,
+    DoubleQuote = 34,
+    Plus = 43,
+    Tilde = 126,
+    QuestionMark = 63,
+    ExclamationMark = 33,
+    Slash = 47,
+    Star = 42,
+    Equal = 61,
+    Dollar = 36,
+    Pipe = 124,
+    Circumflex = 94,
+    Asterisk = 42,
+    GreaterThan = 62,
+    LessThan = 60,
+    Hash = 35,
+    LowerI = 105,
+    LowerS = 115,
+    BackSlash = 92,
+
+    // Whitespace
+    Space = 32,
+    Tab = 9,
+    NewLine = 10,
+    FormFeed = 12,
+    CarriageReturn = 13,
+}
+
+const actionTypes = new Map<number, AttributeAction>([
+    [CharCode.Tilde, AttributeAction.Element],
+    [CharCode.Circumflex, AttributeAction.Start],
+    [CharCode.Dollar, AttributeAction.End],
+    [CharCode.Asterisk, AttributeAction.Any],
+    [CharCode.ExclamationMark, AttributeAction.Not],
+    [CharCode.Pipe, AttributeAction.Hyphen],
 ]);
 
-const Traversals: Record<string, TraversalType> = {
-    ">": "child",
-    "<": "parent",
-    "~": "sibling",
-    "+": "adjacent",
-};
+const Traversals: Map<number, TraversalType> = new Map([
+    [CharCode.GreaterThan, SelectorType.Child],
+    [CharCode.LessThan, SelectorType.Parent],
+    [CharCode.Tilde, SelectorType.Sibling],
+    [CharCode.Plus, SelectorType.Adjacent],
+]);
 
-const attribSelectors: Record<string, [string, AttributeAction]> = {
-    "#": ["id", "equals"],
-    ".": ["class", "element"],
-};
+const attribSelectors: Map<number, [string, AttributeAction]> = new Map([
+    [CharCode.Hash, ["id", AttributeAction.Equals]],
+    [CharCode.Dot, ["class", AttributeAction.Element]],
+]);
 
 // Pseudos, whose data property is parsed as well.
 const unpackPseudos = new Set([
@@ -41,11 +78,6 @@ const unpackPseudos = new Set([
     "where",
     "host",
     "host-context",
-]);
-
-const traversalNames = new Set<TraversalType>([
-    "descendant",
-    ...Object.keys(Traversals).map((k) => Traversals[k]),
 ]);
 
 /**
@@ -111,12 +143,19 @@ const caseInsensitiveAttributes = new Set([
  * @param selector Selector to check.
  */
 export function isTraversal(selector: Selector): selector is Traversal {
-    return traversalNames.has(selector.type as TraversalType);
+    switch (selector.type) {
+        case SelectorType.Adjacent:
+        case SelectorType.Child:
+        case SelectorType.Descendant:
+        case SelectorType.Parent:
+        case SelectorType.Sibling:
+            return true;
+        default:
+            return false;
+    }
 }
 
 const stripQuotesFromPseudos = new Set(["contains", "icontains"]);
-
-const quotes = new Set(['"', "'"]);
 
 // Unescape function taken from https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L152
 function funescape(_: string, escaped: string, escapedWhitespace?: string) {
@@ -136,8 +175,18 @@ function unescapeCSS(str: string) {
     return str.replace(reEscape, funescape);
 }
 
-function isWhitespace(c: string) {
-    return c === " " || c === "\n" || c === "\t" || c === "\f" || c === "\r";
+function isQuote(c: number): boolean {
+    return c === CharCode.SingleQuote || c === CharCode.DoubleQuote;
+}
+
+function isWhitespace(c: number): boolean {
+    return (
+        c === CharCode.Space ||
+        c === CharCode.Tab ||
+        c === CharCode.NewLine ||
+        c === CharCode.FormFeed ||
+        c === CharCode.CarriageReturn
+    );
 }
 
 /**
@@ -185,14 +234,15 @@ function parseSelector(
     }
 
     function stripWhitespace(offset: number) {
-        while (isWhitespace(selector.charAt(selectorIndex + offset))) offset++;
+        while (isWhitespace(selector.charCodeAt(selectorIndex + offset)))
+            offset++;
         selectorIndex += offset;
     }
 
     function isEscaped(pos: number): boolean {
         let slashCount = 0;
 
-        while (selector.charAt(--pos) === "\\") slashCount++;
+        while (selector.charCodeAt(--pos) === CharCode.BackSlash) slashCount++;
         return (slashCount & 1) === 1;
     }
 
@@ -205,18 +255,18 @@ function parseSelector(
     stripWhitespace(0);
 
     while (selector !== "") {
-        const firstChar = selector.charAt(selectorIndex);
+        const firstChar = selector.charCodeAt(selectorIndex);
 
         if (isWhitespace(firstChar)) {
             sawWS = true;
             stripWhitespace(1);
-        } else if (firstChar in Traversals) {
+        } else if (Traversals.has(firstChar)) {
             ensureNotTraversal();
-            tokens.push({ type: Traversals[firstChar] });
+            tokens.push({ type: Traversals.get(firstChar)! });
             sawWS = false;
 
             stripWhitespace(1);
-        } else if (firstChar === ",") {
+        } else if (firstChar === CharCode.Comma) {
             if (tokens.length === 0) {
                 throw new Error("Empty sub-selector");
             }
@@ -235,14 +285,15 @@ function parseSelector(
         } else {
             if (sawWS) {
                 ensureNotTraversal();
-                tokens.push({ type: "descendant" });
+                tokens.push({ type: SelectorType.Descendant });
                 sawWS = false;
             }
 
-            if (firstChar in attribSelectors) {
-                const [name, action] = attribSelectors[firstChar];
+            const attribSelector = attribSelectors.get(firstChar);
+            if (attribSelector) {
+                const [name, action] = attribSelector;
                 tokens.push({
-                    type: "attribute",
+                    type: SelectorType.Attribute,
                     name,
                     action,
                     value: getName(1),
@@ -250,19 +301,17 @@ function parseSelector(
                     // TODO: Add quirksMode option, which makes `ignoreCase` `true` for HTML.
                     ignoreCase: options.xmlMode ? null : false,
                 });
-            } else if (firstChar === "[") {
+            } else if (firstChar === CharCode.LeftSquareBracket) {
                 stripWhitespace(1);
 
                 // Determine attribute name and namespace
 
                 let namespace: string | null = null;
 
-                if (selector.charAt(selectorIndex) === "|") {
+                if (selector.charCodeAt(selectorIndex) === CharCode.Pipe) {
                     namespace = "";
                     selectorIndex += 1;
-                }
-
-                if (selector.startsWith("*|", selectorIndex)) {
+                } else if (selector.startsWith("*|", selectorIndex)) {
                     namespace = "*";
                     selectorIndex += 2;
                 }
@@ -271,8 +320,8 @@ function parseSelector(
 
                 if (
                     namespace === null &&
-                    selector.charAt(selectorIndex) === "|" &&
-                    selector.charAt(selectorIndex + 1) !== "="
+                    selector.charCodeAt(selectorIndex) === CharCode.Pipe &&
+                    selector.charCodeAt(selectorIndex + 1) !== CharCode.Equal
                 ) {
                     namespace = name;
                     name = getName(1);
@@ -286,21 +335,26 @@ function parseSelector(
 
                 // Determine comparison operation
 
-                let action: AttributeAction = "exists";
+                let action: AttributeAction = AttributeAction.Exists;
                 const possibleAction = actionTypes.get(
-                    selector.charAt(selectorIndex)
+                    selector.charCodeAt(selectorIndex)
                 );
 
                 if (possibleAction) {
                     action = possibleAction;
 
-                    if (selector.charAt(selectorIndex + 1) !== "=") {
+                    if (
+                        selector.charCodeAt(selectorIndex + 1) !==
+                        CharCode.Equal
+                    ) {
                         throw new Error("Expected `=`");
                     }
 
                     stripWhitespace(2);
-                } else if (selector.charAt(selectorIndex) === "=") {
-                    action = "equals";
+                } else if (
+                    selector.charCodeAt(selectorIndex) === CharCode.Equal
+                ) {
+                    action = AttributeAction.Equals;
                     stripWhitespace(1);
                 }
 
@@ -310,18 +364,18 @@ function parseSelector(
                 let ignoreCase: boolean | null = null;
 
                 if (action !== "exists") {
-                    if (quotes.has(selector.charAt(selectorIndex))) {
-                        const quote = selector.charAt(selectorIndex);
+                    if (isQuote(selector.charCodeAt(selectorIndex))) {
+                        const quote = selector.charCodeAt(selectorIndex);
                         let sectionEnd = selectorIndex + 1;
                         while (
                             sectionEnd < selector.length &&
-                            (selector.charAt(sectionEnd) !== quote ||
+                            (selector.charCodeAt(sectionEnd) !== quote ||
                                 isEscaped(sectionEnd))
                         ) {
                             sectionEnd += 1;
                         }
 
-                        if (selector.charAt(sectionEnd) !== quote) {
+                        if (selector.charCodeAt(sectionEnd) !== quote) {
                             throw new Error("Attribute value didn't end");
                         }
 
@@ -334,8 +388,11 @@ function parseSelector(
 
                         while (
                             selectorIndex < selector.length &&
-                            ((!isWhitespace(selector.charAt(selectorIndex)) &&
-                                selector.charAt(selectorIndex) !== "]") ||
+                            ((!isWhitespace(
+                                selector.charCodeAt(selectorIndex)
+                            ) &&
+                                selector.charCodeAt(selectorIndex) !==
+                                    CharCode.RightSquareBracket) ||
                                 isEscaped(selectorIndex))
                         ) {
                             selectorIndex += 1;
@@ -350,12 +407,14 @@ function parseSelector(
 
                     // See if we have a force ignore flag
 
-                    const forceIgnore = selector.charAt(selectorIndex);
+                    const forceIgnore =
+                        selector.charCodeAt(selectorIndex) | 0x20;
+
                     // If the forceIgnore flag is set (either `i` or `s`), use that value
-                    if (forceIgnore === "s" || forceIgnore === "S") {
+                    if (forceIgnore === CharCode.LowerS) {
                         ignoreCase = false;
                         stripWhitespace(1);
-                    } else if (forceIgnore === "i" || forceIgnore === "I") {
+                    } else if (forceIgnore === CharCode.LowerI) {
                         ignoreCase = true;
                         stripWhitespace(1);
                     }
@@ -367,14 +426,17 @@ function parseSelector(
                     ignoreCase ??= caseInsensitiveAttributes.has(name);
                 }
 
-                if (selector.charAt(selectorIndex) !== "]") {
+                if (
+                    selector.charCodeAt(selectorIndex) !==
+                    CharCode.RightSquareBracket
+                ) {
                     throw new Error("Attribute selector didn't terminate");
                 }
 
                 selectorIndex += 1;
 
                 const attributeSelector: AttributeSelector = {
-                    type: "attribute",
+                    type: SelectorType.Attribute,
                     name,
                     action,
                     value,
@@ -383,10 +445,10 @@ function parseSelector(
                 };
 
                 tokens.push(attributeSelector);
-            } else if (firstChar === ":") {
-                if (selector.charAt(selectorIndex + 1) === ":") {
+            } else if (firstChar === CharCode.Colon) {
+                if (selector.charCodeAt(selectorIndex + 1) === CharCode.Colon) {
                     tokens.push({
-                        type: "pseudo-element",
+                        type: SelectorType.PseudoElement,
                         name: getName(2).toLowerCase(),
                     });
                     continue;
@@ -395,9 +457,12 @@ function parseSelector(
                 const name = getName(1).toLowerCase();
                 let data: DataType = null;
 
-                if (selector.charAt(selectorIndex) === "(") {
+                if (
+                    selector.charCodeAt(selectorIndex) ===
+                    CharCode.LeftParenthesis
+                ) {
                     if (unpackPseudos.has(name)) {
-                        if (quotes.has(selector.charAt(selectorIndex + 1))) {
+                        if (isQuote(selector.charCodeAt(selectorIndex + 1))) {
                             throw new Error(
                                 `Pseudo-selector ${name} cannot be quoted`
                             );
@@ -411,7 +476,10 @@ function parseSelector(
                             selectorIndex + 1
                         );
 
-                        if (selector.charAt(selectorIndex) !== ")") {
+                        if (
+                            selector.charCodeAt(selectorIndex) !==
+                            CharCode.RightParenthesis
+                        ) {
                             throw new Error(
                                 `Missing closing parenthesis in :${name} (${selector})`
                             );
@@ -429,12 +497,14 @@ function parseSelector(
                             selectorIndex++
                         ) {
                             if (
-                                selector.charAt(selectorIndex) === "(" &&
+                                selector.charCodeAt(selectorIndex) ===
+                                    CharCode.LeftParenthesis &&
                                 !isEscaped(selectorIndex)
                             ) {
                                 counter++;
                             } else if (
-                                selector.charAt(selectorIndex) === ")" &&
+                                selector.charCodeAt(selectorIndex) ===
+                                    CharCode.RightParenthesis &&
                                 !isEscaped(selectorIndex)
                             ) {
                                 counter--;
@@ -448,9 +518,12 @@ function parseSelector(
                         data = selector.slice(start, selectorIndex - 1);
 
                         if (stripQuotesFromPseudos.has(name)) {
-                            const quot = data.charAt(0);
+                            const quot = data.charCodeAt(0);
 
-                            if (quot === data.slice(-1) && quotes.has(quot)) {
+                            if (
+                                quot === data.charCodeAt(data.length - 1) &&
+                                isQuote(quot)
+                            ) {
                                 data = data.slice(1, -1);
                             }
 
@@ -459,16 +532,16 @@ function parseSelector(
                     }
                 }
 
-                tokens.push({ type: "pseudo", name, data });
+                tokens.push({ type: SelectorType.Pseudo, name, data });
             } else {
                 let namespace = null;
                 let name: string;
 
-                if (firstChar === "*") {
+                if (firstChar === CharCode.Asterisk) {
                     selectorIndex += 1;
                     name = "*";
                 } else if (reName.test(selector.slice(selectorIndex))) {
-                    if (selector.charAt(selectorIndex) === "|") {
+                    if (selector.charCodeAt(selectorIndex) === CharCode.Pipe) {
                         namespace = "";
                         selectorIndex += 1;
                     }
@@ -482,7 +555,8 @@ function parseSelector(
                      */
                     if (
                         tokens.length &&
-                        tokens[tokens.length - 1].type === "descendant"
+                        tokens[tokens.length - 1].type ===
+                            SelectorType.Descendant
                     ) {
                         tokens.pop();
                     }
@@ -490,9 +564,12 @@ function parseSelector(
                     return selectorIndex;
                 }
 
-                if (selector.charAt(selectorIndex) === "|") {
+                if (selector.charCodeAt(selectorIndex) === CharCode.Pipe) {
                     namespace = name;
-                    if (selector.charAt(selectorIndex + 1) === "*") {
+                    if (
+                        selector.charCodeAt(selectorIndex + 1) ===
+                        CharCode.Asterisk
+                    ) {
                         name = "*";
                         selectorIndex += 2;
                     } else {
@@ -501,13 +578,13 @@ function parseSelector(
                 }
 
                 if (name === "*") {
-                    tokens.push({ type: "universal", namespace });
+                    tokens.push({ type: SelectorType.Universal, namespace });
                 } else {
                     if (options.lowerCaseTags ?? !options.xmlMode) {
                         name = name.toLowerCase();
                     }
 
-                    tokens.push({ type: "tag", name, namespace });
+                    tokens.push({ type: SelectorType.Tag, name, namespace });
                 }
             }
         }
