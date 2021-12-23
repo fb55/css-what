@@ -7,7 +7,7 @@
         "declaration": true /* Generates corresponding '.d.ts' file. */,
         "declarationMap": true /* Generates a sourcemap for each corresponding '.d.ts' file. */,
         // "sourceMap": true,                     /* Generates corresponding '.map' file. */
-        "outDir": "lib" /* Redirect output structure to the directory. */,
+        "outDir": "lib/commonjs" /* Redirect output structure to the directory. */,
         // "importHelpers": true,                 /* Import emit helpers from 'tslib'. */
 
         /* Strict Type-Checking Options */

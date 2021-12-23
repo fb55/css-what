@@ -1,3 +1,3 @@
-export * from "./parse";
-export { default as parse } from "./parse";
-export { default as stringify } from "./stringify";
+export * from "./types";
+export { isTraversal, parse } from "./parse";
+export { stringify } from "./stringify";
