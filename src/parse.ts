@@ -254,7 +254,7 @@ function parseSelector(
 
     stripWhitespace(0);
 
-    while (selector !== "") {
+    for (;;) {
         const firstChar = selector.charCodeAt(selectorIndex);
 
         if (isWhitespace(firstChar)) {
@@ -589,10 +589,6 @@ function parseSelector(
             }
         }
     }
-
-    addToken(subselects, tokens);
-
-    return selectorIndex;
 }
 
 function addToken(subselects: Selector[][], tokens: Selector[]) {
