@@ -42,6 +42,7 @@ export enum SelectorType {
     Descendant = "descendant",
     Parent = "parent",
     Sibling = "sibling",
+    ColumnCombinator = "column-combinator",
 }
 
 export interface AttributeSelector {
@@ -97,4 +98,5 @@ export type TraversalType =
     | SelectorType.Child
     | SelectorType.Descendant
     | SelectorType.Parent
-    | SelectorType.Sibling;
+    | SelectorType.Sibling
+    | SelectorType.ColumnCombinator;

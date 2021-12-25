@@ -32,6 +32,8 @@ function stringifyToken(token: Selector): string {
             return " + ";
         case SelectorType.Descendant:
             return " ";
+        case SelectorType.ColumnCombinator:
+            return " || ";
         case SelectorType.Universal:
             return `${getNamespace(token.namespace)}*`;
 

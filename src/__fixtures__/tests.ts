@@ -1016,4 +1016,25 @@ export const tests: [
         ],
         "case-sensitive attribute selector",
     ],
+    [
+        "foo || bar",
+        [
+            [
+                {
+                    name: "foo",
+                    namespace: null,
+                    type: SelectorType.Tag,
+                },
+                {
+                    type: SelectorType.ColumnCombinator,
+                },
+                {
+                    name: "bar",
+                    namespace: null,
+                    type: SelectorType.Tag,
+                },
+            ],
+        ],
+        "column combinator",
+    ],
 ];

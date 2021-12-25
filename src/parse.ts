@@ -137,6 +137,7 @@ export function isTraversal(selector: Selector): selector is Traversal {
         case SelectorType.Descendant:
         case SelectorType.Parent:
         case SelectorType.Sibling:
+        case SelectorType.ColumnCombinator:
             return true;
         default:
             return false;
@@ -616,6 +617,14 @@ function parseSelector(
                     name = "*";
                 } else if (firstChar === CharCode.Pipe) {
                     name = "";
+
+                    if (
+                        selector.charCodeAt(selectorIndex + 1) === CharCode.Pipe
+                    ) {
+                        addTraversal(SelectorType.ColumnCombinator);
+                        stripWhitespace(2);
+                        break;
+                    }
                 } else if (reName.test(selector.slice(selectorIndex))) {
                     name = getName(0);
                 } else {
