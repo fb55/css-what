@@ -18,7 +18,7 @@ const enum CharCode {
     LeftSquareBracket = 91,
     RightSquareBracket = 93,
     Comma = 44,
-    Dot = 46,
+    Period = 46,
     Colon = 58,
     SingleQuote = 39,
     DoubleQuote = 34,
@@ -55,18 +55,6 @@ const actionTypes = new Map<number, AttributeAction>([
     [CharCode.Asterisk, AttributeAction.Any],
     [CharCode.ExclamationMark, AttributeAction.Not],
     [CharCode.Pipe, AttributeAction.Hyphen],
-]);
-
-const Traversals: Map<number, TraversalType> = new Map([
-    [CharCode.GreaterThan, SelectorType.Child],
-    [CharCode.LessThan, SelectorType.Parent],
-    [CharCode.Tilde, SelectorType.Sibling],
-    [CharCode.Plus, SelectorType.Adjacent],
-]);
-
-const attribSelectors: Map<number, [string, AttributeAction]> = new Map([
-    [CharCode.Hash, ["id", AttributeAction.Equals]],
-    [CharCode.Dot, ["class", AttributeAction.Element]],
 ]);
 
 // Pseudos, whose data property is parsed as well.
@@ -217,7 +205,6 @@ function parseSelector(
     selectorIndex: number
 ): number {
     let tokens: Selector[] = [];
-    let sawWS = false;
 
     function getName(offset: number): string {
         const match = selector.slice(selectorIndex + offset).match(reName);
@@ -234,9 +221,14 @@ function parseSelector(
     }
 
     function stripWhitespace(offset: number) {
-        while (isWhitespace(selector.charCodeAt(selectorIndex + offset)))
-            offset++;
         selectorIndex += offset;
+
+        while (
+            selectorIndex < selector.length &&
+            isWhitespace(selector.charCodeAt(selectorIndex))
+        ) {
+            selectorIndex++;
+        }
     }
 
     function isEscaped(pos: number): boolean {
@@ -252,56 +244,112 @@ function parseSelector(
         }
     }
 
+    function addTraversal(type: TraversalType) {
+        if (
+            tokens.length > 0 &&
+            tokens[tokens.length - 1].type === SelectorType.Descendant
+        ) {
+            tokens[tokens.length - 1].type = type;
+            return;
+        }
+
+        ensureNotTraversal();
+
+        tokens.push({ type });
+    }
+
+    function addSpecialAttribute(name: string, action: AttributeAction) {
+        tokens.push({
+            type: SelectorType.Attribute,
+            name,
+            action,
+            value: getName(1),
+            namespace: null,
+            // TODO: Add quirksMode option, which makes `ignoreCase` `true` for HTML.
+            ignoreCase: options.xmlMode ? null : false,
+        });
+    }
+
+    /**
+     * We have finished parsing the current part of the selector.
+     *
+     * Remove descendant tokens at the end if they exist,
+     * and return the last index, so that parsing can be
+     * picked up from here.
+     */
+    function finalizeSubselector() {
+        if (
+            tokens.length &&
+            tokens[tokens.length - 1].type === SelectorType.Descendant
+        ) {
+            tokens.pop();
+        }
+
+        if (tokens.length === 0) {
+            throw new Error("Empty sub-selector");
+        }
+
+        subselects.push(tokens);
+    }
+
     stripWhitespace(0);
 
-    for (;;) {
+    if (selector.length === selectorIndex) {
+        return selectorIndex;
+    }
+
+    loop: while (selectorIndex < selector.length) {
         const firstChar = selector.charCodeAt(selectorIndex);
 
-        if (isWhitespace(firstChar)) {
-            sawWS = true;
-            stripWhitespace(1);
-        } else if (Traversals.has(firstChar)) {
-            ensureNotTraversal();
-            tokens.push({ type: Traversals.get(firstChar)! });
-            sawWS = false;
+        switch (firstChar) {
+            // Whitespace
+            case CharCode.Space:
+            case CharCode.Tab:
+            case CharCode.NewLine:
+            case CharCode.FormFeed:
+            case CharCode.CarriageReturn: {
+                if (
+                    tokens.length === 0 ||
+                    tokens[0].type !== SelectorType.Descendant
+                ) {
+                    ensureNotTraversal();
+                    tokens.push({ type: SelectorType.Descendant });
+                }
 
-            stripWhitespace(1);
-        } else if (firstChar === CharCode.Comma) {
-            if (tokens.length === 0) {
-                throw new Error("Empty sub-selector");
+                stripWhitespace(1);
+                break;
             }
-            subselects.push(tokens);
-            tokens = [];
-            sawWS = false;
-            stripWhitespace(1);
-        } else if (selector.startsWith("/*", selectorIndex)) {
-            const endIndex = selector.indexOf("*/", selectorIndex + 2);
-
-            if (endIndex < 0) {
-                throw new Error("Comment was not terminated");
+            // Traversals
+            case CharCode.GreaterThan: {
+                addTraversal(SelectorType.Child);
+                stripWhitespace(1);
+                break;
             }
-
-            selectorIndex = endIndex + 2;
-        } else {
-            if (sawWS) {
-                ensureNotTraversal();
-                tokens.push({ type: SelectorType.Descendant });
-                sawWS = false;
+            case CharCode.LessThan: {
+                addTraversal(SelectorType.Parent);
+                stripWhitespace(1);
+                break;
             }
-
-            const attribSelector = attribSelectors.get(firstChar);
-            if (attribSelector) {
-                const [name, action] = attribSelector;
-                tokens.push({
-                    type: SelectorType.Attribute,
-                    name,
-                    action,
-                    value: getName(1),
-                    namespace: null,
-                    // TODO: Add quirksMode option, which makes `ignoreCase` `true` for HTML.
-                    ignoreCase: options.xmlMode ? null : false,
-                });
-            } else if (firstChar === CharCode.LeftSquareBracket) {
+            case CharCode.Tilde: {
+                addTraversal(SelectorType.Sibling);
+                stripWhitespace(1);
+                break;
+            }
+            case CharCode.Plus: {
+                addTraversal(SelectorType.Adjacent);
+                stripWhitespace(1);
+                break;
+            }
+            // Special attribute selectors: .class, #id
+            case CharCode.Period: {
+                addSpecialAttribute("class", AttributeAction.Element);
+                break;
+            }
+            case CharCode.Hash: {
+                addSpecialAttribute("id", AttributeAction.Equals);
+                break;
+            }
+            case CharCode.LeftSquareBracket: {
                 stripWhitespace(1);
 
                 // Determine attribute name and namespace
@@ -445,7 +493,9 @@ function parseSelector(
                 };
 
                 tokens.push(attributeSelector);
-            } else if (firstChar === CharCode.Colon) {
+                break;
+            }
+            case CharCode.Colon: {
                 if (selector.charCodeAt(selectorIndex + 1) === CharCode.Colon) {
                     tokens.push({
                         type: SelectorType.PseudoElement,
@@ -533,35 +583,38 @@ function parseSelector(
                 }
 
                 tokens.push({ type: SelectorType.Pseudo, name, data });
-            } else {
+                break;
+            }
+            case CharCode.Comma: {
+                finalizeSubselector();
+                tokens = [];
+                stripWhitespace(1);
+                break;
+            }
+            default: {
+                if (selector.startsWith("/*", selectorIndex)) {
+                    const endIndex = selector.indexOf("*/", selectorIndex + 2);
+
+                    if (endIndex < 0) {
+                        throw new Error("Comment was not terminated");
+                    }
+
+                    selectorIndex = endIndex + 2;
+                    break;
+                }
+
                 let namespace = null;
                 let name: string;
 
                 if (firstChar === CharCode.Asterisk) {
                     selectorIndex += 1;
                     name = "*";
+                } else if (firstChar === CharCode.Pipe) {
+                    name = "";
                 } else if (reName.test(selector.slice(selectorIndex))) {
-                    if (selector.charCodeAt(selectorIndex) === CharCode.Pipe) {
-                        namespace = "";
-                        selectorIndex += 1;
-                    }
                     name = getName(0);
                 } else {
-                    /*
-                     * We have finished parsing the selector.
-                     * Remove descendant tokens at the end if they exist,
-                     * and return the last index, so that parsing can be
-                     * picked up from here.
-                     */
-                    if (
-                        tokens.length &&
-                        tokens[tokens.length - 1].type ===
-                            SelectorType.Descendant
-                    ) {
-                        tokens.pop();
-                    }
-                    addToken(subselects, tokens);
-                    return selectorIndex;
+                    break loop;
                 }
 
                 if (selector.charCodeAt(selectorIndex) === CharCode.Pipe) {
@@ -589,12 +642,7 @@ function parseSelector(
             }
         }
     }
-}
 
-function addToken(subselects: Selector[][], tokens: Selector[]) {
-    if (subselects.length > 0 && tokens.length === 0) {
-        throw new Error("Empty sub-selector");
-    }
-
-    subselects.push(tokens);
+    finalizeSubselector();
+    return selectorIndex;
 }
