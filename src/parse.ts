@@ -599,6 +599,12 @@ function parseSelector(
                     }
 
                     selectorIndex = endIndex + 2;
+
+                    // Remove leading whitespace
+                    if (tokens.length === 0) {
+                        stripWhitespace(0);
+                    }
+
                     break;
                 }
 

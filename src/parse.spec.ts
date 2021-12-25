@@ -56,10 +56,7 @@ describe("Parse", () => {
 
     it("should ignore comments", () => {
         expect(parse("/* comment1 */ /**/ foo /*comment2*/")).toEqual([
-            [
-                { type: "descendant" },
-                { name: "foo", namespace: null, type: "tag" },
-            ],
+            [{ name: "foo", namespace: null, type: "tag" }],
         ]);
 
         expect(() => parse("/*/")).toThrowError("Comment was not terminated");
