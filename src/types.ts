@@ -15,6 +15,10 @@ export interface Options {
      * @default false
      */
     xmlMode?: boolean;
+    /**
+     * Quirks mode, for HTML documents that aren't HTML5.
+     */
+    quirksMode?: boolean;
 }
 
 export type Selector =

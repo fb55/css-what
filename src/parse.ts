@@ -265,8 +265,7 @@ function parseSelector(
             action,
             value: getName(1),
             namespace: null,
-            // TODO: Add quirksMode option, which makes `ignoreCase` `true` for HTML.
-            ignoreCase: options.xmlMode ? null : false,
+            ignoreCase: options.xmlMode ? null : !!options.quirksMode,
         });
     }
 
