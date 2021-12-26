@@ -34,27 +34,36 @@ const charsToEscapeInName = new Set(
  */
 export function stringify(selector: Selector[][]): string {
     return selector
-        .map((token) => token.map((t) => stringifyToken(t)).join(""))
+        .map((token) => token.map(stringifyToken).join(""))
         .join(", ");
 }
 
-function stringifyToken(token: Selector): string {
+function stringifyToken(
+    token: Selector,
+    index: number,
+    arr: Selector[]
+): string {
     switch (token.type) {
         // Simple types
         case SelectorType.Child:
-            return " > ";
+            return index === 0 ? "> " : " > ";
         case SelectorType.Parent:
-            return " < ";
+            return index === 0 ? "< " : " < ";
         case SelectorType.Sibling:
-            return " ~ ";
+            return index === 0 ? "~ " : " ~ ";
         case SelectorType.Adjacent:
-            return " + ";
+            return index === 0 ? "+ " : " + ";
         case SelectorType.Descendant:
             return " ";
         case SelectorType.ColumnCombinator:
-            return " || ";
+            return index === 0 ? "|| " : " || ";
         case SelectorType.Universal:
-            return `${getNamespace(token.namespace)}*`;
+            // Return an empty string if the selector isn't needed.
+            return token.namespace === "*" &&
+                index + 1 < arr.length &&
+                "name" in arr[index + 1]
+                ? ""
+                : `${getNamespace(token.namespace)}*`;
 
         case SelectorType.Tag:
             return getNamespacedName(token);
