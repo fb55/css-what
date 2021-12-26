@@ -1,9 +1,24 @@
 import { Selector, SelectorType, AttributeAction } from "./types";
 
 const charsToEscape = new Set(
-    ["~", "^", "$", "*", "!", "|", ":", "[", "]", " ", "\\", "(", ")", "'"].map(
-        (c) => c.charCodeAt(0)
-    )
+    [
+        "~",
+        "^",
+        "$",
+        "*",
+        "+",
+        "!",
+        "|",
+        ":",
+        "[",
+        "]",
+        " ",
+        ".",
+        "\\",
+        "(",
+        ")",
+        '"',
+    ].map((c) => c.charCodeAt(0))
 );
 
 /**
@@ -12,11 +27,9 @@ const charsToEscape = new Set(
  * @param selector Selector to stringify.
  */
 export function stringify(selector: Selector[][]): string {
-    return selector.map(stringifySubselector).join(", ");
-}
-
-function stringifySubselector(token: Selector[]): string {
-    return token.map(stringifyToken).join("");
+    return selector
+        .map((token) => token.map((t) => stringifyToken(t)).join(""))
+        .join(", ");
 }
 
 function stringifyToken(token: Selector): string {
@@ -54,7 +67,7 @@ function stringifyToken(token: Selector): string {
             if (
                 token.name === "id" &&
                 token.action === AttributeAction.Equals &&
-                !token.ignoreCase &&
+                token.ignoreCase === "quirks" &&
                 !token.namespace
             ) {
                 return `#${escapeName(token.value)}`;
@@ -62,7 +75,7 @@ function stringifyToken(token: Selector): string {
             if (
                 token.name === "class" &&
                 token.action === AttributeAction.Element &&
-                !token.ignoreCase &&
+                token.ignoreCase === "quirks" &&
                 !token.namespace
             ) {
                 return `.${escapeName(token.value)}`;
@@ -74,10 +87,10 @@ function stringifyToken(token: Selector): string {
                 return `[${name}]`;
             }
 
-            return `[${name}${getActionValue(token.action)}='${escapeName(
+            return `[${name}${getActionValue(token.action)}="${escapeName(
                 token.value
-            )}'${
-                token.ignoreCase ? "i" : token.ignoreCase === false ? "s" : ""
+            )}"${
+                token.ignoreCase === null ? "" : token.ignoreCase ? " i" : " s"
             }]`;
         }
     }
@@ -128,5 +141,5 @@ function escapeName(str: string): string {
         }
     }
 
-    return ret + str.slice(lastIdx);
+    return ret.length > 0 ? ret + str.slice(lastIdx) : str;
 }

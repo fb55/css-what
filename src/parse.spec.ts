@@ -28,9 +28,9 @@ const broken = [
 
 describe("Parse", () => {
     describe("Own tests", () => {
-        for (const [selector, expected, message, options] of tests) {
+        for (const [selector, expected, message] of tests) {
             test(message, () =>
-                expect(parse(selector, options)).toStrictEqual(expected)
+                expect(parse(selector)).toStrictEqual(expected)
             );
         }
     });
@@ -60,57 +60,5 @@ describe("Parse", () => {
         ]);
 
         expect(() => parse("/*/")).toThrowError("Comment was not terminated");
-    });
-
-    it("should support quirks mode", () => {
-        expect(parse("#foo", { quirksMode: true })).toEqual([
-            [
-                {
-                    action: "equals",
-                    ignoreCase: true,
-                    name: "id",
-                    namespace: null,
-                    type: "attribute",
-                    value: "foo",
-                },
-            ],
-        ]);
-        expect(parse("#foo", { quirksMode: false })).toEqual([
-            [
-                {
-                    action: "equals",
-                    ignoreCase: false,
-                    name: "id",
-                    namespace: null,
-                    type: "attribute",
-                    value: "foo",
-                },
-            ],
-        ]);
-
-        expect(parse(".foo", { quirksMode: true })).toEqual([
-            [
-                {
-                    action: "element",
-                    ignoreCase: true,
-                    name: "class",
-                    namespace: null,
-                    type: "attribute",
-                    value: "foo",
-                },
-            ],
-        ]);
-        expect(parse(".foo", { quirksMode: false })).toEqual([
-            [
-                {
-                    action: "element",
-                    ignoreCase: false,
-                    name: "class",
-                    namespace: null,
-                    type: "attribute",
-                    value: "foo",
-                },
-            ],
-        ]);
     });
 });

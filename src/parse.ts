@@ -1,5 +1,4 @@
 import {
-    Options,
     Selector,
     SelectorType,
     AttributeSelector,
@@ -69,61 +68,6 @@ const unpackPseudos = new Set([
 ]);
 
 /**
- * Attributes that are case-insensitive in HTML.
- *
- * @private
- * @see https://html.spec.whatwg.org/multipage/semantics-other.html#case-sensitivity-of-selectors
- */
-const caseInsensitiveAttributes = new Set([
-    "accept",
-    "accept-charset",
-    "align",
-    "alink",
-    "axis",
-    "bgcolor",
-    "charset",
-    "checked",
-    "clear",
-    "codetype",
-    "color",
-    "compact",
-    "declare",
-    "defer",
-    "dir",
-    "direction",
-    "disabled",
-    "enctype",
-    "face",
-    "frame",
-    "hreflang",
-    "http-equiv",
-    "lang",
-    "language",
-    "link",
-    "media",
-    "method",
-    "multiple",
-    "nohref",
-    "noresize",
-    "noshade",
-    "nowrap",
-    "readonly",
-    "rel",
-    "rev",
-    "rules",
-    "scope",
-    "scrolling",
-    "selected",
-    "shape",
-    "target",
-    "text",
-    "type",
-    "valign",
-    "valuetype",
-    "vlink",
-]);
-
-/**
  * Checks whether a specific selector is a traversal.
  * This is useful eg. in swapping the order of elements that
  * are not traversals.
@@ -187,10 +131,10 @@ function isWhitespace(c: number): boolean {
  * The first dimension represents selectors separated by commas (eg. `sub1, sub2`),
  * the second contains the relevant tokens for that selector.
  */
-export function parse(selector: string, options?: Options): Selector[][] {
+export function parse(selector: string): Selector[][] {
     const subselects: Selector[][] = [];
 
-    const endIndex = parseSelector(subselects, `${selector}`, options, 0);
+    const endIndex = parseSelector(subselects, `${selector}`, 0);
 
     if (endIndex < selector.length) {
         throw new Error(`Unmatched selector: ${selector.slice(endIndex)}`);
@@ -202,7 +146,6 @@ export function parse(selector: string, options?: Options): Selector[][] {
 function parseSelector(
     subselects: Selector[][],
     selector: string,
-    options: Options = {},
     selectorIndex: number
 ): number {
     let tokens: Selector[] = [];
@@ -266,7 +209,7 @@ function parseSelector(
             action,
             value: getName(1),
             namespace: null,
-            ignoreCase: options.xmlMode ? null : !!options.quirksMode,
+            ignoreCase: "quirks",
         });
     }
 
@@ -375,10 +318,6 @@ function parseSelector(
                     name = getName(1);
                 }
 
-                if (options.lowerCaseAttributeNames ?? !options.xmlMode) {
-                    name = name.toLowerCase();
-                }
-
                 stripWhitespace(0);
 
                 // Determine comparison operation
@@ -468,12 +407,6 @@ function parseSelector(
                     }
                 }
 
-                // If `xmlMode` is set, there are no rules; otherwise, use the `caseInsensitiveAttributes` list.
-                if (!options.xmlMode) {
-                    // TODO: Skip this for `exists`, as there is no value to compare to.
-                    ignoreCase ??= caseInsensitiveAttributes.has(name);
-                }
-
                 if (
                     selector.charCodeAt(selectorIndex) !==
                     CharCode.RightSquareBracket
@@ -522,7 +455,6 @@ function parseSelector(
                         selectorIndex = parseSelector(
                             data,
                             selector,
-                            options,
                             selectorIndex + 1
                         );
 
@@ -576,9 +508,9 @@ function parseSelector(
                             ) {
                                 data = data.slice(1, -1);
                             }
-
-                            data = unescapeCSS(data);
                         }
+
+                        data = unescapeCSS(data);
                     }
                 }
 
@@ -647,10 +579,6 @@ function parseSelector(
                 if (name === "*") {
                     tokens.push({ type: SelectorType.Universal, namespace });
                 } else {
-                    if (options.lowerCaseTags ?? !options.xmlMode) {
-                        name = name.toLowerCase();
-                    }
-
                     tokens.push({ type: SelectorType.Tag, name, namespace });
                 }
             }

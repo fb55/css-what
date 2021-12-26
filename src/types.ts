@@ -1,26 +1,3 @@
-export interface Options {
-    /**
-     * When false, tag names will not be lowercased.
-     * @default true
-     */
-    lowerCaseAttributeNames?: boolean;
-    /**
-     * When false, attribute names will not be lowercased.
-     * @default true
-     */
-    lowerCaseTags?: boolean;
-    /**
-     * When `true`, `xmlMode` implies both `lowerCaseTags` and `lowerCaseAttributeNames` are set to `false`.
-     * Also, `ignoreCase` on attributes will not be inferred based on HTML rules anymore.
-     * @default false
-     */
-    xmlMode?: boolean;
-    /**
-     * Quirks mode, for HTML documents that aren't HTML5.
-     */
-    quirksMode?: boolean;
-}
-
 export type Selector =
     | PseudoSelector
     | PseudoElement
@@ -45,12 +22,26 @@ export enum SelectorType {
     ColumnCombinator = "column-combinator",
 }
 
+/**
+ * Modes for ignore case.
+ *
+ * This could be updated to an enum, and the object is
+ * the current stand-in that will allow code to be updated
+ * without big changes.
+ */
+export const IgnoreCaseMode = {
+    Unknown: null,
+    QuirksMode: "quirks",
+    IgnoreCase: true,
+    CaseSensitive: false,
+} as const;
+
 export interface AttributeSelector {
     type: SelectorType.Attribute;
     name: string;
     action: AttributeAction;
     value: string;
-    ignoreCase: boolean | null;
+    ignoreCase: "quirks" | boolean | null;
     namespace: string | null;
 }
 
