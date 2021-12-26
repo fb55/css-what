@@ -1,7 +1,17 @@
 import { Selector, SelectorType, AttributeAction } from "./types";
 
-const charsToEscape = new Set(
+const attribValChars = ["\\", '"'];
+const pseudoValChars = [...attribValChars, "(", ")"];
+
+const charsToEscapeInAttributeValue = new Set(
+    attribValChars.map((c) => c.charCodeAt(0))
+);
+const charsToEscapeInPseudoValue = new Set(
+    pseudoValChars.map((c) => c.charCodeAt(0))
+);
+const charsToEscapeInName = new Set(
     [
+        ...pseudoValChars,
         "~",
         "^",
         "$",
@@ -14,10 +24,6 @@ const charsToEscape = new Set(
         "]",
         " ",
         ".",
-        "\\",
-        "(",
-        ")",
-        '"',
     ].map((c) => c.charCodeAt(0))
 );
 
@@ -54,14 +60,20 @@ function stringifyToken(token: Selector): string {
             return getNamespacedName(token);
 
         case SelectorType.PseudoElement:
-            return `::${escapeName(token.name)}`;
+            return `::${escapeName(token.name, charsToEscapeInName)}`;
 
         case SelectorType.Pseudo:
-            if (token.data === null) return `:${escapeName(token.name)}`;
+            if (token.data === null)
+                return `:${escapeName(token.name, charsToEscapeInName)}`;
             if (typeof token.data === "string") {
-                return `:${escapeName(token.name)}(${escapeName(token.data)})`;
+                return `:${escapeName(
+                    token.name,
+                    charsToEscapeInName
+                )}(${escapeName(token.data, charsToEscapeInPseudoValue)})`;
             }
-            return `:${escapeName(token.name)}(${stringify(token.data)})`;
+            return `:${escapeName(token.name, charsToEscapeInName)}(${stringify(
+                token.data
+            )})`;
 
         case SelectorType.Attribute: {
             if (
@@ -70,7 +82,7 @@ function stringifyToken(token: Selector): string {
                 token.ignoreCase === "quirks" &&
                 !token.namespace
             ) {
-                return `#${escapeName(token.value)}`;
+                return `#${escapeName(token.value, charsToEscapeInName)}`;
             }
             if (
                 token.name === "class" &&
@@ -78,7 +90,7 @@ function stringifyToken(token: Selector): string {
                 token.ignoreCase === "quirks" &&
                 !token.namespace
             ) {
-                return `.${escapeName(token.value)}`;
+                return `.${escapeName(token.value, charsToEscapeInName)}`;
             }
 
             const name = getNamespacedName(token);
@@ -88,7 +100,8 @@ function stringifyToken(token: Selector): string {
             }
 
             return `[${name}${getActionValue(token.action)}="${escapeName(
-                token.value
+                token.value,
+                charsToEscapeInAttributeValue
             )}"${
                 token.ignoreCase === null ? "" : token.ignoreCase ? " i" : " s"
             }]`;
@@ -121,16 +134,23 @@ function getNamespacedName(token: {
     name: string;
     namespace: string | null;
 }): string {
-    return `${getNamespace(token.namespace)}${escapeName(token.name)}`;
+    return `${getNamespace(token.namespace)}${escapeName(
+        token.name,
+        charsToEscapeInName
+    )}`;
 }
 
 function getNamespace(namespace: string | null): string {
     return namespace !== null
-        ? `${namespace === "*" ? "*" : escapeName(namespace)}|`
+        ? `${
+              namespace === "*"
+                  ? "*"
+                  : escapeName(namespace, charsToEscapeInName)
+          }|`
         : "";
 }
 
-function escapeName(str: string): string {
+function escapeName(str: string, charsToEscape: Set<number>): string {
     let lastIdx = 0;
     let ret = "";
 
