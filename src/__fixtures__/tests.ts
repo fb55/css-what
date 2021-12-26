@@ -895,7 +895,7 @@ export const tests: [
                     action: AttributeAction.Exists,
                     name: "bar",
                     type: SelectorType.Attribute,
-                    namespace: "",
+                    namespace: null,
                     value: "",
                     ignoreCase: IgnoreCaseMode.Unknown,
                 },

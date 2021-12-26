@@ -297,25 +297,26 @@ function parseSelector(
 
                 // Determine attribute name and namespace
 
+                let name: string;
                 let namespace: string | null = null;
 
                 if (selector.charCodeAt(selectorIndex) === CharCode.Pipe) {
-                    namespace = "";
-                    selectorIndex += 1;
+                    // Equivalent to no namespace
+                    name = getName(1);
                 } else if (selector.startsWith("*|", selectorIndex)) {
                     namespace = "*";
-                    selectorIndex += 2;
-                }
+                    name = getName(2);
+                } else {
+                    name = getName(0);
 
-                let name = getName(0);
-
-                if (
-                    namespace === null &&
-                    selector.charCodeAt(selectorIndex) === CharCode.Pipe &&
-                    selector.charCodeAt(selectorIndex + 1) !== CharCode.Equal
-                ) {
-                    namespace = name;
-                    name = getName(1);
+                    if (
+                        selector.charCodeAt(selectorIndex) === CharCode.Pipe &&
+                        selector.charCodeAt(selectorIndex + 1) !==
+                            CharCode.Equal
+                    ) {
+                        namespace = name;
+                        name = getName(1);
+                    }
                 }
 
                 stripWhitespace(0);
