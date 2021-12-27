@@ -564,7 +564,10 @@ function parseSelector(
                     break loop;
                 }
 
-                if (selector.charCodeAt(selectorIndex) === CharCode.Pipe) {
+                if (
+                    selector.charCodeAt(selectorIndex) === CharCode.Pipe &&
+                    selector.charCodeAt(selectorIndex + 1) !== CharCode.Pipe
+                ) {
                     namespace = name;
                     if (
                         selector.charCodeAt(selectorIndex + 1) ===

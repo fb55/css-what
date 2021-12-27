@@ -972,4 +972,25 @@ export const tests: [
         ],
         "column combinator",
     ],
+    [
+        "foo||bar",
+        [
+            [
+                {
+                    name: "foo",
+                    namespace: null,
+                    type: SelectorType.Tag,
+                },
+                {
+                    type: SelectorType.ColumnCombinator,
+                },
+                {
+                    name: "bar",
+                    namespace: null,
+                    type: SelectorType.Tag,
+                },
+            ],
+        ],
+        "column combinator without whitespace",
+    ],
 ];
