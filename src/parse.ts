@@ -68,6 +68,19 @@ const unpackPseudos = new Set([
 ]);
 
 /**
+ * Pseudo elements defined in CSS Level 1 and CSS Level 2 can be written with
+ * a single colon; eg. :before will turn into ::before.
+ *
+ * @see {@link https://www.w3.org/TR/2018/WD-selectors-4-20181121/#pseudo-element-syntax}
+ */
+const pseudosToPseudoElements = new Set([
+    "before",
+    "after",
+    "first-line",
+    "first-letter",
+]);
+
+/**
  * Checks whether a specific selector is a traversal.
  * This is useful eg. in swapping the order of elements that
  * are not traversals.
@@ -435,10 +448,19 @@ function parseSelector(
                         type: SelectorType.PseudoElement,
                         name: getName(2).toLowerCase(),
                     });
-                    continue;
+                    break;
                 }
 
                 const name = getName(1).toLowerCase();
+
+                if (pseudosToPseudoElements.has(name)) {
+                    tokens.push({
+                        type: SelectorType.PseudoElement,
+                        name,
+                    });
+                    break;
+                }
+
                 let data: DataType = null;
 
                 if (
