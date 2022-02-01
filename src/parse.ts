@@ -580,11 +580,11 @@ function parseSelector(
                     }
                 }
 
-                if (name === "*") {
-                    tokens.push({ type: SelectorType.Universal, namespace });
-                } else {
-                    tokens.push({ type: SelectorType.Tag, name, namespace });
-                }
+                tokens.push(
+                    name === "*"
+                        ? { type: SelectorType.Universal, namespace }
+                        : { type: SelectorType.Tag, name, namespace }
+                );
             }
         }
     }
