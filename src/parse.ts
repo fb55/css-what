@@ -175,6 +175,38 @@ function parseSelector(
         }
     }
 
+    function readValueWithParenthesis(): string {
+        selectorIndex += 1;
+        const start = selectorIndex;
+        let counter = 1;
+
+        for (
+            ;
+            counter > 0 && selectorIndex < selector.length;
+            selectorIndex++
+        ) {
+            if (
+                selector.charCodeAt(selectorIndex) ===
+                    CharCode.LeftParenthesis &&
+                !isEscaped(selectorIndex)
+            ) {
+                counter++;
+            } else if (
+                selector.charCodeAt(selectorIndex) ===
+                    CharCode.RightParenthesis &&
+                !isEscaped(selectorIndex)
+            ) {
+                counter--;
+            }
+        }
+
+        if (counter) {
+            throw new Error("Parenthesis not matched");
+        }
+
+        return unescapeCSS(selector.slice(start, selectorIndex - 1));
+    }
+
     function isEscaped(pos: number): boolean {
         let slashCount = 0;
 
@@ -434,6 +466,11 @@ function parseSelector(
                     tokens.push({
                         type: SelectorType.PseudoElement,
                         name: getName(2).toLowerCase(),
+                        data:
+                            selector.charCodeAt(selectorIndex) ===
+                            CharCode.LeftParenthesis
+                                ? readValueWithParenthesis()
+                                : null,
                     });
                     continue;
                 }
@@ -470,35 +507,7 @@ function parseSelector(
 
                         selectorIndex += 1;
                     } else {
-                        selectorIndex += 1;
-                        const start = selectorIndex;
-                        let counter = 1;
-
-                        for (
-                            ;
-                            counter > 0 && selectorIndex < selector.length;
-                            selectorIndex++
-                        ) {
-                            if (
-                                selector.charCodeAt(selectorIndex) ===
-                                    CharCode.LeftParenthesis &&
-                                !isEscaped(selectorIndex)
-                            ) {
-                                counter++;
-                            } else if (
-                                selector.charCodeAt(selectorIndex) ===
-                                    CharCode.RightParenthesis &&
-                                !isEscaped(selectorIndex)
-                            ) {
-                                counter--;
-                            }
-                        }
-
-                        if (counter) {
-                            throw new Error("Parenthesis not matched");
-                        }
-
-                        data = selector.slice(start, selectorIndex - 1);
+                        data = readValueWithParenthesis();
 
                         if (stripQuotesFromPseudos.has(name)) {
                             const quot = data.charCodeAt(0);
