@@ -411,6 +411,33 @@ export const tests: [
                 {
                     type: SelectorType.PseudoElement,
                     name: "foo",
+                    data: null,
+                },
+            ],
+        ],
+        "pseudo-element",
+    ],
+    [
+        "::foo()",
+        [
+            [
+                {
+                    type: SelectorType.PseudoElement,
+                    name: "foo",
+                    data: "",
+                },
+            ],
+        ],
+        "pseudo-element",
+    ],
+    [
+        "::foo(bar())",
+        [
+            [
+                {
+                    type: SelectorType.PseudoElement,
+                    name: "foo",
+                    data: "bar()",
                 },
             ],
         ],
@@ -485,7 +512,7 @@ export const tests: [
                 {
                     type: SelectorType.Pseudo,
                     name: "contains",
-                    data: "(a((foo\\))))",
+                    data: "(a((foo))))",
                 },
             ],
         ],

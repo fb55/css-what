@@ -69,20 +69,25 @@ function stringifyToken(
             return getNamespacedName(token);
 
         case SelectorType.PseudoElement:
-            return `::${escapeName(token.name, charsToEscapeInName)}`;
+            return `::${escapeName(token.name, charsToEscapeInName)}${
+                token.data === null
+                    ? ""
+                    : `(${escapeName(token.data, charsToEscapeInPseudoValue)})`
+            }`;
 
         case SelectorType.Pseudo:
-            if (token.data === null)
-                return `:${escapeName(token.name, charsToEscapeInName)}`;
-            if (typeof token.data === "string") {
-                return `:${escapeName(
-                    token.name,
-                    charsToEscapeInName
-                )}(${escapeName(token.data, charsToEscapeInPseudoValue)})`;
-            }
-            return `:${escapeName(token.name, charsToEscapeInName)}(${stringify(
-                token.data
-            )})`;
+            return `:${escapeName(token.name, charsToEscapeInName)}${
+                token.data === null
+                    ? ""
+                    : `(${
+                          typeof token.data === "string"
+                              ? escapeName(
+                                    token.data,
+                                    charsToEscapeInPseudoValue
+                                )
+                              : stringify(token.data)
+                      })`
+            }`;
 
         case SelectorType.Attribute: {
             if (
