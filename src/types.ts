@@ -56,6 +56,7 @@ export interface PseudoSelector {
 export interface PseudoElement {
     type: SelectorType.PseudoElement;
     name: string;
+    data: string | null;
 }
 
 export interface TagSelector {
