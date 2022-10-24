@@ -494,6 +494,7 @@ function parseSelector(
                     tokens.push({
                         type: SelectorType.PseudoElement,
                         name,
+                        data: null,
                     });
                     break;
                 }

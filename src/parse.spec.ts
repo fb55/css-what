@@ -61,4 +61,10 @@ describe("Parse", () => {
 
         expect(() => parse("/*/")).toThrowError("Comment was not terminated");
     });
+
+    it("should support legacy pseudo-elements with single colon", () => {
+        expect(parse(":before")).toEqual([
+            [{ name: "before", data: null, type: "pseudo-element" }],
+        ]);
+    });
 });
