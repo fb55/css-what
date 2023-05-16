@@ -1,6 +1,6 @@
 import { Selector, SelectorType, AttributeAction } from "./types";
 
-const attribValChars = ["\\", '"'];
+const attribValChars = ["\\", '"', "%"];
 const pseudoValChars = [...attribValChars, "(", ")"];
 
 const charsToEscapeInAttributeValue = new Set(
