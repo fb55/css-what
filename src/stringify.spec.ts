@@ -20,7 +20,7 @@ describe("Stringify & re-parse", () => {
         }
     });
 
-    it.only("escape % in attribute value", () => {
+    it("escape % in attribute value", () => {
         const selector = `.before\\:h-\\[calc\\(100\\%-28px\\)\\]::before`;
         expect(stringify(parse(selector))).toBe(selector);
     });
