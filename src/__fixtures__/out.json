@@ -17279,5 +17279,18 @@
                 "namespace": null
             }
         ]
+    ],
+    ".before\\:h-\\[calc\\(100\\%-28px\\)\\]::before": [
+        [
+            {
+                "type": "attribute",
+                "name": "class",
+                "action": "element",
+                "value": "before:h-[calc(100%-28px)]",
+                "namespace": null,
+                "ignoreCase": "quirks"
+            },
+            { "type": "pseudo-element", "name": "before", "data": null }
+        ]
     ]
 }

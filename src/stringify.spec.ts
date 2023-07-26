@@ -19,9 +19,4 @@ describe("Stringify & re-parse", () => {
             expect(parse(stringify(out[s]))).toStrictEqual(out[s]);
         }
     });
-
-    it("escape % in attribute value", () => {
-        const selector = `.before\\:h-\\[calc\\(100\\%-28px\\)\\]::before`;
-        expect(stringify(parse(selector))).toBe(selector);
-    });
 });
