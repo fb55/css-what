@@ -26,7 +26,6 @@ const enum CharCode {
     QuestionMark = 63,
     ExclamationMark = 33,
     Slash = 47,
-    Star = 42,
     Equal = 61,
     Dollar = 36,
     Pipe = 124,
