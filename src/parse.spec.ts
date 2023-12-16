@@ -30,14 +30,14 @@ describe("Parse", () => {
     describe("Own tests", () => {
         for (const [selector, expected, message] of tests) {
             test(message, () =>
-                expect(parse(selector)).toStrictEqual(expected)
+                expect(parse(selector)).toStrictEqual(expected),
             );
         }
     });
 
     describe("Collected selectors (qwery, sizzle, nwmatcher)", () => {
         const out = JSON.parse(
-            readFileSync(`${__dirname}/__fixtures__/out.json`, "utf8")
+            readFileSync(`${__dirname}/__fixtures__/out.json`, "utf8"),
         );
         for (const s of Object.keys(out)) {
             test(s, () => {

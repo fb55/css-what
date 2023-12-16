@@ -3,7 +3,7 @@ import { Selector, SelectorType, AttributeAction, IgnoreCaseMode } from "..";
 export const tests: [
     selector: string,
     expected: Selector[][],
-    message: string
+    message: string,
 ][] = [
     // Tag names
     [

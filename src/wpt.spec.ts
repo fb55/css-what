@@ -8,7 +8,7 @@ import { parse, stringify } from ".";
 
 function test_valid_selector(
     selector: string,
-    serialized: string | string[] = selector
+    serialized: string | string[] = selector,
 ) {
     const result = stringify(parse(selector));
     if (Array.isArray(serialized)) {
@@ -110,7 +110,7 @@ describe("Web Platform Tests", () => {
     it("The Matches-Any Pseudo-class: ':is()'", () => {
         test_valid_selector(
             ":is(ul,ol,.list) > [hidden]",
-            ":is(ul, ol, .list) > [hidden]"
+            ":is(ul, ol, .list) > [hidden]",
         );
         test_valid_selector(":is(:hover,:focus)", ":is(:hover, :focus)");
         test_valid_selector("a:is(:not(:hover))");
@@ -140,11 +140,11 @@ describe("Web Platform Tests", () => {
         test_valid_selector(":not(:host(:not(.a)))");
         test_valid_selector(
             ":not([disabled][selected])",
-            ":not([disabled][selected])"
+            ":not([disabled][selected])",
         );
         test_valid_selector(
             ":not([disabled],[selected])",
-            ":not([disabled], [selected])"
+            ":not([disabled], [selected])",
         );
 
         test_invalid_selector(":not()");
@@ -172,7 +172,7 @@ describe("Web Platform Tests", () => {
     it("The Specificity-adjustment Pseudo-class: ':where()'", () => {
         test_valid_selector(
             ":where(ul,ol,.list) > [hidden]",
-            ":where(ul, ol, .list) > [hidden]"
+            ":where(ul, ol, .list) > [hidden]",
         );
         test_valid_selector(":where(:hover,:focus)", ":where(:hover, :focus)");
         test_valid_selector("a:where(:not(:hover))");

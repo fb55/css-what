@@ -111,10 +111,10 @@ function funescape(_: string, escaped: string, escapedWhitespace?: string) {
     return high !== high || escapedWhitespace
         ? escaped
         : high < 0
-        ? // BMP codepoint
-          String.fromCharCode(high + 0x10000)
-        : // Supplemental Plane codepoint (surrogate pair)
-          String.fromCharCode((high >> 10) | 0xd800, (high & 0x3ff) | 0xdc00);
+          ? // BMP codepoint
+            String.fromCharCode(high + 0x10000)
+          : // Supplemental Plane codepoint (surrogate pair)
+            String.fromCharCode((high >> 10) | 0xd800, (high & 0x3ff) | 0xdc00);
 }
 
 function unescapeCSS(str: string) {
@@ -159,7 +159,7 @@ export function parse(selector: string): Selector[][] {
 function parseSelector(
     subselects: Selector[][],
     selector: string,
-    selectorIndex: number
+    selectorIndex: number,
 ): number {
     let tokens: Selector[] = [];
 
@@ -168,7 +168,7 @@ function parseSelector(
 
         if (!match) {
             throw new Error(
-                `Expected name, found ${selector.slice(selectorIndex)}`
+                `Expected name, found ${selector.slice(selectorIndex)}`,
             );
         }
 
@@ -370,7 +370,7 @@ function parseSelector(
 
                 let action: AttributeAction = AttributeAction.Exists;
                 const possibleAction = actionTypes.get(
-                    selector.charCodeAt(selectorIndex)
+                    selector.charCodeAt(selectorIndex),
                 );
 
                 if (possibleAction) {
@@ -413,7 +413,7 @@ function parseSelector(
                         }
 
                         value = unescapeCSS(
-                            selector.slice(selectorIndex + 1, sectionEnd)
+                            selector.slice(selectorIndex + 1, sectionEnd),
                         );
                         selectorIndex = sectionEnd + 1;
                     } else {
@@ -422,7 +422,7 @@ function parseSelector(
                         while (
                             selectorIndex < selector.length &&
                             ((!isWhitespace(
-                                selector.charCodeAt(selectorIndex)
+                                selector.charCodeAt(selectorIndex),
                             ) &&
                                 selector.charCodeAt(selectorIndex) !==
                                     CharCode.RightSquareBracket) ||
@@ -432,7 +432,7 @@ function parseSelector(
                         }
 
                         value = unescapeCSS(
-                            selector.slice(valueStart, selectorIndex)
+                            selector.slice(valueStart, selectorIndex),
                         );
                     }
 
@@ -508,7 +508,7 @@ function parseSelector(
                     if (unpackPseudos.has(name)) {
                         if (isQuote(selector.charCodeAt(selectorIndex + 1))) {
                             throw new Error(
-                                `Pseudo-selector ${name} cannot be quoted`
+                                `Pseudo-selector ${name} cannot be quoted`,
                             );
                         }
 
@@ -516,7 +516,7 @@ function parseSelector(
                         selectorIndex = parseSelector(
                             data,
                             selector,
-                            selectorIndex + 1
+                            selectorIndex + 1,
                         );
 
                         if (
@@ -524,7 +524,7 @@ function parseSelector(
                             CharCode.RightParenthesis
                         ) {
                             throw new Error(
-                                `Missing closing parenthesis in :${name} (${selector})`
+                                `Missing closing parenthesis in :${name} (${selector})`,
                             );
                         }
 
@@ -615,7 +615,7 @@ function parseSelector(
                 tokens.push(
                     name === "*"
                         ? { type: SelectorType.Universal, namespace }
-                        : { type: SelectorType.Tag, name, namespace }
+                        : { type: SelectorType.Tag, name, namespace },
                 );
             }
         }
