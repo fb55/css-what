@@ -4,10 +4,10 @@ const attribValChars = ["\\", '"'];
 const pseudoValChars = [...attribValChars, "(", ")"];
 
 const charsToEscapeInAttributeValue = new Set(
-    attribValChars.map((c) => c.charCodeAt(0))
+    attribValChars.map((c) => c.charCodeAt(0)),
 );
 const charsToEscapeInPseudoValue = new Set(
-    pseudoValChars.map((c) => c.charCodeAt(0))
+    pseudoValChars.map((c) => c.charCodeAt(0)),
 );
 const charsToEscapeInName = new Set(
     [
@@ -25,7 +25,7 @@ const charsToEscapeInName = new Set(
         " ",
         ".",
         "%",
-    ].map((c) => c.charCodeAt(0))
+    ].map((c) => c.charCodeAt(0)),
 );
 
 /**
@@ -42,7 +42,7 @@ export function stringify(selector: Selector[][]): string {
 function stringifyToken(
     token: Selector,
     index: number,
-    arr: Selector[]
+    arr: Selector[],
 ): string {
     switch (token.type) {
         // Simple types
@@ -84,7 +84,7 @@ function stringifyToken(
                           typeof token.data === "string"
                               ? escapeName(
                                     token.data,
-                                    charsToEscapeInPseudoValue
+                                    charsToEscapeInPseudoValue,
                                 )
                               : stringify(token.data)
                       })`
@@ -116,7 +116,7 @@ function stringifyToken(
 
             return `[${name}${getActionValue(token.action)}="${escapeName(
                 token.value,
-                charsToEscapeInAttributeValue
+                charsToEscapeInAttributeValue,
             )}"${
                 token.ignoreCase === null ? "" : token.ignoreCase ? " i" : " s"
             }]`;
@@ -151,7 +151,7 @@ function getNamespacedName(token: {
 }): string {
     return `${getNamespace(token.namespace)}${escapeName(
         token.name,
-        charsToEscapeInName
+        charsToEscapeInName,
     )}`;
 }
 

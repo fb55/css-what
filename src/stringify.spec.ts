@@ -13,7 +13,7 @@ describe("Stringify & re-parse", () => {
 
     it("Collected Selectors (qwery, sizzle, nwmatcher)", () => {
         const out = JSON.parse(
-            readFileSync(`${__dirname}/__fixtures__/out.json`, "utf8")
+            readFileSync(`${__dirname}/__fixtures__/out.json`, "utf8"),
         );
         for (const s of Object.keys(out)) {
             expect(parse(stringify(out[s]))).toStrictEqual(out[s]);
