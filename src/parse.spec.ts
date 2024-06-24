@@ -1,6 +1,7 @@
-import { readFileSync } from "fs";
-import { parse } from ".";
-import { tests } from "./__fixtures__/tests";
+import { readFileSync } from "node:fs";
+import { describe, it, expect } from "vitest";
+import { parse } from "./parse.js";
+import { tests } from "./__fixtures__/tests.js";
 
 const broken = [
     "[",
@@ -29,9 +30,7 @@ const broken = [
 describe("Parse", () => {
     describe("Own tests", () => {
         for (const [selector, expected, message] of tests) {
-            test(message, () =>
-                expect(parse(selector)).toStrictEqual(expected),
-            );
+            it(message, () => expect(parse(selector)).toStrictEqual(expected));
         }
     });
 
@@ -40,7 +39,7 @@ describe("Parse", () => {
             readFileSync(`${__dirname}/__fixtures__/out.json`, "utf8"),
         );
         for (const s of Object.keys(out)) {
-            test(s, () => {
+            it(s, () => {
                 expect(parse(s)).toStrictEqual(out[s]);
             });
         }

@@ -1,17 +1,17 @@
-import { Selector, SelectorType, AttributeAction } from "./types";
+import { type Selector, SelectorType, AttributeAction } from "./types.js";
 
-const attribValChars = ["\\", '"'];
-const pseudoValChars = [...attribValChars, "(", ")"];
+const attribValueChars = ["\\", '"'];
+const pseudoValueChars = [...attribValueChars, "(", ")"];
 
 const charsToEscapeInAttributeValue = new Set(
-    attribValChars.map((c) => c.charCodeAt(0)),
+    attribValueChars.map((c) => c.charCodeAt(0)),
 );
 const charsToEscapeInPseudoValue = new Set(
-    pseudoValChars.map((c) => c.charCodeAt(0)),
+    pseudoValueChars.map((c) => c.charCodeAt(0)),
 );
 const charsToEscapeInName = new Set(
     [
-        ...pseudoValChars,
+        ...pseudoValueChars,
         "~",
         "^",
         "$",
@@ -35,48 +35,63 @@ const charsToEscapeInName = new Set(
  */
 export function stringify(selector: Selector[][]): string {
     return selector
-        .map((token) => token.map(stringifyToken).join(""))
+        .map((token) =>
+            token
+                .map((token, index, array) =>
+                    stringifyToken(token, index, array),
+                )
+                .join(""),
+        )
         .join(", ");
 }
 
 function stringifyToken(
     token: Selector,
     index: number,
-    arr: Selector[],
+    array: Selector[],
 ): string {
     switch (token.type) {
         // Simple types
-        case SelectorType.Child:
+        case SelectorType.Child: {
             return index === 0 ? "> " : " > ";
-        case SelectorType.Parent:
+        }
+        case SelectorType.Parent: {
             return index === 0 ? "< " : " < ";
-        case SelectorType.Sibling:
+        }
+        case SelectorType.Sibling: {
             return index === 0 ? "~ " : " ~ ";
-        case SelectorType.Adjacent:
+        }
+        case SelectorType.Adjacent: {
             return index === 0 ? "+ " : " + ";
-        case SelectorType.Descendant:
+        }
+        case SelectorType.Descendant: {
             return " ";
-        case SelectorType.ColumnCombinator:
+        }
+        case SelectorType.ColumnCombinator: {
             return index === 0 ? "|| " : " || ";
-        case SelectorType.Universal:
+        }
+        case SelectorType.Universal: {
             // Return an empty string if the selector isn't needed.
             return token.namespace === "*" &&
-                index + 1 < arr.length &&
-                "name" in arr[index + 1]
+                index + 1 < array.length &&
+                "name" in array[index + 1]
                 ? ""
                 : `${getNamespace(token.namespace)}*`;
+        }
 
-        case SelectorType.Tag:
+        case SelectorType.Tag: {
             return getNamespacedName(token);
+        }
 
-        case SelectorType.PseudoElement:
+        case SelectorType.PseudoElement: {
             return `::${escapeName(token.name, charsToEscapeInName)}${
                 token.data === null
                     ? ""
                     : `(${escapeName(token.data, charsToEscapeInPseudoValue)})`
             }`;
+        }
 
-        case SelectorType.Pseudo:
+        case SelectorType.Pseudo: {
             return `:${escapeName(token.name, charsToEscapeInName)}${
                 token.data === null
                     ? ""
@@ -89,6 +104,7 @@ function stringifyToken(
                               : stringify(token.data)
                       })`
             }`;
+        }
 
         case SelectorType.Attribute: {
             if (
@@ -126,22 +142,30 @@ function stringifyToken(
 
 function getActionValue(action: AttributeAction): string {
     switch (action) {
-        case AttributeAction.Equals:
+        case AttributeAction.Equals: {
             return "";
-        case AttributeAction.Element:
+        }
+        case AttributeAction.Element: {
             return "~";
-        case AttributeAction.Start:
+        }
+        case AttributeAction.Start: {
             return "^";
-        case AttributeAction.End:
+        }
+        case AttributeAction.End: {
             return "$";
-        case AttributeAction.Any:
+        }
+        case AttributeAction.Any: {
             return "*";
-        case AttributeAction.Not:
+        }
+        case AttributeAction.Not: {
             return "!";
-        case AttributeAction.Hyphen:
+        }
+        case AttributeAction.Hyphen: {
             return "|";
-        case AttributeAction.Exists:
+        }
+        default: {
             throw new Error("Shouldn't be here");
+        }
     }
 }
 
@@ -156,25 +180,25 @@ function getNamespacedName(token: {
 }
 
 function getNamespace(namespace: string | null): string {
-    return namespace !== null
-        ? `${
+    return namespace === null
+        ? ""
+        : `${
               namespace === "*"
                   ? "*"
                   : escapeName(namespace, charsToEscapeInName)
-          }|`
-        : "";
+          }|`;
 }
 
-function escapeName(str: string, charsToEscape: Set<number>): string {
-    let lastIdx = 0;
-    let ret = "";
+function escapeName(name: string, charsToEscape: Set<number>): string {
+    let lastIndex = 0;
+    let escapedName = "";
 
-    for (let i = 0; i < str.length; i++) {
-        if (charsToEscape.has(str.charCodeAt(i))) {
-            ret += `${str.slice(lastIdx, i)}\\${str.charAt(i)}`;
-            lastIdx = i + 1;
+    for (let index = 0; index < name.length; index++) {
+        if (charsToEscape.has(name.charCodeAt(index))) {
+            escapedName += `${name.slice(lastIndex, index)}\\${name.charAt(index)}`;
+            lastIndex = index + 1;
         }
     }
 
-    return ret.length > 0 ? ret + str.slice(lastIdx) : str;
+    return escapedName.length > 0 ? escapedName + name.slice(lastIndex) : name;
 }

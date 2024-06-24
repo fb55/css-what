@@ -1,11 +1,12 @@
-import { readFileSync } from "fs";
-import { parse, stringify } from ".";
-import { tests } from "./__fixtures__/tests";
+import { readFileSync } from "node:fs";
+import { describe, it, expect } from "vitest";
+import { parse, stringify } from "./index.js";
+import { tests } from "./__fixtures__/tests.js";
 
 describe("Stringify & re-parse", () => {
     describe("Own tests", () => {
         for (const [selector, expected, message] of tests) {
-            test(`${message} (${selector})`, () => {
+            it(`${message} (${selector})`, () => {
                 expect(parse(stringify(expected))).toStrictEqual(expected);
             });
         }
