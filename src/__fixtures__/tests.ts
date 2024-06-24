@@ -1,4 +1,9 @@
-import { Selector, SelectorType, AttributeAction, IgnoreCaseMode } from "..";
+import {
+    type Selector,
+    SelectorType,
+    AttributeAction,
+    IgnoreCaseMode,
+} from "../types.js";
 
 export const tests: [
     selector: string,
@@ -141,7 +146,7 @@ export const tests: [
 
     // Escaped whitespace
     [
-        "#\\  > a ",
+        String.raw`#\  > a `,
         [
             [
                 {
@@ -165,7 +170,7 @@ export const tests: [
         "Space between escaped space and combinator",
     ],
     [
-        ".\\  ",
+        String.raw`.\  `,
         [
             [
                 {
@@ -197,7 +202,7 @@ export const tests: [
         "Special charecters in selector",
     ],
     [
-        "\\61 ",
+        String.raw`\61 `,
         [
             [
                 {
@@ -210,7 +215,7 @@ export const tests: [
         "Numeric escape with space (BMP)",
     ],
     [
-        "\\1d306\\01d306",
+        String.raw`\1d306\01d306`,
         [
             [
                 {
@@ -223,7 +228,7 @@ export const tests: [
         "Numeric escape (outside BMP)",
     ],
     [
-        "#\\26 B",
+        String.raw`#\26 B`,
         [
             [
                 {
@@ -321,7 +326,7 @@ export const tests: [
         "quoted attribute with internal newline",
     ],
     [
-        "[name=foo\\.baz]",
+        String.raw`[name=foo\.baz]`,
         [
             [
                 {
@@ -337,7 +342,7 @@ export const tests: [
         "attribute with escaped dot",
     ],
     [
-        "[name=foo\\[bar\\]]",
+        String.raw`[name=foo\[bar\]]`,
         [
             [
                 {
@@ -353,7 +358,7 @@ export const tests: [
         "attribute with escaped square brackets",
     ],
     [
-        "[xml\\:test]",
+        String.raw`[xml\:test]`,
         [
             [
                 {
@@ -506,7 +511,7 @@ export const tests: [
         "pseudo selector with data",
     ],
     [
-        ':contains("(a((foo\\\\\\))))")',
+        String.raw`:contains("(a((foo\\\))))")`,
         [
             [
                 {
@@ -617,7 +622,7 @@ export const tests: [
         "Underscores don't need escaping",
     ],
     [
-        "[name=foo\\ bar]",
+        String.raw`[name=foo\ bar]`,
         [
             [
                 {
@@ -633,7 +638,7 @@ export const tests: [
         "Escaped space",
     ],
     [
-        "[name=foo\\.baz]",
+        String.raw`[name=foo\.baz]`,
         [
             [
                 {
@@ -649,7 +654,7 @@ export const tests: [
         "Escaped dot",
     ],
     [
-        "[name=foo\\[baz\\]]",
+        String.raw`[name=foo\[baz\]]`,
         [
             [
                 {
@@ -665,7 +670,7 @@ export const tests: [
         "Escaped brackets",
     ],
     [
-        "[data-attr='foo_baz\\']']",
+        String.raw`[data-attr='foo_baz\']']`,
         [
             [
                 {
@@ -681,7 +686,7 @@ export const tests: [
         "Escaped quote + right bracket",
     ],
     [
-        "[data-attr='\\'']",
+        String.raw`[data-attr='\'']`,
         [
             [
                 {
@@ -697,7 +702,7 @@ export const tests: [
         "Quoted quote",
     ],
     [
-        "[data-attr='\\\\']",
+        String.raw`[data-attr='\\']`,
         [
             [
                 {
@@ -713,7 +718,7 @@ export const tests: [
         "Quoted backslash",
     ],
     [
-        "[data-attr='\\\\\\'']",
+        String.raw`[data-attr='\\\'']`,
         [
             [
                 {
@@ -721,7 +726,7 @@ export const tests: [
                     namespace: null,
                     action: AttributeAction.Equals,
                     name: "data-attr",
-                    value: "\\'",
+                    value: String.raw`\'`,
                     ignoreCase: IgnoreCaseMode.Unknown,
                 },
             ],
@@ -729,7 +734,7 @@ export const tests: [
         "Quoted backslash quote",
     ],
     [
-        "[data-attr='\\\\\\\\']",
+        String.raw`[data-attr='\\\\']`,
         [
             [
                 {
@@ -745,7 +750,7 @@ export const tests: [
         "Quoted backslash backslash",
     ],
     [
-        "[data-attr='\\5C\\\\']",
+        String.raw`[data-attr='\5C\\']`,
         [
             [
                 {
@@ -761,7 +766,7 @@ export const tests: [
         "Quoted backslash backslash (numeric escape)",
     ],
     [
-        "[data-attr='\\5C \\\\']",
+        String.raw`[data-attr='\5C \\']`,
         [
             [
                 {
@@ -793,7 +798,7 @@ export const tests: [
         "Quoted backslash backslash (numeric escape with trailing tab)",
     ],
     [
-        "[data-attr='\\04e00']",
+        String.raw`[data-attr='\04e00']`,
         [
             [
                 {
@@ -801,7 +806,7 @@ export const tests: [
                     namespace: null,
                     action: AttributeAction.Equals,
                     name: "data-attr",
-                    value: "\u4e00",
+                    value: "\u4E00",
                     ignoreCase: IgnoreCaseMode.Unknown,
                 },
             ],
@@ -809,7 +814,7 @@ export const tests: [
         "Long numeric escape (BMP)",
     ],
     [
-        "[data-attr='\\01D306A']",
+        String.raw`[data-attr='\01D306A']`,
         [
             [
                 {

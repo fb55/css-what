@@ -1,14 +1,14 @@
 import {
-    Selector,
+    type Selector,
     SelectorType,
-    AttributeSelector,
-    Traversal,
+    type AttributeSelector,
+    type Traversal,
     AttributeAction,
-    TraversalType,
-    DataType,
-} from "./types";
+    type TraversalType,
+    type DataType,
+} from "./types.js";
 
-const reName = /^[^\\#]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\-\u00b0-\uFFFF])+/;
+const reName = /^[^#\\]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\u00B0-\uFFFF-])+/;
 const reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi;
 
 const enum CharCode {
@@ -93,10 +93,12 @@ export function isTraversal(selector: Selector): selector is Traversal {
         case SelectorType.Descendant:
         case SelectorType.Parent:
         case SelectorType.Sibling:
-        case SelectorType.ColumnCombinator:
+        case SelectorType.ColumnCombinator: {
             return true;
-        default:
+        }
+        default: {
             return false;
+        }
     }
 }
 
@@ -104,20 +106,23 @@ const stripQuotesFromPseudos = new Set(["contains", "icontains"]);
 
 // Unescape function taken from https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L152
 function funescape(_: string, escaped: string, escapedWhitespace?: string) {
-    const high = parseInt(escaped, 16) - 0x10000;
+    const high = Number.parseInt(escaped, 16) - 0x1_00_00;
 
     // NaN means non-codepoint
     return high !== high || escapedWhitespace
         ? escaped
         : high < 0
           ? // BMP codepoint
-            String.fromCharCode(high + 0x10000)
+            String.fromCharCode(high + 0x1_00_00)
           : // Supplemental Plane codepoint (surrogate pair)
-            String.fromCharCode((high >> 10) | 0xd800, (high & 0x3ff) | 0xdc00);
+            String.fromCharCode(
+                (high >> 10) | 0xd8_00,
+                (high & 0x3_ff) | 0xdc_00,
+            );
 }
 
-function unescapeCSS(str: string) {
-    return str.replace(reEscape, funescape);
+function unescapeCSS(cssString: string) {
+    return cssString.replace(reEscape, funescape);
 }
 
 function isQuote(c: number): boolean {
@@ -266,7 +271,7 @@ function parseSelector(
      */
     function finalizeSubselector() {
         if (
-            tokens.length &&
+            tokens.length > 0 &&
             tokens[tokens.length - 1].type === SelectorType.Descendant
         ) {
             tokens.pop();
