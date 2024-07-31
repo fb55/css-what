@@ -195,40 +195,37 @@ function parseSelector(
     function readValueWithParenthesis(): string {
         selectorIndex += 1;
         const start = selectorIndex;
-        let counter = 1;
 
         for (
-            ;
-            counter > 0 && selectorIndex < selector.length;
+            let counter = 1;
+            selectorIndex < selector.length;
             selectorIndex++
         ) {
-            if (
-                selector.charCodeAt(selectorIndex) ===
-                    CharCode.LeftParenthesis &&
-                !isEscaped(selectorIndex)
-            ) {
-                counter++;
-            } else if (
-                selector.charCodeAt(selectorIndex) ===
-                    CharCode.RightParenthesis &&
-                !isEscaped(selectorIndex)
-            ) {
-                counter--;
+            switch (selector.charCodeAt(selectorIndex)) {
+                case CharCode.BackSlash: {
+                    // Skip next character
+                    selectorIndex += 1;
+                    break;
+                }
+                case CharCode.LeftParenthesis: {
+                    counter += 1;
+                    break;
+                }
+                case CharCode.RightParenthesis: {
+                    counter -= 1;
+
+                    if (counter === 0) {
+                        return unescapeCSS(
+                            selector.slice(start, selectorIndex++),
+                        );
+                    }
+
+                    break;
+                }
             }
         }
 
-        if (counter) {
-            throw new Error("Parenthesis not matched");
-        }
-
-        return unescapeCSS(selector.slice(start, selectorIndex - 1));
-    }
-
-    function isEscaped(pos: number): boolean {
-        let slashCount = 0;
-
-        while (selector.charCodeAt(--pos) === CharCode.BackSlash) slashCount++;
-        return (slashCount & 1) === 1;
+        throw new Error("Parenthesis not matched");
     }
 
     function ensureNotTraversal() {
@@ -403,36 +400,43 @@ function parseSelector(
                 if (action !== "exists") {
                     if (isQuote(selector.charCodeAt(selectorIndex))) {
                         const quote = selector.charCodeAt(selectorIndex);
-                        let sectionEnd = selectorIndex + 1;
+                        selectorIndex += 1;
+                        const sectionStart = selectorIndex;
                         while (
-                            sectionEnd < selector.length &&
-                            (selector.charCodeAt(sectionEnd) !== quote ||
-                                isEscaped(sectionEnd))
+                            selectorIndex < selector.length &&
+                            selector.charCodeAt(selectorIndex) !== quote
                         ) {
-                            sectionEnd += 1;
+                            selectorIndex +=
+                                // Skip next character if it is escaped
+                                selector.charCodeAt(selectorIndex) ===
+                                CharCode.BackSlash
+                                    ? 2
+                                    : 1;
                         }
 
-                        if (selector.charCodeAt(sectionEnd) !== quote) {
+                        if (selector.charCodeAt(selectorIndex) !== quote) {
                             throw new Error("Attribute value didn't end");
                         }
 
                         value = unescapeCSS(
-                            selector.slice(selectorIndex + 1, sectionEnd),
+                            selector.slice(sectionStart, selectorIndex),
                         );
-                        selectorIndex = sectionEnd + 1;
+                        selectorIndex += 1;
                     } else {
                         const valueStart = selectorIndex;
 
                         while (
                             selectorIndex < selector.length &&
-                            ((!isWhitespace(
-                                selector.charCodeAt(selectorIndex),
-                            ) &&
-                                selector.charCodeAt(selectorIndex) !==
-                                    CharCode.RightSquareBracket) ||
-                                isEscaped(selectorIndex))
+                            !isWhitespace(selector.charCodeAt(selectorIndex)) &&
+                            selector.charCodeAt(selectorIndex) !==
+                                CharCode.RightSquareBracket
                         ) {
-                            selectorIndex += 1;
+                            selectorIndex +=
+                                // Skip next character if it is escaped
+                                selector.charCodeAt(selectorIndex) ===
+                                CharCode.BackSlash
+                                    ? 2
+                                    : 1;
                         }
 
                         value = unescapeCSS(
@@ -443,17 +447,18 @@ function parseSelector(
                     stripWhitespace(0);
 
                     // See if we have a force ignore flag
-
-                    const forceIgnore =
-                        selector.charCodeAt(selectorIndex) | 0x20;
-
-                    // If the forceIgnore flag is set (either `i` or `s`), use that value
-                    if (forceIgnore === CharCode.LowerS) {
-                        ignoreCase = false;
-                        stripWhitespace(1);
-                    } else if (forceIgnore === CharCode.LowerI) {
-                        ignoreCase = true;
-                        stripWhitespace(1);
+                    switch (selector.charCodeAt(selectorIndex) | 0x20) {
+                        // If the forceIgnore flag is set (either `i` or `s`), use that value
+                        case CharCode.LowerI: {
+                            ignoreCase = true;
+                            stripWhitespace(1);
+                            break;
+                        }
+                        case CharCode.LowerS: {
+                            ignoreCase = false;
+                            stripWhitespace(1);
+                            break;
+                        }
                     }
                 }
 
