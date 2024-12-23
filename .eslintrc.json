@@ -50,6 +50,8 @@
                 "project": "./tsconfig.eslint.json"
             },
             "rules": {
+                "curly": [2, "multi-line"],
+
                 "@typescript-eslint/prefer-for-of": 0,
                 "@typescript-eslint/member-ordering": 0,
                 "@typescript-eslint/explicit-function-return-type": 0,
