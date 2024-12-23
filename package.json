@@ -17,18 +17,17 @@
         "./package.json": "./package.json",
         ".": {
             "import": {
-                "source": "./src/index.ts",
                 "types": "./dist/esm/index.d.ts",
                 "default": "./dist/esm/index.js"
             },
             "require": {
-                "source": "./src/index.ts",
                 "types": "./dist/commonjs/index.d.ts",
                 "default": "./dist/commonjs/index.js"
             }
         }
     },
     "main": "./dist/commonjs/index.js",
+    "module": "./dist/esm/index.js",
     "types": "./dist/commonjs/index.d.ts",
     "files": [
         "lib/**/*"
@@ -37,9 +36,10 @@
         "format": "npm run format:es && npm run format:prettier",
         "format:es": "npm run lint:es -- --fix",
         "format:prettier": "npm run prettier -- --write",
-        "lint": "npm run lint:es && npm run lint:prettier",
+        "lint": "npm run lint:tsc && npm run lint:es && npm run lint:prettier",
         "lint:es": "eslint src",
         "lint:prettier": "npm run prettier -- --check",
+        "lint:tsc": "tsc --noEmit",
         "prepublishOnly": "tshy",
         "prettier": "prettier '**/*.{ts,md,json,yml}'",
         "test": "npm run test:vi && npm run lint",
@@ -55,7 +55,7 @@
         "@vitest/coverage-v8": "^2.1.8",
         "eslint": "^8.57.1",
         "eslint-config-prettier": "^9.1.0",
-        "eslint-plugin-n": "^17.15.0",
+        "eslint-plugin-n": "^17.15.1",
         "eslint-plugin-unicorn": "^56.0.1",
         "prettier": "^3.4.2",
         "tshy": "^3.0.2",
