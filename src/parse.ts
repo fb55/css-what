@@ -140,10 +140,9 @@ function isWhitespace(c: number): boolean {
 }
 
 /**
- * Parses `selector`, optionally with the passed `options`.
+ * Parses `selector`.
  *
  * @param selector Selector to parse.
- * @param options Options for parsing.
  * @returns Returns a two-dimensional array.
  * The first dimension represents selectors separated by commas (eg. `sub1, sub2`),
  * the second contains the relevant tokens for that selector.
