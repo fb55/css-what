@@ -60,7 +60,7 @@
         "prettier": "^3.5.3",
         "tshy": "^3.0.2",
         "typescript": "^5.8.2",
-        "vitest": "^2.0.2"
+        "vitest": "^3.0.9"
     },
     "engines": {
         "node": ">= 6"
