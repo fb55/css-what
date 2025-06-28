@@ -2,7 +2,7 @@
     "author": "Felix Böhm <me@feedic.com> (http://feedic.com)",
     "name": "css-what",
     "description": "a CSS selector parser",
-    "version": "6.1.0",
+    "version": "6.2.2",
     "funding": {
         "url": "https://github.com/sponsors/fb55"
     },
