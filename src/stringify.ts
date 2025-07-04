@@ -25,7 +25,8 @@ const charsToEscapeInName = new Set(
         " ",
         ".",
         "%",
-        "/"
+        "/",
+        ","
     ].map((c) => c.charCodeAt(0)),
 );
 
