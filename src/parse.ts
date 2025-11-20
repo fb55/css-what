@@ -568,7 +568,7 @@ function parseSelector(
                 if (selector.startsWith("/*", selectorIndex)) {
                     const endIndex = selector.indexOf("*/", selectorIndex + 2);
 
-                    if (endIndex < 0) {
+                    if (endIndex === -1) {
                         throw new Error("Comment was not terminated");
                     }
 
