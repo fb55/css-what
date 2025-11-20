@@ -85,7 +85,8 @@
         {
             "files": "*.spec.ts",
             "rules": {
-                "n/no-unsupported-features/node-builtins": 0
+                "n/no-unsupported-features/node-builtins": 0,
+                "n/no-unpublished-import": 0
             }
         }
     ]
