@@ -18,7 +18,7 @@ jobs:
     lint:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@71cf2267d89c5cb81562390fa70a37fa40b1305e
+            - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
             - uses: actions/setup-node@v6
               with:
                   node-version: lts/*
@@ -44,7 +44,7 @@ jobs:
                     - lts/*
 
         steps:
-            - uses: actions/checkout@71cf2267d89c5cb81562390fa70a37fa40b1305e
+            - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
             - name: Use Node.js ${{ matrix.node }}
               uses: actions/setup-node@v6
               with:
