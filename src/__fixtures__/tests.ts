@@ -1,8 +1,8 @@
 import {
-    type Selector,
-    SelectorType,
     AttributeAction,
     IgnoreCaseMode,
+    type Selector,
+    SelectorType,
 } from "../types.js";
 
 export const tests: [

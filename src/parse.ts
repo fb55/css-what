@@ -1,17 +1,17 @@
 import {
+    AttributeAction,
+    type AttributeSelector,
+    type DataType,
     type Selector,
     SelectorType,
-    type AttributeSelector,
     type Traversal,
-    AttributeAction,
     type TraversalType,
-    type DataType,
 } from "./types.js";
 
 const reName = /^[^#\\]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\u00B0-\uFFFF-])+/;
 const reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi;
 
-const enum CharCode {
+enum CharCode {
     LeftParenthesis = 40,
     RightParenthesis = 41,
     LeftSquareBracket = 91,
@@ -96,7 +96,11 @@ export function isTraversal(selector: Selector): selector is Traversal {
         case SelectorType.ColumnCombinator: {
             return true;
         }
-        default: {
+        case SelectorType.Attribute:
+        case SelectorType.Pseudo:
+        case SelectorType.PseudoElement:
+        case SelectorType.Tag:
+        case SelectorType.Universal: {
             return false;
         }
     }
@@ -109,7 +113,7 @@ function funescape(_: string, escaped: string, escapedWhitespace?: string) {
     const high = Number.parseInt(escaped, 16) - 0x1_00_00;
 
     // NaN means non-codepoint
-    return high !== high || escapedWhitespace
+    return Number.isNaN(high) || escapedWhitespace
         ? escaped
         : high < 0
           ? // BMP codepoint

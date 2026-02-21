@@ -4,7 +4,7 @@
  * @license BSD-3-Clause (https://github.com/web-platform-tests/wpt/blob/master/LICENSE.md)
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { parse, stringify } from "./index.js";
 
 function test_valid_selector(

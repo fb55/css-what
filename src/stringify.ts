@@ -1,4 +1,4 @@
-import { type Selector, SelectorType, AttributeAction } from "./types.js";
+import { AttributeAction, type Selector, SelectorType } from "./types.js";
 
 const attribValueChars = ["\\", '"'];
 const pseudoValueChars = [...attribValueChars, "(", ")"];
@@ -162,6 +162,9 @@ function getActionValue(action: AttributeAction): string {
         }
         case AttributeAction.Hyphen: {
             return "|";
+        }
+        case AttributeAction.Exists: {
+            return "";
         }
         default: {
             throw new Error("Shouldn't be here");
