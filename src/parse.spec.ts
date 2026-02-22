@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
-import { describe, it, expect } from "vitest";
-import { parse } from "./parse.js";
+import { describe, expect, it } from "vitest";
 import { tests } from "./__fixtures__/tests.js";
+import { parse } from "./parse.js";
 
 const broken = [
     "[",

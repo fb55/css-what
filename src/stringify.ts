@@ -1,4 +1,4 @@
-import { type Selector, SelectorType, AttributeAction } from "./types.js";
+import { AttributeAction, type Selector, SelectorType } from "./types.js";
 
 const attribValueChars = ["\\", '"'];
 const pseudoValueChars = [...attribValueChars, "(", ")"];
@@ -140,7 +140,9 @@ function stringifyToken(
     }
 }
 
-function getActionValue(action: AttributeAction): string {
+function getActionValue(
+    action: Exclude<AttributeAction, AttributeAction.Exists>,
+): string {
     switch (action) {
         case AttributeAction.Equals: {
             return "";
