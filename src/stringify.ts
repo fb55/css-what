@@ -140,7 +140,9 @@ function stringifyToken(
     }
 }
 
-function getActionValue(action: AttributeAction): string {
+function getActionValue(
+    action: Exclude<AttributeAction, AttributeAction.Exists>,
+): string {
     switch (action) {
         case AttributeAction.Equals: {
             return "";
@@ -162,9 +164,6 @@ function getActionValue(action: AttributeAction): string {
         }
         case AttributeAction.Hyphen: {
             return "|";
-        }
-        case AttributeAction.Exists: {
-            return "";
         }
         default: {
             throw new Error("Shouldn't be here");
