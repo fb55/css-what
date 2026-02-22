@@ -11,7 +11,7 @@ import {
 const reName = /^[^#\\]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\u00B0-\uFFFF-])+/;
 const reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi;
 
-enum CharCode {
+const enum CharCode {
     LeftParenthesis = 40,
     RightParenthesis = 41,
     LeftSquareBracket = 91,
