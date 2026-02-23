@@ -4,7 +4,7 @@ import { commonTypeScriptRules } from '@feedic/eslint-config/typescript';
 import tseslint from 'typescript-eslint';
 import { defineConfig } from 'eslint/config';
 import { fileURLToPath } from 'node:url';
-import eslintConfigPrettier from 'eslint-config-prettier';
+import eslintConfigBiome from 'eslint-config-biome';
 
 const gitignorePath = fileURLToPath(new URL('.gitignore', import.meta.url));
 
@@ -33,7 +33,6 @@ export default defineConfig([
     },
     rules: {
       ...commonTypeScriptRules,
-      "@typescript-eslint/no-unused-vars": 0,
       "@typescript-eslint/consistent-type-imports": [
           2,
           {
@@ -52,5 +51,5 @@ export default defineConfig([
         "n/no-unpublished-import": 0
     },
   },
-  eslintConfigPrettier
+  eslintConfigBiome
 ]);

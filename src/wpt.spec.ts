@@ -1,7 +1,8 @@
 /**
- * @fileoverview CSS Selector parsing tests from WPT
+ * @file CSS Selector parsing tests from WPT
  * @see https://github.com/web-platform-tests/wpt/tree/0bb883967c888261a8372923fd61eb5ad14305b2/css/selectors/parsing
- * @license BSD-3-Clause (https://github.com/web-platform-tests/wpt/blob/master/LICENSE.md)
+ * @see https://github.com/web-platform-tests/wpt/blob/master/LICENSE.md
+ * @license BSD-3-Clause
  */
 
 import { describe, expect, it } from "vitest";

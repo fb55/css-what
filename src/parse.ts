@@ -69,7 +69,6 @@ const unpackPseudos = new Set([
 /**
  * Pseudo elements defined in CSS Level 1 and CSS Level 2 can be written with
  * a single colon; eg. :before will turn into ::before.
- *
  * @see {@link https://www.w3.org/TR/2018/WD-selectors-4-20181121/#pseudo-element-syntax}
  */
 const pseudosToPseudoElements = new Set([
@@ -83,7 +82,6 @@ const pseudosToPseudoElements = new Set([
  * Checks whether a specific selector is a traversal.
  * This is useful eg. in swapping the order of elements that
  * are not traversals.
- *
  * @param selector Selector to check.
  */
 export function isTraversal(selector: Selector): selector is Traversal {
@@ -145,7 +143,6 @@ function isWhitespace(c: number): boolean {
 
 /**
  * Parses `selector`.
- *
  * @param selector Selector to parse.
  * @returns Returns a two-dimensional array.
  * The first dimension represents selectors separated by commas (eg. `sub1, sub2`),

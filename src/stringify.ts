@@ -30,7 +30,6 @@ const charsToEscapeInName = new Set(
 
 /**
  * Turns `selector` back into a string.
- *
  * @param selector Selector to stringify.
  */
 export function stringify(selector: Selector[][]): string {
