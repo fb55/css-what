@@ -1,4 +1,4 @@
-import { type Selector, SelectorType, AttributeAction } from "./types.js";
+import { AttributeAction, type Selector, SelectorType } from "./types.js";
 
 const attribValueChars = ["\\", '"'];
 const pseudoValueChars = [...attribValueChars, "(", ")"];
@@ -30,7 +30,6 @@ const charsToEscapeInName = new Set(
 
 /**
  * Turns `selector` back into a string.
- *
  * @param selector Selector to stringify.
  */
 export function stringify(selector: Selector[][]): string {
@@ -140,7 +139,9 @@ function stringifyToken(
     }
 }
 
-function getActionValue(action: AttributeAction): string {
+function getActionValue(
+    action: Exclude<AttributeAction, AttributeAction.Exists>,
+): string {
     switch (action) {
         case AttributeAction.Equals: {
             return "";

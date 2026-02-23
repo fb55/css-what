@@ -1,11 +1,11 @@
 import {
+    AttributeAction,
+    type AttributeSelector,
+    type DataType,
     type Selector,
     SelectorType,
-    type AttributeSelector,
     type Traversal,
-    AttributeAction,
     type TraversalType,
-    type DataType,
 } from "./types.js";
 
 const reName = /^[^#\\]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\u00B0-\uFFFF-])+/;
@@ -69,7 +69,6 @@ const unpackPseudos = new Set([
 /**
  * Pseudo elements defined in CSS Level 1 and CSS Level 2 can be written with
  * a single colon; eg. :before will turn into ::before.
- *
  * @see {@link https://www.w3.org/TR/2018/WD-selectors-4-20181121/#pseudo-element-syntax}
  */
 const pseudosToPseudoElements = new Set([
@@ -83,7 +82,6 @@ const pseudosToPseudoElements = new Set([
  * Checks whether a specific selector is a traversal.
  * This is useful eg. in swapping the order of elements that
  * are not traversals.
- *
  * @param selector Selector to check.
  */
 export function isTraversal(selector: Selector): selector is Traversal {
@@ -96,7 +94,11 @@ export function isTraversal(selector: Selector): selector is Traversal {
         case SelectorType.ColumnCombinator: {
             return true;
         }
-        default: {
+        case SelectorType.Attribute:
+        case SelectorType.Pseudo:
+        case SelectorType.PseudoElement:
+        case SelectorType.Tag:
+        case SelectorType.Universal: {
             return false;
         }
     }
@@ -109,7 +111,7 @@ function funescape(_: string, escaped: string, escapedWhitespace?: string) {
     const high = Number.parseInt(escaped, 16) - 0x1_00_00;
 
     // NaN means non-codepoint
-    return high !== high || escapedWhitespace
+    return Number.isNaN(high) || escapedWhitespace
         ? escaped
         : high < 0
           ? // BMP codepoint
@@ -141,7 +143,6 @@ function isWhitespace(c: number): boolean {
 
 /**
  * Parses `selector`.
- *
  * @param selector Selector to parse.
  * @returns Returns a two-dimensional array.
  * The first dimension represents selectors separated by commas (eg. `sub1, sub2`),
