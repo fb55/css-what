@@ -365,6 +365,11 @@ function parseSelector(
                     }
                 }
 
+                // Support unescaped colons in attribute names (e.g., xml:lang)
+                while (selector.charCodeAt(selectorIndex) === CharCode.Colon) {
+                    name += `:${getName(1)}`;
+                }
+
                 stripWhitespace(0);
 
                 // Determine comparison operation
