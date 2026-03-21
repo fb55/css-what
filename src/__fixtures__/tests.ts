@@ -374,6 +374,26 @@ export const tests: [
         "escaped attribute",
     ],
     [
+        `*[xml:lang|="es"]`,
+        [
+            [
+                {
+                    type: SelectorType.Universal,
+                    namespace: null,
+                },
+                {
+                    type: SelectorType.Attribute,
+                    namespace: null,
+                    name: "xml:lang",
+                    action: AttributeAction.Hyphen,
+                    value: "es",
+                    ignoreCase: IgnoreCaseMode.Unknown,
+                },
+            ],
+        ],
+        "attribute with unescaped colon and hyphen action",
+    ],
+    [
         "[name='foo ~ < > , bar' i]",
         [
             [
