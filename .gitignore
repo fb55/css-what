@@ -1,5 +1,4 @@
 node_modules/
 coverage/
 dist/
-.tshy
-.tshy-build/
+jsr.json
