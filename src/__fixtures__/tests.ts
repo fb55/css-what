@@ -408,6 +408,56 @@ export const tests: [
         "ID starting with a dot",
     ],
 
+    // Class names with special characters (Tailwind CSS-style)
+    [
+        String.raw`.before\:bottom-1\/2`,
+        [
+            [
+                {
+                    type: SelectorType.Attribute,
+                    namespace: null,
+                    action: AttributeAction.Element,
+                    name: "class",
+                    ignoreCase: IgnoreCaseMode.QuirksMode,
+                    value: "before:bottom-1/2",
+                },
+            ],
+        ],
+        "class with escaped colon and slash",
+    ],
+    [
+        String.raw`.bg-\[hsl\(227\,91\%\,65\%\)\;\]`,
+        [
+            [
+                {
+                    type: SelectorType.Attribute,
+                    namespace: null,
+                    action: AttributeAction.Element,
+                    name: "class",
+                    ignoreCase: IgnoreCaseMode.QuirksMode,
+                    value: "bg-[hsl(227,91%,65%);]",
+                },
+            ],
+        ],
+        "class with escaped brackets, parentheses, commas, and semicolons",
+    ],
+    [
+        String.raw`.\#foo`,
+        [
+            [
+                {
+                    type: SelectorType.Attribute,
+                    namespace: null,
+                    action: AttributeAction.Element,
+                    name: "class",
+                    ignoreCase: IgnoreCaseMode.QuirksMode,
+                    value: "#foo",
+                },
+            ],
+        ],
+        "class with escaped hash",
+    ],
+
     // Pseudo elements
     [
         "::foo",
