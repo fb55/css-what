@@ -25,6 +25,7 @@ const charsToEscapeInName = new Set(
         " ",
         ".",
         "%",
+        "'",
         "#",
         ">",
         "<",
@@ -201,8 +202,26 @@ function escapeName(name: string, charsToEscape: Set<number>): string {
     let escapedName = "";
 
     for (let index = 0; index < name.length; index++) {
-        if (charsToEscape.has(name.charCodeAt(index))) {
-            escapedName += `${name.slice(lastIndex, index)}\\${name.charAt(index)}`;
+        const code = name.charCodeAt(index);
+        const isDigit = code >= 0x30 && code <= 0x39;
+
+        // Hex-escape: null (as FFFD), control chars, DEL, and leading digit/lone hyphen cases
+        const needsHex =
+            code <= 0x1f ||
+            code === 0x7f ||
+            (isDigit &&
+                (index === 0 ||
+                    (index === 1 && name.charCodeAt(0) === 0x2d))) ||
+            (index === 0 && code === 0x2d && name.length === 1);
+
+        const escaped = needsHex
+            ? `\\${code === 0x00 ? "fffd" : code.toString(16)} `
+            : charsToEscape.has(code)
+              ? `\\${name.charAt(index)}`
+              : undefined;
+
+        if (escaped !== undefined) {
+            escapedName += name.slice(lastIndex, index) + escaped;
             lastIndex = index + 1;
         }
     }

@@ -477,6 +477,48 @@ export const tests: [
         ],
         "class with escaped hash",
     ],
+    [
+        String.raw`.\31 foo`,
+        [
+            [
+                {
+                    type: SelectorType.Attribute,
+                    namespace: null,
+                    action: AttributeAction.Element,
+                    name: "class",
+                    ignoreCase: IgnoreCaseMode.QuirksMode,
+                    value: "1foo",
+                },
+            ],
+        ],
+        "class with hex-escaped leading digit",
+    ],
+    [
+        String.raw`\0 a`,
+        [
+            [
+                {
+                    type: SelectorType.Tag,
+                    namespace: null,
+                    name: "\uFFFDa",
+                },
+            ],
+        ],
+        "null escape replaced with U+FFFD",
+    ],
+    [
+        String.raw`\110000 a`,
+        [
+            [
+                {
+                    type: SelectorType.Tag,
+                    namespace: null,
+                    name: "\uFFFDa",
+                },
+            ],
+        ],
+        "out-of-range escape replaced with U+FFFD",
+    ],
 
     // Pseudo elements
     [

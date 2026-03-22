@@ -106,21 +106,20 @@ export function isTraversal(selector: Selector): selector is Traversal {
 
 const stripQuotesFromPseudos = new Set(["contains", "icontains"]);
 
-// Unescape function taken from https://github.com/jquery/sizzle/blob/master/src/sizzle.js#L152
 function funescape(_: string, escaped: string, escapedWhitespace?: string) {
-    const high = Number.parseInt(escaped, 16) - 0x1_00_00;
+    const codePoint = Number.parseInt(escaped, 16);
 
-    // NaN means non-codepoint
-    return Number.isNaN(high) || escapedWhitespace
-        ? escaped
-        : high < 0
-          ? // BMP codepoint
-            String.fromCharCode(high + 0x1_00_00)
-          : // Supplemental Plane codepoint (surrogate pair)
-            String.fromCharCode(
-                (high >> 10) | 0xd8_00,
-                (high & 0x3_ff) | 0xdc_00,
-            );
+    // NaN means non-codepoint (e.g., \X where X is not hex)
+    if (Number.isNaN(codePoint) || escapedWhitespace) {
+        return escaped;
+    }
+
+    // Per CSS spec: U+0000 and out-of-range values → U+FFFD
+    if (codePoint === 0 || codePoint > 0x10_ff_ff) {
+        return "\uFFFD";
+    }
+
+    return String.fromCodePoint(codePoint);
 }
 
 function unescapeCSS(cssString: string) {
