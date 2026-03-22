@@ -28,29 +28,21 @@ const broken = [
 ];
 
 describe("Parse", () => {
-    describe("Own tests", () => {
-        for (const [selector, expected, message] of tests) {
-            it(message, () => expect(parse(selector)).toStrictEqual(expected));
-        }
+    it.each(tests)("%s", (selector, expected) => {
+        expect(parse(selector)).toStrictEqual(expected);
     });
 
     describe("Collected selectors (qwery, sizzle, nwmatcher)", () => {
-        const out = JSON.parse(
+        const out: Record<string, unknown> = JSON.parse(
             readFileSync(`${__dirname}/__fixtures__/out.json`, "utf8"),
         );
-        for (const s of Object.keys(out)) {
-            it(s, () => {
-                expect(parse(s)).toStrictEqual(out[s]);
-            });
-        }
+        it.each(Object.entries(out))("%s", (selector, expected) => {
+            expect(parse(selector)).toStrictEqual(expected);
+        });
     });
 
-    describe("Broken selectors", () => {
-        for (const selector of broken) {
-            it(`should not parse — ${selector}`, () => {
-                expect(() => parse(selector)).toThrow(Error);
-            });
-        }
+    it.each(broken)("should not parse — %s", (selector) => {
+        expect(() => parse(selector)).toThrow(Error);
     });
 
     it("should ignore comments", () => {
