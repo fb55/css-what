@@ -519,6 +519,58 @@ export const tests: [
         ],
         "out-of-range escape replaced with U+FFFD",
     ],
+    [
+        String.raw`\d800 x`,
+        [
+            [
+                {
+                    type: SelectorType.Tag,
+                    namespace: null,
+                    name: "\uFFFDx",
+                },
+            ],
+        ],
+        "surrogate escape replaced with U+FFFD",
+    ],
+    [
+        String.raw`\4A x`,
+        [
+            [
+                {
+                    type: SelectorType.Tag,
+                    namespace: null,
+                    name: "Jx",
+                },
+            ],
+        ],
+        "uppercase hex escape",
+    ],
+    [
+        "\\41\r\nb",
+        [
+            [
+                {
+                    type: SelectorType.Tag,
+                    namespace: null,
+                    name: "Ab",
+                },
+            ],
+        ],
+        "CRLF consumed after hex escape",
+    ],
+    [
+        "ab\\",
+        [
+            [
+                {
+                    type: SelectorType.Tag,
+                    namespace: null,
+                    name: "ab\uFFFD",
+                },
+            ],
+        ],
+        "trailing backslash at EOF replaced with U+FFFD",
+    ],
 
     // Pseudo elements
     [

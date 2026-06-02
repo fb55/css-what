@@ -8,8 +8,9 @@ import {
     type TraversalType,
 } from "./types.js";
 
-const reName = /^[^#\\]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\u00B0-\uFFFF-])+/;
-const reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi;
+const reName =
+    /^[^#\\]?(?:\\(?:[\da-f]{1,6}(?:\r\n|\s)?|.|$)|[\w\u00B0-\uFFFF-])+/i;
+const reEscape = /\\([\da-f]{1,6}(?:\r\n|\s)?|(\s)|.|$)/gi;
 
 const enum CharCode {
     LeftParenthesis = 40,
@@ -107,6 +108,11 @@ export function isTraversal(selector: Selector): selector is Traversal {
 const stripQuotesFromPseudos = new Set(["contains", "icontains"]);
 
 function funescape(_: string, escaped: string, escapedWhitespace?: string) {
+    // A backslash at EOF (an empty escape) is a parse error → U+FFFD.
+    if (escaped === "") {
+        return "\uFFFD";
+    }
+
     const codePoint = Number.parseInt(escaped, 16);
 
     // NaN means non-codepoint (e.g., \X where X is not hex)
@@ -114,8 +120,12 @@ function funescape(_: string, escaped: string, escapedWhitespace?: string) {
         return escaped;
     }
 
-    // Per CSS spec: U+0000 and out-of-range values → U+FFFD
-    if (codePoint === 0 || codePoint > 0x10_ff_ff) {
+    // Per CSS spec: U+0000, surrogates and out-of-range values → U+FFFD
+    if (
+        codePoint === 0 ||
+        (codePoint >= 0xd8_00 && codePoint <= 0xdf_ff) ||
+        codePoint > 0x10_ff_ff
+    ) {
         return "\uFFFD";
     }
 
