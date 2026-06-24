@@ -24,9 +24,9 @@ describe("Stringify CSS spec compliance", () => {
         ["1foo", String.raw`\31 foo`, "leading digit"],
         ["-1foo", String.raw`-\31 foo`, "leading hyphen+digit"],
         ["-", String.raw`\2d `, "lone hyphen"],
-        ["a\u0001b", String.raw`a\1 b`, "control character"],
-        ["a\u007Fb", String.raw`a\7f b`, "DEL character"],
-        ["a\u0000b", String.raw`a\fffd b`, "null → FFFD"],
+        ["a\u{1}b", String.raw`a\1 b`, "control character"],
+        ["a\u{7F}b", String.raw`a\7f b`, "DEL character"],
+        ["a\u{0}b", String.raw`a\fffd b`, "null → FFFD"],
         ["a'b", String.raw`a\'b`, "single quote"],
     ];
 

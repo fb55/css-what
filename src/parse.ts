@@ -8,6 +8,7 @@ import {
     type TraversalType,
 } from "./types.js";
 
+// eslint-disable-next-line unicorn/prefer-unicode-code-point-escapes -- regex has no `u` flag; code-point escapes would require it and alter matching semantics
 const reName = /^[^#\\]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\u00B0-\uFFFF-])+/;
 const reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi;
 
@@ -116,13 +117,14 @@ function funescape(_: string, escaped: string, escapedWhitespace?: string) {
 
     // Per CSS spec: U+0000 and out-of-range values → U+FFFD
     if (codePoint === 0 || codePoint > 0x10_ff_ff) {
-        return "\uFFFD";
+        return "\u{FFFD}";
     }
 
     return String.fromCodePoint(codePoint);
 }
 
 function unescapeCSS(cssString: string) {
+    // eslint-disable-next-line unicorn/no-unsafe-string-replacement -- replacement is a function, not a string with `$` patterns; this is safe
     return cssString.replace(reEscape, funescape);
 }
 
@@ -132,6 +134,7 @@ function isQuote(c: number): boolean {
 
 function isWhitespace(c: number): boolean {
     return (
+        // eslint-disable-next-line unicorn/prefer-includes-over-repeated-comparisons -- hot-path parser predicate; `.includes()` allocates an array per call
         c === CharCode.Space ||
         c === CharCode.Tab ||
         c === CharCode.NewLine ||
@@ -150,7 +153,7 @@ function isWhitespace(c: number): boolean {
 export function parse(selector: string): Selector[][] {
     const subselects: Selector[][] = [];
 
-    const endIndex = parseSelector(subselects, `${selector}`, 0);
+    const endIndex = parseSelector(subselects, selector, 0);
 
     if (endIndex < selector.length) {
         throw new Error(`Unmatched selector: ${selector.slice(endIndex)}`);
@@ -204,10 +207,12 @@ function parseSelector(
                 case CharCode.BackSlash: {
                     // Skip next character
                     selectorIndex += 1;
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
                     break;
                 }
                 case CharCode.LeftParenthesis: {
                     counter += 1;
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
                     break;
                 }
                 case CharCode.RightParenthesis: {
@@ -219,6 +224,7 @@ function parseSelector(
                         );
                     }
 
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
                     break;
                 }
             }
@@ -305,36 +311,43 @@ function parseSelector(
                 }
 
                 stripWhitespace(1);
+                // eslint-disable-next-line unicorn/no-break-in-nested-loop
                 break;
             }
             // Traversals
             case CharCode.GreaterThan: {
                 addTraversal(SelectorType.Child);
                 stripWhitespace(1);
+                // eslint-disable-next-line unicorn/no-break-in-nested-loop
                 break;
             }
             case CharCode.LessThan: {
                 addTraversal(SelectorType.Parent);
                 stripWhitespace(1);
+                // eslint-disable-next-line unicorn/no-break-in-nested-loop
                 break;
             }
             case CharCode.Tilde: {
                 addTraversal(SelectorType.Sibling);
                 stripWhitespace(1);
+                // eslint-disable-next-line unicorn/no-break-in-nested-loop
                 break;
             }
             case CharCode.Plus: {
                 addTraversal(SelectorType.Adjacent);
                 stripWhitespace(1);
+                // eslint-disable-next-line unicorn/no-break-in-nested-loop
                 break;
             }
             // Special attribute selectors: .class, #id
             case CharCode.Period: {
                 addSpecialAttribute("class", AttributeAction.Element);
+                // eslint-disable-next-line unicorn/no-break-in-nested-loop
                 break;
             }
             case CharCode.Hash: {
                 addSpecialAttribute("id", AttributeAction.Equals);
+                // eslint-disable-next-line unicorn/no-break-in-nested-loop
                 break;
             }
             case CharCode.LeftSquareBracket: {
@@ -456,11 +469,13 @@ function parseSelector(
                         case CharCode.LowerI: {
                             ignoreCase = true;
                             stripWhitespace(1);
+                            // eslint-disable-next-line unicorn/no-break-in-nested-loop
                             break;
                         }
                         case CharCode.LowerS: {
                             ignoreCase = false;
                             stripWhitespace(1);
+                            // eslint-disable-next-line unicorn/no-break-in-nested-loop
                             break;
                         }
                     }
@@ -485,6 +500,7 @@ function parseSelector(
                 };
 
                 tokens.push(attributeSelector);
+                // eslint-disable-next-line unicorn/no-break-in-nested-loop
                 break;
             }
             case CharCode.Colon: {
@@ -498,6 +514,7 @@ function parseSelector(
                                 ? readValueWithParenthesis()
                                 : null,
                     });
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
                     break;
                 }
 
@@ -509,6 +526,7 @@ function parseSelector(
                         name,
                         data: null,
                     });
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
                     break;
                 }
 
@@ -561,12 +579,14 @@ function parseSelector(
                 }
 
                 tokens.push({ type: SelectorType.Pseudo, name, data });
+                // eslint-disable-next-line unicorn/no-break-in-nested-loop
                 break;
             }
             case CharCode.Comma: {
                 finalizeSubselector();
                 tokens = [];
                 stripWhitespace(1);
+                // eslint-disable-next-line unicorn/no-break-in-nested-loop
                 break;
             }
             default: {
@@ -584,6 +604,7 @@ function parseSelector(
                         stripWhitespace(0);
                     }
 
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
                     break;
                 }
 
@@ -601,6 +622,7 @@ function parseSelector(
                     ) {
                         addTraversal(SelectorType.ColumnCombinator);
                         stripWhitespace(2);
+                        // eslint-disable-next-line unicorn/no-break-in-nested-loop
                         break;
                     }
                 } else if (reName.test(selector.slice(selectorIndex))) {

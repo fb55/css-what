@@ -206,7 +206,7 @@ function escapeName(name: string, charsToEscape: Set<number>): string {
         const isDigit = code >= 0x30 && code <= 0x39;
 
         // Hex-escape: null (as FFFD), control chars, DEL, and leading digit/lone hyphen cases
-        const needsHex =
+        const isNeedsHex =
             code <= 0x1f ||
             code === 0x7f ||
             (isDigit &&
@@ -214,7 +214,7 @@ function escapeName(name: string, charsToEscape: Set<number>): string {
                     (index === 1 && name.charCodeAt(0) === 0x2d))) ||
             (index === 0 && code === 0x2d && name.length === 1);
 
-        const escaped = needsHex
+        const escaped = isNeedsHex
             ? `\\${code === 0x00 ? "fffd" : code.toString(16)} `
             : charsToEscape.has(code)
               ? `\\${name.charAt(index)}`
