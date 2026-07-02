@@ -33,6 +33,7 @@ describe("Stringify CSS spec compliance", () => {
         ["a{b}c", String.raw`a\{b\}c`, "braces"],
         ["a?b", String.raw`a\?b`, "question mark"],
         ["a@b", String.raw`a\@b`, "at sign"],
+        ["a`b", String.raw`a\`b`, "backtick"],
     ];
 
     it.each(escapeCases)("%s → %s (%s)", (name, expected) => {
@@ -47,5 +48,20 @@ describe("Stringify CSS spec compliance", () => {
             [{ type: SelectorType.Tag as const, name, namespace: null }],
         ];
         expect(stringify(ast)).toBe(name);
+    });
+});
+
+describe("Stringify round-trips special characters in identifiers", () => {
+    const selectors = [
+        String.raw`.x\&y`,
+        String.raw`[data-foo\=bar]`,
+        String.raw`.a\{b\}c`,
+        String.raw`.w-1\/2`,
+        String.raw`#a\?b`,
+    ];
+    it.each(selectors)("%s", (selector) => {
+        const original = parse(selector);
+        const roundTripped = parse(stringify(original));
+        expect(roundTripped).toStrictEqual(original);
     });
 });
