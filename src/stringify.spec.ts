@@ -58,6 +58,7 @@ describe("Stringify round-trips special characters in identifiers", () => {
         String.raw`.a\{b\}c`,
         String.raw`.w-1\/2`,
         String.raw`#a\?b`,
+        String.raw`.a\@b`,
     ];
     it.each(selectors)("%s", (selector) => {
         const original = parse(selector);
