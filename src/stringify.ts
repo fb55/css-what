@@ -47,15 +47,42 @@ const charsToEscapeInName = new Set(
  * @param selector Selector to stringify.
  */
 export function stringify(selector: Selector[][]): string {
-    return selector
-        .map((token) =>
-            token
-                .map((token, index, array) =>
-                    stringifyToken(token, index, array),
-                )
-                .join(""),
-        )
-        .join(", ");
+    let result = "";
+    // Nested selectors (eg. in `:is(…)`) are added to this stack.
+    const stack = [{ selector, group: 0, index: 0 }];
+
+    while (stack.length > 0) {
+        const frame = stack[stack.length - 1];
+        const tokens = frame.selector[frame.group];
+
+        if (frame.group === frame.selector.length) {
+            stack.pop();
+
+            if (stack.length > 0) {
+                result += ")";
+            }
+        } else if (frame.index === tokens.length) {
+            frame.index = 0;
+
+            if (++frame.group < frame.selector.length) {
+                result += ", ";
+            }
+        } else {
+            const token = tokens[frame.index];
+            result += stringifyToken(token, frame.index, tokens);
+
+            if (
+                token.type === SelectorType.Pseudo &&
+                Array.isArray(token.data)
+            ) {
+                stack.push({ selector: token.data, group: 0, index: 0 });
+            }
+
+            frame.index++;
+        }
+    }
+
+    return result;
 }
 
 function stringifyToken(
@@ -108,14 +135,9 @@ function stringifyToken(
             return `:${escapeName(token.name, charsToEscapeInName)}${
                 token.data === null
                     ? ""
-                    : `(${
-                          typeof token.data === "string"
-                              ? escapeName(
-                                    token.data,
-                                    charsToEscapeInPseudoValue,
-                                )
-                              : stringify(token.data)
-                      })`
+                    : typeof token.data === "string"
+                      ? `(${escapeName(token.data, charsToEscapeInPseudoValue)})`
+                      : "("
             }`;
         }
 

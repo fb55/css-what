@@ -19,6 +19,25 @@ describe("Stringify & re-parse", () => {
     });
 });
 
+describe("Stringify", () => {
+    it("should stringify deeply nested pseudo-selectors", () => {
+        const depth = 100_000;
+        let selector: Selector[][] = [
+            [{ type: SelectorType.Tag, name: "a", namespace: null }],
+        ];
+
+        for (let level = 0; level < depth; level++) {
+            selector = [
+                [{ type: SelectorType.Pseudo, name: "is", data: selector }],
+            ];
+        }
+
+        expect(stringify(selector)).toBe(
+            `${":is(".repeat(depth)}a${")".repeat(depth)}`,
+        );
+    });
+});
+
 describe("Stringify CSS spec compliance", () => {
     const escapeCases: [string, string, string][] = [
         ["1foo", String.raw`\31 foo`, "leading digit"],
