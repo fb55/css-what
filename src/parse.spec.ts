@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { tests } from "./__fixtures__/tests.js";
 import { parse } from "./parse.js";
+import { SelectorType } from "./types.js";
 
 const broken = [
     "[",
@@ -57,5 +58,33 @@ describe("Parse", () => {
         expect(parse(":before")).toEqual([
             [{ name: "before", data: null, type: "pseudo-element" }],
         ]);
+    });
+
+    it("should parse deeply nested pseudo-selectors", () => {
+        const depth = 100_000;
+        let [[token]] = parse(`${":is(".repeat(depth)}a${")".repeat(depth)}`);
+        let levels = 0;
+
+        while (
+            token.type === SelectorType.Pseudo &&
+            Array.isArray(token.data)
+        ) {
+            [[token]] = token.data;
+            levels++;
+        }
+
+        expect(levels).toBe(depth);
+        expect(token).toStrictEqual({
+            type: "tag",
+            name: "a",
+            namespace: null,
+        });
+    });
+
+    it("should report unclosed deeply nested pseudo-selectors", () => {
+        const selector = `:not(${":has(".repeat(100_000)}a`;
+        expect(() => parse(selector)).toThrow(
+            `Missing closing parenthesis in :has (${selector})`,
+        );
     });
 });

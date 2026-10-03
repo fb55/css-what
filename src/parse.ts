@@ -292,6 +292,13 @@ function parseSelector(
         return selectorIndex;
     }
 
+    // Enclosing selectors of the nested pseudos (eg. `:is(…)`) being parsed.
+    const stack: {
+        subselects: Selector[][];
+        tokens: Selector[];
+        name: string;
+    }[] = [];
+
     loop: while (selectorIndex < selector.length) {
         const firstChar = selector.charCodeAt(selectorIndex);
 
@@ -544,22 +551,13 @@ function parseSelector(
                         }
 
                         data = [];
-                        selectorIndex = parseSelector(
-                            data,
-                            selector,
-                            selectorIndex + 1,
-                        );
+                        stripWhitespace(1);
 
-                        if (
-                            selector.charCodeAt(selectorIndex) !==
-                            CharCode.RightParenthesis
-                        ) {
+                        if (selectorIndex === selector.length) {
                             throw new Error(
                                 `Missing closing parenthesis in :${name} (${selector})`,
                             );
                         }
-
-                        selectorIndex += 1;
                     } else {
                         data = readValueWithParenthesis();
 
@@ -579,6 +577,14 @@ function parseSelector(
                 }
 
                 tokens.push({ type: SelectorType.Pseudo, name, data });
+
+                if (Array.isArray(data)) {
+                    // Parse the nested selectors in this loop, instead of recursing.
+                    stack.push({ subselects, tokens, name });
+                    subselects = data;
+                    tokens = [];
+                }
+
                 // eslint-disable-next-line unicorn/no-break-in-nested-loop
                 break;
             }
@@ -627,6 +633,17 @@ function parseSelector(
                     }
                 } else if (reName.test(selector.slice(selectorIndex))) {
                     name = getName(0);
+                } else if (
+                    stack.length > 0 &&
+                    firstChar === CharCode.RightParenthesis
+                ) {
+                    // The nested selectors end here, continue with the outer one.
+                    finalizeSubselector();
+                    ({ subselects, tokens } = stack[stack.length - 1]);
+                    stack.pop();
+                    selectorIndex += 1;
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                    break;
                 } else {
                     break loop;
                 }
@@ -657,5 +674,12 @@ function parseSelector(
     }
 
     finalizeSubselector();
+
+    if (stack.length > 0) {
+        throw new Error(
+            `Missing closing parenthesis in :${stack[stack.length - 1].name} (${selector})`,
+        );
+    }
+
     return selectorIndex;
 }
