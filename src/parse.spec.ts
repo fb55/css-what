@@ -33,6 +33,83 @@ describe("Parse", () => {
     });
 
     describe("Forgiving selector lists", () => {
+        it.each([
+            [
+                "bare LF",
+                "is",
+                "contains",
+                ':is(ol,:contains("bad\n),ul).tail',
+                '"bad\n',
+                null,
+            ],
+            [
+                "bare CR",
+                "where",
+                "icontains",
+                ":where(ol,:icontains('bad\r),ul).tail",
+                "'bad\r",
+                null,
+            ],
+            [
+                "bare FF",
+                "is",
+                "contains",
+                ':is(ol,:contains("bad\f),ul).tail',
+                '"bad\f',
+                null,
+            ],
+            [
+                "escaped LF",
+                "is",
+                "contains",
+                `:is(ol,:contains("bad${String.fromCharCode(92)}\n"),ul).tail`,
+                "bad\n",
+                "bad\n",
+            ],
+            [
+                "hex escape followed by LF",
+                "where",
+                "icontains",
+                `:where(ol,:icontains('${String.fromCharCode(92)}61\n'),ul).tail`,
+                "a",
+                "a",
+            ],
+        ])(
+            "should handle known quoted newline %s",
+            (_, listName, name, selector, strictData, forgivingData) => {
+                const expected = (data: string | null) => [
+                    [
+                        {
+                            type: "pseudo",
+                            name: listName,
+                            data: [
+                                [{ type: "tag", name: "ol", namespace: null }],
+                                ...(data === null
+                                    ? []
+                                    : [[{ type: "pseudo", name, data }]]),
+                                [{ type: "tag", name: "ul", namespace: null }],
+                            ],
+                        },
+                        {
+                            type: "attribute",
+                            name: "class",
+                            action: "element",
+                            value: "tail",
+                            namespace: null,
+                            ignoreCase: "quirks",
+                        },
+                    ],
+                ];
+                expect(parse(selector)).toStrictEqual(expected(strictData));
+                expect(parse(selector, { forgiving: false })).toStrictEqual(
+                    expected(strictData),
+                );
+                expect(parse(selector, { forgiving: true })).toStrictEqual(
+                    expected(forgivingData),
+                );
+            },
+        );
+
         it.each(["(", ")"])(
             "should discard mismatched quoted %s with trailing whitespace",
             (value) => {

@@ -577,12 +577,13 @@ function parseSelector(
             return unescapeCSSAtEOF(selector.slice(start + 1), true);
         }
 
+        if (selector.charCodeAt(stringEnd) !== quote) {
+            throw syntaxError("Unterminated string");
+        }
+
         const hasClosingParenthesis =
             selector.charCodeAt(stringEnd + 1) === CharCode.RightParenthesis;
-        if (
-            selector.charCodeAt(stringEnd) !== quote ||
-            (!hasClosingParenthesis && stringEnd + 1 !== selector.length)
-        ) {
+        if (!hasClosingParenthesis && stringEnd + 1 !== selector.length) {
             return null;
         }
 
