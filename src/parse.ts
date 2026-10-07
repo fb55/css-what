@@ -591,14 +591,13 @@ function parseSelector(
         if (!hasClosingParenthesis) {
             context.eofRecovered = true;
         }
-        return unescapeCSS(selector.slice(start + 1, stringEnd));
+        // Decode closed and EOF-recovered strings consistently.
+        return unescapeCSSAtEOF(selector.slice(start + 1, stringEnd), true);
     }
 
     function readValueWithParenthesis(isStringArgument = false): string {
         selectorIndex += 1;
         const start = selectorIndex;
-        let expectedEnd = -1;
-
         if (
             context.inForgiving &&
             isStringArgument &&
@@ -615,8 +614,9 @@ function parseSelector(
                 end > stringEnd + 1 &&
                 selector.charCodeAt(end) === CharCode.RightParenthesis
             ) {
-                // Validate the quoted boundary without changing legacy decoding.
-                expectedEnd = end;
+                // Preserve legacy quoted data using its actual closing delimiter.
+                selectorIndex = end + 1;
+                return unescapeCSS(selector.slice(start, end));
             }
         }
 
@@ -625,14 +625,6 @@ function parseSelector(
             selectorIndex < selector.length;
             selectorIndex++
         ) {
-            if (
-                expectedEnd >= 0 &&
-                selectorIndex >= expectedEnd &&
-                (selectorIndex !== expectedEnd || counter !== 1)
-            ) {
-                throw syntaxError("Parenthesis not matched");
-            }
-
             switch (selector.charCodeAt(selectorIndex)) {
                 case CharCode.BackSlash: {
                     // Skip next character
@@ -649,9 +641,6 @@ function parseSelector(
                     counter -= 1;
 
                     if (counter === 0) {
-                        if (expectedEnd >= 0 && selectorIndex !== expectedEnd) {
-                            throw syntaxError("Parenthesis not matched");
-                        }
                         return unescapeCSS(
                             selector.slice(start, selectorIndex++),
                         );

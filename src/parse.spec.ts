@@ -64,7 +64,7 @@ describe("Parse", () => {
                 "contains",
                 `:is(ol,:contains("bad${String.fromCharCode(92)}\n"),ul).tail`,
                 "bad\n",
-                "bad\n",
+                "bad",
             ],
             [
                 "hex escape followed by LF",
@@ -111,7 +111,7 @@ describe("Parse", () => {
         );
 
         it.each(["(", ")"])(
-            "should discard mismatched quoted %s with trailing whitespace",
+            "should preserve quoted %s with trailing whitespace in forgiving lists",
             (value) => {
                 const selector = `:is(ol,:contains("${value}" ),ul).tail`;
                 expect(() => parse(selector)).toThrow(Error);
@@ -125,6 +125,13 @@ describe("Parse", () => {
                             name: "is",
                             data: [
                                 [{ type: "tag", name: "ol", namespace: null }],
+                                [
+                                    {
+                                        type: "pseudo",
+                                        name: "contains",
+                                        data: `"${value}" `,
+                                    },
+                                ],
                                 [{ type: "tag", name: "ul", namespace: null }],
                             ],
                         },
