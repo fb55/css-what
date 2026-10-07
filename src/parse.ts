@@ -593,15 +593,45 @@ function parseSelector(
         return unescapeCSS(selector.slice(start + 1, stringEnd));
     }
 
-    function readValueWithParenthesis(): string {
+    function readValueWithParenthesis(isStringArgument = false): string {
         selectorIndex += 1;
         const start = selectorIndex;
+        let expectedEnd = -1;
+
+        if (
+            context.inForgiving &&
+            isStringArgument &&
+            isQuote(selector.charCodeAt(start))
+        ) {
+            const stringEnd = consumeString(selector, start);
+            let end = stringEnd + 1;
+            while (isWhitespace(selector.charCodeAt(end))) {
+                end++;
+            }
+
+            if (
+                selector.charCodeAt(stringEnd) === selector.charCodeAt(start) &&
+                end > stringEnd + 1 &&
+                selector.charCodeAt(end) === CharCode.RightParenthesis
+            ) {
+                // Validate the quoted boundary without changing legacy decoding.
+                expectedEnd = end;
+            }
+        }
 
         for (
             let counter = 1;
             selectorIndex < selector.length;
             selectorIndex++
         ) {
+            if (
+                expectedEnd >= 0 &&
+                selectorIndex >= expectedEnd &&
+                (selectorIndex !== expectedEnd || counter !== 1)
+            ) {
+                throw syntaxError("Parenthesis not matched");
+            }
+
             switch (selector.charCodeAt(selectorIndex)) {
                 case CharCode.BackSlash: {
                     // Skip next character
@@ -618,6 +648,9 @@ function parseSelector(
                     counter -= 1;
 
                     if (counter === 0) {
+                        if (expectedEnd >= 0 && selectorIndex !== expectedEnd) {
+                            throw syntaxError("Parenthesis not matched");
+                        }
                         return unescapeCSS(
                             selector.slice(start, selectorIndex++),
                         );
@@ -1046,7 +1079,7 @@ function parseSelector(
                                 : null;
 
                         if (quotedData === null) {
-                            data = readValueWithParenthesis();
+                            data = readValueWithParenthesis(isStringArgument);
 
                             if (isStringArgument) {
                                 const quot = data.charCodeAt(0);

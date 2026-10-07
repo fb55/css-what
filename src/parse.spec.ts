@@ -33,6 +33,91 @@ describe("Parse", () => {
     });
 
     describe("Forgiving selector lists", () => {
+        it.each(["(", ")"])(
+            "should discard mismatched quoted %s with trailing whitespace",
+            (value) => {
+                const selector = `:is(ol,:contains("${value}" ),ul).tail`;
+                expect(() => parse(selector)).toThrow(Error);
+                expect(() => parse(selector, { forgiving: false })).toThrow(
+                    Error,
+                );
+                expect(parse(selector, { forgiving: true })).toStrictEqual([
+                    [
+                        {
+                            type: "pseudo",
+                            name: "is",
+                            data: [
+                                [{ type: "tag", name: "ol", namespace: null }],
+                                [{ type: "tag", name: "ul", namespace: null }],
+                            ],
+                        },
+                        {
+                            type: "attribute",
+                            name: "class",
+                            action: "element",
+                            value: "tail",
+                            namespace: null,
+                            ignoreCase: "quirks",
+                        },
+                    ],
+                ]);
+            },
+        );
+
+        it.each([
+            ["is", "contains", ':is(ol,:contains("x" ),ul).tail', '"x" '],
+            [
+                "where",
+                "icontains",
+                ":where(ol,:icontains('x'\t),ul).tail",
+                "'x'\t",
+            ],
+            [
+                "is",
+                "contains",
+                String.raw`:is(ol,:contains("\\x" ),ul).tail`,
+                '"x" ',
+            ],
+            [
+                "is",
+                "contains",
+                ':is(ol,:contains("(x)" \t\n\f\r),ul).tail',
+                '"(x)" \t\n\f\r',
+            ],
+        ])(
+            "should preserve existing quoted whitespace data in %s :%s %s",
+            (listName, name, selector, data) => {
+                const expected = [
+                    [
+                        {
+                            type: "pseudo",
+                            name: listName,
+                            data: [
+                                [{ type: "tag", name: "ol", namespace: null }],
+                                [{ type: "pseudo", name, data }],
+                                [{ type: "tag", name: "ul", namespace: null }],
+                            ],
+                        },
+                        {
+                            type: "attribute",
+                            name: "class",
+                            action: "element",
+                            value: "tail",
+                            namespace: null,
+                            ignoreCase: "quirks",
+                        },
+                    ],
+                ];
+                expect(parse(selector)).toStrictEqual(expected);
+                expect(parse(selector, { forgiving: false })).toStrictEqual(
+                    expected,
+                );
+                expect(parse(selector, { forgiving: true })).toStrictEqual(
+                    expected,
+                );
+            },
+        );
+
         it.each([
             [
                 "is",
