@@ -34,6 +34,157 @@ describe("Parse", () => {
 
     describe("Forgiving selector lists", () => {
         it.each([
+            [
+                "is",
+                "contains",
+                String.raw`:is(ol,:contains("\\)"),ul).tail`,
+                String.raw`\)`,
+                "throws",
+            ],
+            [
+                "where",
+                "icontains",
+                String.raw`:where(ol,:icontains('\5c 29'),ul).tail`,
+                String.raw`\29`,
+                ")",
+            ],
+            [
+                "is",
+                "contains",
+                String.raw`:is(ol,:contains("a\\(b)"),ul).tail`,
+                String.raw`a\(b)`,
+                "a(b)",
+            ],
+            [
+                "is",
+                "contains",
+                String.raw`:is(ol,:contains("\)"),ul).tail`,
+                ")",
+                ")",
+            ],
+        ])(
+            "should decode quoted string arguments once in %s :%s %s",
+            (listName, name, selector, value, strictValue) => {
+                const expected = (data: string) => [
+                    [
+                        {
+                            type: "pseudo",
+                            name: listName,
+                            data: [
+                                [{ type: "tag", name: "ol", namespace: null }],
+                                [{ type: "pseudo", name, data }],
+                                [{ type: "tag", name: "ul", namespace: null }],
+                            ],
+                        },
+                        {
+                            type: "attribute",
+                            name: "class",
+                            action: "element",
+                            value: "tail",
+                            namespace: null,
+                            ignoreCase: "quirks",
+                        },
+                    ],
+                ];
+                if (strictValue === "throws") {
+                    expect(() => parse(selector)).toThrow(Error);
+                    expect(() => parse(selector, { forgiving: false })).toThrow(
+                        Error,
+                    );
+                } else {
+                    expect(parse(selector)).toStrictEqual(
+                        expected(strictValue),
+                    );
+                    expect(parse(selector, { forgiving: false })).toStrictEqual(
+                        expected(strictValue),
+                    );
+                }
+                expect(parse(selector, { forgiving: true })).toStrictEqual(
+                    expected(value),
+                );
+            },
+        );
+
+        it.each([
+            [
+                "is",
+                "contains",
+                String.raw`:is(ol,:contains("\\x"`,
+                String.raw`\x`,
+                "throws",
+            ],
+            [
+                "where",
+                "icontains",
+                String.raw`:where(ol,:icontains('\\x`,
+                String.raw`\x`,
+                "throws",
+            ],
+            [
+                "is",
+                "contains",
+                `:is(ol,:contains("a${String.fromCharCode(92)}`,
+                "a",
+                "throws",
+            ],
+            [
+                "where",
+                "icontains",
+                String.raw`:where(ol,:icontains("a\"`,
+                'a"',
+                "throws",
+            ],
+            [
+                "is",
+                "contains",
+                `:is(ol,:contains("a${String.fromCharCode(92)}\nb`,
+                "ab",
+                "throws",
+            ],
+            [
+                "is",
+                "contains",
+                String.raw`:is(ol,:contains("\\x"))`,
+                String.raw`\x`,
+                "x",
+            ],
+            ["is", "contains", ':is(ol,:contains(""', "", "throws"],
+            ["where", "icontains", ":where(ol,:icontains('", "", "throws"],
+        ])(
+            "should decode quoted string arguments at EOF in %s :%s %s",
+            (listName, name, selector, value, strictValue) => {
+                const expected = (data: string) => [
+                    [
+                        {
+                            type: "pseudo",
+                            name: listName,
+                            data: [
+                                [{ type: "tag", name: "ol", namespace: null }],
+                                [{ type: "pseudo", name, data }],
+                            ],
+                        },
+                    ],
+                ];
+                if (strictValue === "throws") {
+                    expect(() => parse(selector)).toThrow(Error);
+                    expect(() => parse(selector, { forgiving: false })).toThrow(
+                        Error,
+                    );
+                } else {
+                    expect(parse(selector)).toStrictEqual(
+                        expected(strictValue),
+                    );
+                    expect(parse(selector, { forgiving: false })).toStrictEqual(
+                        expected(strictValue),
+                    );
+                }
+                expect(parse(selector, { forgiving: true })).toStrictEqual(
+                    expected(value),
+                );
+            },
+        );
+
+        it.each([
             ["contains", "("],
             ["contains", ")"],
             ["icontains", "("],
@@ -430,7 +581,6 @@ describe("Parse", () => {
             ":is(ol,:unknown(url(a(b))),ul).tail",
             String.raw`:is(ol,:contains("a\"(b)"),ul).tail`,
             String.raw`:where(ol,:contains('a\'(b)'),ul).tail`,
-            String.raw`:is(ol,:contains("a\\(b)"),ul).tail`,
             String.raw`:is(\?url,ol).tail`,
             String.raw`:where(ol,.\?url).tail`,
             String.raw`:is(ol,[x="a\\"],[x=a\\])`,

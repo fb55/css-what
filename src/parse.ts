@@ -563,24 +563,39 @@ function parseSelector(
         }
     }
 
-    function readValueWithParenthesis(isStringArgument = false): string {
+    function readQuotedArgument(): string | null {
+        const start = selectorIndex + 1;
+        const quote = selector.charCodeAt(start);
+        if (!isQuote(quote)) {
+            return null;
+        }
+
+        const stringEnd = consumeString(selector, start);
+        if (stringEnd === selector.length) {
+            selectorIndex = selector.length;
+            context.eofRecovered = true;
+            return unescapeCSSAtEOF(selector.slice(start + 1), true);
+        }
+
+        const hasClosingParenthesis =
+            selector.charCodeAt(stringEnd + 1) === CharCode.RightParenthesis;
+        if (
+            selector.charCodeAt(stringEnd) !== quote ||
+            (!hasClosingParenthesis && stringEnd + 1 !== selector.length)
+        ) {
+            return null;
+        }
+
+        selectorIndex = hasClosingParenthesis ? stringEnd + 2 : selector.length;
+        if (!hasClosingParenthesis) {
+            context.eofRecovered = true;
+        }
+        return unescapeCSS(selector.slice(start + 1, stringEnd));
+    }
+
+    function readValueWithParenthesis(): string {
         selectorIndex += 1;
         const start = selectorIndex;
-
-        if (
-            context.inForgiving &&
-            isStringArgument &&
-            isQuote(selector.charCodeAt(start))
-        ) {
-            const stringEnd = consumeString(selector, start);
-            if (
-                selector.charCodeAt(stringEnd) === selector.charCodeAt(start) &&
-                selector.charCodeAt(stringEnd + 1) === CharCode.RightParenthesis
-            ) {
-                selectorIndex = stringEnd + 2;
-                return unescapeCSS(selector.slice(start, stringEnd + 1));
-            }
-        }
 
         for (
             let counter = 1;
@@ -1023,22 +1038,31 @@ function parseSelector(
                             );
                         }
                     } else {
-                        data = readValueWithParenthesis(
-                            stripQuotesFromPseudos.has(name),
-                        );
+                        const isStringArgument =
+                            stripQuotesFromPseudos.has(name);
+                        const quotedData =
+                            context.inForgiving && isStringArgument
+                                ? readQuotedArgument()
+                                : null;
 
-                        if (stripQuotesFromPseudos.has(name)) {
-                            const quot = data.charCodeAt(0);
+                        if (quotedData === null) {
+                            data = readValueWithParenthesis();
 
-                            if (
-                                quot === data.charCodeAt(data.length - 1) &&
-                                isQuote(quot)
-                            ) {
-                                data = data.slice(1, -1);
+                            if (isStringArgument) {
+                                const quot = data.charCodeAt(0);
+
+                                if (
+                                    quot === data.charCodeAt(data.length - 1) &&
+                                    isQuote(quot)
+                                ) {
+                                    data = data.slice(1, -1);
+                                }
                             }
-                        }
 
-                        data = unescapeCSS(data);
+                            data = unescapeCSS(data);
+                        } else {
+                            data = quotedData;
+                        }
                     }
                 }
 
