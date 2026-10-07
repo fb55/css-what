@@ -539,16 +539,15 @@ function parseSelector(
 
     function getSelectorName(offset: number): string {
         const nameStart = selectorIndex + offset;
-        if (
-            context.inForgiving &&
-            getUrlArgumentStart(
-                selector,
-                nameStart,
-                consumeName(selector, nameStart),
-            ) >= 0
-        ) {
-            // URL tokens are not selectors; recover from their atomic boundary.
-            throw syntaxError("Unexpected URL token");
+        if (context.inForgiving) {
+            const nameEnd = consumeName(selector, nameStart);
+            if (nameEnd === nameStart) {
+                throw syntaxError("Expected name");
+            }
+            if (getUrlArgumentStart(selector, nameStart, nameEnd) >= 0) {
+                // URL tokens are not selectors; recover from their atomic boundary.
+                throw syntaxError("Unexpected URL token");
+            }
         }
         return getName(offset);
     }
@@ -564,9 +563,24 @@ function parseSelector(
         }
     }
 
-    function readValueWithParenthesis(): string {
+    function readValueWithParenthesis(isStringArgument = false): string {
         selectorIndex += 1;
         const start = selectorIndex;
+
+        if (
+            context.inForgiving &&
+            isStringArgument &&
+            isQuote(selector.charCodeAt(start))
+        ) {
+            const stringEnd = consumeString(selector, start);
+            if (
+                selector.charCodeAt(stringEnd) === selector.charCodeAt(start) &&
+                selector.charCodeAt(stringEnd + 1) === CharCode.RightParenthesis
+            ) {
+                selectorIndex = stringEnd + 2;
+                return unescapeCSS(selector.slice(start, stringEnd + 1));
+            }
+        }
 
         for (
             let counter = 1;
@@ -1009,7 +1023,9 @@ function parseSelector(
                             );
                         }
                     } else {
-                        data = readValueWithParenthesis();
+                        data = readValueWithParenthesis(
+                            stripQuotesFromPseudos.has(name),
+                        );
 
                         if (stripQuotesFromPseudos.has(name)) {
                             const quot = data.charCodeAt(0);

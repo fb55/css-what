@@ -33,6 +33,75 @@ describe("Parse", () => {
     });
 
     describe("Forgiving selector lists", () => {
+        it.each([
+            ["contains", "("],
+            ["contains", ")"],
+            ["icontains", "("],
+            ["icontains", ")"],
+        ])(
+            "should preserve :%s() quoted %s and subsequent selectors",
+            (name, value) => {
+                const selector = `:is(ol,:${name}("${value}"),ul).tail`;
+                expect(() => parse(selector)).toThrow(Error);
+                expect(() => parse(selector, { forgiving: false })).toThrow(
+                    Error,
+                );
+                expect(parse(selector, { forgiving: true })).toStrictEqual([
+                    [
+                        {
+                            type: "pseudo",
+                            name: "is",
+                            data: [
+                                [{ type: "tag", name: "ol", namespace: null }],
+                                [
+                                    {
+                                        type: "pseudo",
+                                        name,
+                                        data: value,
+                                    },
+                                ],
+                                [{ type: "tag", name: "ul", namespace: null }],
+                            ],
+                        },
+                        {
+                            type: "attribute",
+                            name: "class",
+                            action: "element",
+                            value: "tail",
+                            namespace: null,
+                            ignoreCase: "quirks",
+                        },
+                    ],
+                ]);
+            },
+        );
+
+        it("should recover at a single invalid prefix before a URL token", () => {
+            const selector = ':is(ol,?url(a"b),ul).tail';
+            expect(() => parse(selector)).toThrow(Error);
+            expect(() => parse(selector, { forgiving: false })).toThrow(Error);
+            expect(parse(selector, { forgiving: true })).toStrictEqual([
+                [
+                    {
+                        type: "pseudo",
+                        name: "is",
+                        data: [
+                            [{ type: "tag", name: "ol", namespace: null }],
+                            [{ type: "tag", name: "ul", namespace: null }],
+                        ],
+                    },
+                    {
+                        type: "attribute",
+                        name: "class",
+                        action: "element",
+                        value: "tail",
+                        namespace: null,
+                        ignoreCase: "quirks",
+                    },
+                ],
+            ]);
+        });
+
         it.each(["is", "where"])(
             "should keep valid selectors in :%s() when enabled",
             (name) => {
@@ -354,6 +423,16 @@ describe("Parse", () => {
             ":is(ol,/*,)*/ul)",
             ":is(> ul,:has(:has(a)),:unknown-pseudo(a,b),::unknown)",
             ':is(ol,:unknown(url(a"b)),:url(a"b),ul)',
+            ':is(ol,:url(a"b),:url(c"d),ul).tail',
+            ':is(ol,:unknown(a"b),:unknown(c"d),ul).tail',
+            ':is(ol,:unknown("a),:unknown("),ul).tail',
+            ':is(ol,::unknown("a),::unknown("),ul).tail',
+            ":is(ol,:unknown(url(a(b))),ul).tail",
+            String.raw`:is(ol,:contains("a\"(b)"),ul).tail`,
+            String.raw`:where(ol,:contains('a\'(b)'),ul).tail`,
+            String.raw`:is(ol,:contains("a\\(b)"),ul).tail`,
+            String.raw`:is(\?url,ol).tail`,
+            String.raw`:where(ol,.\?url).tail`,
             String.raw`:is(ol,[x="a\\"],[x=a\\])`,
             `:is(ol,[x="${String.fromCharCode(92)}6${String.fromCharCode(92)}\n1"])`,
         ])("should preserve existing valid ASTs for %s", (selector) => {
