@@ -579,7 +579,6 @@ function parseSelector(
                 tokens.push({ type: SelectorType.Pseudo, name, data });
 
                 if (Array.isArray(data)) {
-                    // Parse the nested selectors in this loop, instead of recursing.
                     stack.push({ subselects, tokens, name });
                     subselects = data;
                     tokens = [];
