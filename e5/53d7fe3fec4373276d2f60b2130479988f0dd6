@@ -1,0 +1,21 @@
+src/parse.spec.ts
+  s_6bbbbbc7cea8e7::t_086e82c99353bf 48-54
+src/parse.ts
+  s_6bbbbbc7cea8e7::t_8cb810ce443fc8 12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e553d7fe3fec4373276d2f60b2130479988f0dd6",
+  "prompts": {},
+  "sessions": {
+    "s_6bbbbbc7cea8e7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "477ae3a9-56cd-4535-bf0f-8d24ed1686d9",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": null
+    }
+  }
+}
