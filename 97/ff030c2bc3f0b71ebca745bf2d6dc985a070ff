@@ -1,0 +1,29 @@
+src/stringify.ts
+  s_cf0a57cea81a87::t_5fbd436e3b5531 50-85,138-140
+src/stringify.spec.ts
+  s_00d32ce91e753c::t_b786dd5bc88dab 22-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "97ff030c2bc3f0b71ebca745bf2d6dc985a070ff",
+  "prompts": {},
+  "sessions": {
+    "s_00d32ce91e753c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a103bb-107f-7910-8983-a0cf2ff5e075",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Felix Boehm <188768+fb55@users.noreply.github.com>"
+    },
+    "s_cf0a57cea81a87": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a103bb-4f12-7ca0-b510-369b0187a591",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Felix Boehm <188768+fb55@users.noreply.github.com>"
+    }
+  }
+}
