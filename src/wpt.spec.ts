@@ -98,7 +98,7 @@ describe("Web Platform Tests", () => {
         test_valid_selector(".a:not(:has(.b))");
         test_valid_selector(".a:has(:not(.b))");
         test_valid_selector(".a:has(.b):has(.c)");
-        test_valid_selector("*|*:has(*)", ":has(*)");
+        test_valid_selector("*|*:has(*)");
         test_valid_selector(":has(*|*)");
         test_invalid_selector(".a:has()");
     });
@@ -126,7 +126,7 @@ describe("Web Platform Tests", () => {
         test_valid_selector("button:not([disabled])");
         test_valid_selector("*:not(foo)", ["*:not(foo)", ":not(foo)"]);
         test_valid_selector(":not(:link):not(:visited)");
-        test_valid_selector("*|*:not(*)", ":not(*)");
+        test_valid_selector("*|*:not(*)");
         test_valid_selector(":not(:hover)");
         test_valid_selector(":not(*|*)");
         test_valid_selector("foo:not(bar)");

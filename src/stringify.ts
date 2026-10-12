@@ -69,7 +69,7 @@ export function stringify(selector: Selector[][]): string {
             }
         } else {
             const token = tokens[frame.index];
-            result += stringifyToken(token, frame.index, tokens);
+            result += stringifyToken(token, frame.index);
 
             if (
                 token.type === SelectorType.Pseudo &&
@@ -85,11 +85,7 @@ export function stringify(selector: Selector[][]): string {
     return result;
 }
 
-function stringifyToken(
-    token: Selector,
-    index: number,
-    array: Selector[],
-): string {
+function stringifyToken(token: Selector, index: number): string {
     switch (token.type) {
         // Simple types
         case SelectorType.Child: {
@@ -111,12 +107,7 @@ function stringifyToken(
             return index === 0 ? "|| " : " || ";
         }
         case SelectorType.Universal: {
-            // Return an empty string if the selector isn't needed.
-            return token.namespace === "*" &&
-                index + 1 < array.length &&
-                "name" in array[index + 1]
-                ? ""
-                : `${getNamespace(token.namespace)}*`;
+            return `${getNamespace(token.namespace)}*`;
         }
 
         case SelectorType.Tag: {
