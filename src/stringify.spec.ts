@@ -20,6 +20,17 @@ describe("Stringify & re-parse", () => {
 });
 
 describe("Stringify", () => {
+    it.each([
+        "*|*.warning",
+        "*|*#myid",
+        "*|*[title]",
+        "*|*:first-child",
+        "*|*::before",
+    ])("preserves the explicit wildcard namespace in %s", (selector) => {
+        // Omitting *|* would restrict matching to a stylesheet's default namespace.
+        expect(stringify(parse(selector))).toBe(selector);
+    });
+
     it("should stringify deeply nested pseudo-selectors", () => {
         const depth = 100_000;
         let selector: Selector[][] = [
