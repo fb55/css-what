@@ -19,6 +19,25 @@ describe("Stringify & re-parse", () => {
     });
 });
 
+describe("Stringify", () => {
+    it("should stringify deeply nested pseudo-selectors", () => {
+        const depth = 100_000;
+        let selector: Selector[][] = [
+            [{ type: SelectorType.Tag, name: "a", namespace: null }],
+        ];
+
+        for (let level = 0; level < depth; level++) {
+            selector = [
+                [{ type: SelectorType.Pseudo, name: "is", data: selector }],
+            ];
+        }
+
+        expect(stringify(selector)).toBe(
+            `${":is(".repeat(depth)}a${")".repeat(depth)}`,
+        );
+    });
+});
+
 describe("Stringify CSS spec compliance", () => {
     const escapeCases: [string, string, string][] = [
         ["1foo", String.raw`\31 foo`, "leading digit"],
@@ -28,6 +47,12 @@ describe("Stringify CSS spec compliance", () => {
         ["a\u{7F}b", String.raw`a\7f b`, "DEL character"],
         ["a\u{0}b", String.raw`a\fffd b`, "null → FFFD"],
         ["a'b", String.raw`a\'b`, "single quote"],
+        ["a=b", String.raw`a\=b`, "equals sign"],
+        ["a&b", String.raw`a\&b`, "ampersand"],
+        ["a{b}c", String.raw`a\{b\}c`, "braces"],
+        ["a?b", String.raw`a\?b`, "question mark"],
+        ["a@b", String.raw`a\@b`, "at sign"],
+        ["a`b", String.raw`a\`b`, "backtick"],
     ];
 
     it.each(escapeCases)("%s → %s (%s)", (name, expected) => {
@@ -42,5 +67,21 @@ describe("Stringify CSS spec compliance", () => {
             [{ type: SelectorType.Tag as const, name, namespace: null }],
         ];
         expect(stringify(ast)).toBe(name);
+    });
+});
+
+describe("Stringify round-trips special characters in identifiers", () => {
+    const selectors = [
+        String.raw`.x\&y`,
+        String.raw`[data-foo\=bar]`,
+        String.raw`.a\{b\}c`,
+        String.raw`.w-1\/2`,
+        String.raw`#a\?b`,
+        String.raw`.a\@b`,
+    ];
+    it.each(selectors)("%s", (selector) => {
+        const original = parse(selector);
+        const roundTripped = parse(stringify(original));
+        expect(roundTripped).toStrictEqual(original);
     });
 });

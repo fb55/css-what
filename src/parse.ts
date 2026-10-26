@@ -435,48 +435,6 @@ function skipInvalidSelector(
     return selector.length;
 }
 
-function parseForgivingSelector(
-    subselects: Selector[][],
-    selector: string,
-    selectorIndex: number,
-    context: ParseContext,
-): number {
-    while (selectorIndex < selector.length) {
-        // Keep the entire branch separate until parsing it succeeds.
-        const candidate: Selector[][] = [];
-        try {
-            selectorIndex = parseSelector(
-                candidate,
-                selector,
-                selectorIndex,
-                context,
-                true,
-            );
-            subselects.push(...candidate);
-        } catch (error) {
-            if (!(error instanceof ParseError)) {
-                throw error;
-            }
-            selectorIndex = skipInvalidSelector(
-                selector,
-                error.syncStart,
-                error.depth - context.depth,
-            );
-        }
-
-        if (selector.charCodeAt(selectorIndex) !== CharCode.Comma) {
-            if (selectorIndex === selector.length) {
-                context.eofRecovered = true;
-            }
-            return selectorIndex;
-        }
-        selectorIndex += 1;
-    }
-
-    context.eofRecovered = true;
-    return selectorIndex;
-}
-
 /**
  * Parses `selector`.
  * @param selector Selector to parse.
@@ -510,7 +468,6 @@ function parseSelector(
     selector: string,
     selectorIndex: number,
     context: ParseContext,
-    shouldStopAtComma = false,
 ): number {
     let tokens: Selector[] = [];
     let tokenStart = selectorIndex;
@@ -722,150 +679,247 @@ function parseSelector(
         return selectorIndex;
     }
 
-    loop: while (selectorIndex < selector.length) {
-        tokenStart = selectorIndex;
-        const firstChar = selector.charCodeAt(selectorIndex);
+    // Enclosing selectors of the nested pseudos (eg. `:is(…)`) being parsed.
+    const stack: {
+        subselects: Selector[][];
+        tokens: Selector[];
+        name: string;
+        context: ParseContext;
+        isForgivingList: boolean;
+        tokenStart: number;
+    }[] = [];
+    let isForgivingList = false;
 
-        if (context.inForgiving && isQuote(firstChar)) {
-            throw syntaxError("Expected a selector, found a string");
+    function restoreParent(): string {
+        const { eofRecovered } = context;
+        const parent = stack[stack.length - 1];
+        stack.pop();
+        ({ subselects, tokens, context, isForgivingList, tokenStart } = parent);
+        if (eofRecovered) {
+            context.eofRecovered = true;
         }
+        return parent.name;
+    }
 
-        switch (firstChar) {
-            // Whitespace
-            case CharCode.Space:
-            case CharCode.Tab:
-            case CharCode.NewLine:
-            case CharCode.FormFeed:
-            case CharCode.CarriageReturn: {
+    for (;;) {
+        try {
+            if (selectorIndex >= selector.length) {
                 if (
-                    tokens.length === 0 ||
-                    tokens[0].type !== SelectorType.Descendant
+                    tokens.length > 0 ||
+                    (!isForgivingList &&
+                        (context.inForgiving || stack.length === 0))
                 ) {
-                    ensureNotTraversal();
-                    tokens.push({ type: SelectorType.Descendant });
+                    finalizeSubselector();
                 }
+                if (context.inForgiving && selectorIndex === selector.length) {
+                    context.eofRecovered = true;
+                }
+                if (stack.length === 0) {
+                    return selectorIndex;
+                }
+                const canClose = isForgivingList || context.eofRecovered;
+                const name = restoreParent();
+                if (!canClose) {
+                    throw syntaxError(
+                        `Missing closing parenthesis in :${name} (${selector})`,
+                    );
+                }
+                continue;
+            }
 
-                stripWhitespace(1);
-                // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                break;
-            }
-            // Traversals
-            case CharCode.GreaterThan: {
-                addTraversal(SelectorType.Child);
-                stripWhitespace(1);
-                // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                break;
-            }
-            case CharCode.LessThan: {
-                addTraversal(SelectorType.Parent);
-                stripWhitespace(1);
-                // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                break;
-            }
-            case CharCode.Tilde: {
-                addTraversal(SelectorType.Sibling);
-                stripWhitespace(1);
-                // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                break;
-            }
-            case CharCode.Plus: {
-                addTraversal(SelectorType.Adjacent);
-                stripWhitespace(1);
-                // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                break;
-            }
-            // Special attribute selectors: .class, #id
-            case CharCode.Period: {
-                addSpecialAttribute("class", AttributeAction.Element);
-                // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                break;
-            }
-            case CharCode.Hash: {
-                addSpecialAttribute("id", AttributeAction.Equals);
-                // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                break;
-            }
-            case CharCode.LeftSquareBracket: {
-                stripWhitespace(1);
+            tokenStart = selectorIndex;
+            const firstChar = selector.charCodeAt(selectorIndex);
 
-                // Determine attribute name and namespace
+            if (context.inForgiving && isQuote(firstChar)) {
+                throw syntaxError("Expected a selector, found a string");
+            }
 
-                let name: string;
-                let namespace: string | null = null;
-
-                if (selector.charCodeAt(selectorIndex) === CharCode.Pipe) {
-                    // Equivalent to no namespace
-                    name = getName(1);
-                } else if (selector.startsWith("*|", selectorIndex)) {
-                    namespace = "*";
-                    name = getName(2);
-                } else {
-                    name = getName(0);
-
+            switch (firstChar) {
+                // Whitespace
+                case CharCode.Space:
+                case CharCode.Tab:
+                case CharCode.NewLine:
+                case CharCode.FormFeed:
+                case CharCode.CarriageReturn: {
                     if (
-                        selector.charCodeAt(selectorIndex) === CharCode.Pipe &&
-                        selector.charCodeAt(selectorIndex + 1) !==
-                            CharCode.Equal
+                        tokens.length === 0 ||
+                        tokens[0].type !== SelectorType.Descendant
                     ) {
-                        namespace = name;
-                        name = getName(1);
-                    }
-                }
-
-                // Support unescaped colons in attribute names (e.g., xml:lang)
-                while (selector.charCodeAt(selectorIndex) === CharCode.Colon) {
-                    name += `:${getName(1)}`;
-                }
-
-                stripWhitespace(0);
-
-                // Determine comparison operation
-
-                let action: AttributeAction = AttributeAction.Exists;
-                const possibleAction = actionTypes.get(
-                    selector.charCodeAt(selectorIndex),
-                );
-
-                if (possibleAction) {
-                    action = possibleAction;
-
-                    if (
-                        selector.charCodeAt(selectorIndex + 1) !==
-                        CharCode.Equal
-                    ) {
-                        throw syntaxError("Expected `=`");
+                        ensureNotTraversal();
+                        tokens.push({ type: SelectorType.Descendant });
                     }
 
-                    stripWhitespace(2);
-                } else if (
-                    selector.charCodeAt(selectorIndex) === CharCode.Equal
-                ) {
-                    action = AttributeAction.Equals;
                     stripWhitespace(1);
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                    break;
                 }
+                // Traversals
+                case CharCode.GreaterThan: {
+                    addTraversal(SelectorType.Child);
+                    stripWhitespace(1);
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                    break;
+                }
+                case CharCode.LessThan: {
+                    addTraversal(SelectorType.Parent);
+                    stripWhitespace(1);
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                    break;
+                }
+                case CharCode.Tilde: {
+                    addTraversal(SelectorType.Sibling);
+                    stripWhitespace(1);
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                    break;
+                }
+                case CharCode.Plus: {
+                    addTraversal(SelectorType.Adjacent);
+                    stripWhitespace(1);
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                    break;
+                }
+                // Special attribute selectors: .class, #id
+                case CharCode.Period: {
+                    addSpecialAttribute("class", AttributeAction.Element);
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                    break;
+                }
+                case CharCode.Hash: {
+                    addSpecialAttribute("id", AttributeAction.Equals);
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                    break;
+                }
+                case CharCode.LeftSquareBracket: {
+                    stripWhitespace(1);
 
-                // Determine value
+                    // Determine attribute name and namespace
 
-                let value = "";
-                let ignoreCase: boolean | null = null;
+                    let name: string;
+                    let namespace: string | null = null;
 
-                if (action !== "exists") {
-                    if (isQuote(selector.charCodeAt(selectorIndex))) {
-                        const quote = selector.charCodeAt(selectorIndex);
-                        const sectionStart = selectorIndex + 1;
-                        if (context.inForgiving) {
-                            selectorIndex = consumeString(
-                                selector,
+                    if (selector.charCodeAt(selectorIndex) === CharCode.Pipe) {
+                        // Equivalent to no namespace
+                        name = getName(1);
+                    } else if (selector.startsWith("*|", selectorIndex)) {
+                        namespace = "*";
+                        name = getName(2);
+                    } else {
+                        name = getName(0);
+
+                        if (
+                            selector.charCodeAt(selectorIndex) ===
+                                CharCode.Pipe &&
+                            selector.charCodeAt(selectorIndex + 1) !==
+                                CharCode.Equal
+                        ) {
+                            namespace = name;
+                            name = getName(1);
+                        }
+                    }
+
+                    // Support unescaped colons in attribute names (e.g., xml:lang)
+                    while (
+                        selector.charCodeAt(selectorIndex) === CharCode.Colon
+                    ) {
+                        name += `:${getName(1)}`;
+                    }
+
+                    stripWhitespace(0);
+
+                    // Determine comparison operation
+
+                    let action: AttributeAction = AttributeAction.Exists;
+                    const possibleAction = actionTypes.get(
+                        selector.charCodeAt(selectorIndex),
+                    );
+
+                    if (possibleAction) {
+                        action = possibleAction;
+
+                        if (
+                            selector.charCodeAt(selectorIndex + 1) !==
+                            CharCode.Equal
+                        ) {
+                            throw syntaxError("Expected `=`");
+                        }
+
+                        stripWhitespace(2);
+                    } else if (
+                        selector.charCodeAt(selectorIndex) === CharCode.Equal
+                    ) {
+                        action = AttributeAction.Equals;
+                        stripWhitespace(1);
+                    }
+
+                    // Determine value
+
+                    let value = "";
+                    let ignoreCase: boolean | null = null;
+
+                    if (action !== "exists") {
+                        if (isQuote(selector.charCodeAt(selectorIndex))) {
+                            const quote = selector.charCodeAt(selectorIndex);
+                            const sectionStart = selectorIndex + 1;
+                            if (context.inForgiving) {
+                                selectorIndex = consumeString(
+                                    selector,
+                                    selectorIndex,
+                                );
+                                if (
+                                    isNewline(
+                                        selector.charCodeAt(selectorIndex),
+                                    )
+                                ) {
+                                    throw syntaxError(
+                                        "Attribute value didn't end",
+                                    );
+                                }
+                            } else {
+                                selectorIndex += 1;
+                                while (
+                                    selectorIndex < selector.length &&
+                                    selector.charCodeAt(selectorIndex) !== quote
+                                ) {
+                                    selectorIndex +=
+                                        // Skip next character if it is escaped
+                                        selector.charCodeAt(selectorIndex) ===
+                                        CharCode.BackSlash
+                                            ? 2
+                                            : 1;
+                                }
+                            }
+
+                            if (selector.charCodeAt(selectorIndex) !== quote) {
+                                if (!context.inForgiving) {
+                                    throw syntaxError(
+                                        "Attribute value didn't end",
+                                    );
+                                }
+                                selectorIndex = selector.length;
+                            }
+
+                            const rawValue = selector.slice(
+                                sectionStart,
                                 selectorIndex,
                             );
-                            if (isNewline(selector.charCodeAt(selectorIndex))) {
-                                throw syntaxError("Attribute value didn't end");
+                            value =
+                                context.inForgiving &&
+                                selectorIndex === selector.length
+                                    ? unescapeCSSAtEOF(rawValue, true)
+                                    : unescapeCSS(rawValue);
+                            if (selector.charCodeAt(selectorIndex) === quote) {
+                                selectorIndex += 1;
                             }
                         } else {
-                            selectorIndex += 1;
+                            const valueStart = selectorIndex;
+
                             while (
                                 selectorIndex < selector.length &&
-                                selector.charCodeAt(selectorIndex) !== quote
+                                !isWhitespace(
+                                    selector.charCodeAt(selectorIndex),
+                                ) &&
+                                selector.charCodeAt(selectorIndex) !==
+                                    CharCode.RightSquareBracket
                             ) {
                                 selectorIndex +=
                                     // Skip next character if it is escaped
@@ -874,315 +928,318 @@ function parseSelector(
                                         ? 2
                                         : 1;
                             }
-                        }
 
-                        if (selector.charCodeAt(selectorIndex) !== quote) {
-                            if (!context.inForgiving) {
-                                throw syntaxError("Attribute value didn't end");
+                            if (context.inForgiving) {
+                                selectorIndex = Math.min(
+                                    selectorIndex,
+                                    selector.length,
+                                );
                             }
-                            selectorIndex = selector.length;
-                        }
 
-                        const rawValue = selector.slice(
-                            sectionStart,
-                            selectorIndex,
-                        );
-                        value =
-                            context.inForgiving &&
-                            selectorIndex === selector.length
-                                ? unescapeCSSAtEOF(rawValue, true)
-                                : unescapeCSS(rawValue);
-                        if (selector.charCodeAt(selectorIndex) === quote) {
-                            selectorIndex += 1;
-                        }
-                    } else {
-                        const valueStart = selectorIndex;
-
-                        while (
-                            selectorIndex < selector.length &&
-                            !isWhitespace(selector.charCodeAt(selectorIndex)) &&
-                            selector.charCodeAt(selectorIndex) !==
-                                CharCode.RightSquareBracket
-                        ) {
-                            selectorIndex +=
-                                // Skip next character if it is escaped
-                                selector.charCodeAt(selectorIndex) ===
-                                CharCode.BackSlash
-                                    ? 2
-                                    : 1;
-                        }
-
-                        if (context.inForgiving) {
-                            selectorIndex = Math.min(
+                            const rawValue = selector.slice(
+                                valueStart,
                                 selectorIndex,
-                                selector.length,
                             );
+                            value =
+                                context.inForgiving &&
+                                selectorIndex === selector.length
+                                    ? unescapeCSSAtEOF(rawValue, false)
+                                    : unescapeCSS(rawValue);
                         }
 
-                        const rawValue = selector.slice(
-                            valueStart,
-                            selectorIndex,
-                        );
-                        value =
-                            context.inForgiving &&
-                            selectorIndex === selector.length
-                                ? unescapeCSSAtEOF(rawValue, false)
-                                : unescapeCSS(rawValue);
-                    }
+                        stripWhitespace(0);
 
-                    stripWhitespace(0);
-
-                    // See if we have a force ignore flag
-                    switch (selector.charCodeAt(selectorIndex) | 0x20) {
-                        // If the forceIgnore flag is set (either `i` or `s`), use that value
-                        case CharCode.LowerI: {
-                            ignoreCase = true;
-                            stripWhitespace(1);
-                            // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                            break;
-                        }
-                        case CharCode.LowerS: {
-                            ignoreCase = false;
-                            stripWhitespace(1);
-                            // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                            break;
+                        // See if we have a force ignore flag
+                        switch (selector.charCodeAt(selectorIndex) | 0x20) {
+                            // If the forceIgnore flag is set (either `i` or `s`), use that value
+                            case CharCode.LowerI: {
+                                ignoreCase = true;
+                                stripWhitespace(1);
+                                // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                                break;
+                            }
+                            case CharCode.LowerS: {
+                                ignoreCase = false;
+                                stripWhitespace(1);
+                                // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                                break;
+                            }
                         }
                     }
-                }
 
-                if (
-                    selector.charCodeAt(selectorIndex) ===
-                    CharCode.RightSquareBracket
-                ) {
-                    selectorIndex += 1;
-                } else {
                     if (
-                        !context.inForgiving ||
-                        selectorIndex !== selector.length
+                        selector.charCodeAt(selectorIndex) ===
+                        CharCode.RightSquareBracket
                     ) {
-                        throw syntaxError(
-                            "Attribute selector didn't terminate",
-                        );
-                    }
-                    context.eofRecovered = true;
-                }
-
-                const attributeSelector: AttributeSelector = {
-                    type: SelectorType.Attribute,
-                    name,
-                    action,
-                    value,
-                    namespace,
-                    ignoreCase,
-                };
-
-                tokens.push(attributeSelector);
-                // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                break;
-            }
-            case CharCode.Colon: {
-                if (selector.charCodeAt(selectorIndex + 1) === CharCode.Colon) {
-                    tokens.push({
-                        type: SelectorType.PseudoElement,
-                        name: getName(2).toLowerCase(),
-                        data:
-                            selector.charCodeAt(selectorIndex) ===
-                            CharCode.LeftParenthesis
-                                ? readValueWithParenthesis()
-                                : null,
-                    });
-                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                    break;
-                }
-
-                const name = getName(1).toLowerCase();
-
-                if (pseudosToPseudoElements.has(name)) {
-                    tokens.push({
-                        type: SelectorType.PseudoElement,
-                        name,
-                        data: null,
-                    });
-                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                    break;
-                }
-
-                let data: DataType = null;
-
-                if (
-                    selector.charCodeAt(selectorIndex) ===
-                    CharCode.LeftParenthesis
-                ) {
-                    if (unpackPseudos.has(name)) {
-                        const isForgiving =
-                            context.forgiving &&
-                            (name === "is" || name === "where");
+                        selectorIndex += 1;
+                    } else {
                         if (
-                            !isForgiving &&
-                            isQuote(selector.charCodeAt(selectorIndex + 1))
+                            !context.inForgiving ||
+                            selectorIndex !== selector.length
                         ) {
                             throw syntaxError(
-                                `Pseudo-selector ${name} cannot be quoted`,
+                                "Attribute selector didn't terminate",
                             );
                         }
+                        context.eofRecovered = true;
+                    }
 
-                        data = [];
-                        const childContext: ParseContext = {
+                    const attributeSelector: AttributeSelector = {
+                        type: SelectorType.Attribute,
+                        name,
+                        action,
+                        value,
+                        namespace,
+                        ignoreCase,
+                    };
+
+                    tokens.push(attributeSelector);
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                    break;
+                }
+                case CharCode.Colon: {
+                    if (
+                        selector.charCodeAt(selectorIndex + 1) ===
+                        CharCode.Colon
+                    ) {
+                        tokens.push({
+                            type: SelectorType.PseudoElement,
+                            name: getName(2).toLowerCase(),
+                            data:
+                                selector.charCodeAt(selectorIndex) ===
+                                CharCode.LeftParenthesis
+                                    ? readValueWithParenthesis()
+                                    : null,
+                        });
+                        // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                        break;
+                    }
+
+                    const name = getName(1).toLowerCase();
+
+                    if (pseudosToPseudoElements.has(name)) {
+                        tokens.push({
+                            type: SelectorType.PseudoElement,
+                            name,
+                            data: null,
+                        });
+                        // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                        break;
+                    }
+
+                    let data: DataType = null;
+
+                    if (
+                        selector.charCodeAt(selectorIndex) ===
+                        CharCode.LeftParenthesis
+                    ) {
+                        if (unpackPseudos.has(name)) {
+                            const isForgiving =
+                                context.forgiving &&
+                                (name === "is" || name === "where");
+                            if (
+                                !isForgiving &&
+                                isQuote(selector.charCodeAt(selectorIndex + 1))
+                            ) {
+                                throw syntaxError(
+                                    `Pseudo-selector ${name} cannot be quoted`,
+                                );
+                            }
+
+                            data = [];
+                        } else {
+                            const isStringArgument =
+                                stripQuotesFromPseudos.has(name);
+                            const quotedData =
+                                context.inForgiving && isStringArgument
+                                    ? readQuotedArgument()
+                                    : null;
+
+                            if (quotedData === null) {
+                                data =
+                                    readValueWithParenthesis(isStringArgument);
+
+                                if (isStringArgument) {
+                                    const quot = data.charCodeAt(0);
+
+                                    if (
+                                        quot ===
+                                            data.charCodeAt(data.length - 1) &&
+                                        isQuote(quot)
+                                    ) {
+                                        data = data.slice(1, -1);
+                                    }
+                                }
+
+                                data = unescapeCSS(data);
+                            } else {
+                                data = quotedData;
+                            }
+                        }
+                    }
+
+                    tokens.push({ type: SelectorType.Pseudo, name, data });
+
+                    if (Array.isArray(data)) {
+                        const isChildForgivingList =
+                            context.forgiving &&
+                            (name === "is" || name === "where");
+                        stack.push({
+                            subselects,
+                            tokens,
+                            name,
+                            context,
+                            isForgivingList,
+                            tokenStart,
+                        });
+                        context = {
                             forgiving: context.forgiving,
                             depth: context.depth + 1,
-                            inForgiving: context.inForgiving || isForgiving,
+                            inForgiving:
+                                context.inForgiving || isChildForgivingList,
                             eofRecovered: false,
                         };
-                        const parseList = isForgiving
-                            ? parseForgivingSelector
-                            : parseSelector;
-                        selectorIndex = parseList(
-                            data,
-                            selector,
-                            selectorIndex + 1,
-                            childContext,
+                        isForgivingList = isChildForgivingList;
+                        subselects = data;
+                        tokens = [];
+                        stripWhitespace(1);
+                    }
+
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                    break;
+                }
+                case CharCode.Comma: {
+                    if (!isForgivingList || tokens.length > 0) {
+                        finalizeSubselector();
+                    }
+                    tokens = [];
+                    stripWhitespace(1);
+                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                    break;
+                }
+                default: {
+                    if (selector.startsWith("/*", selectorIndex)) {
+                        const endIndex = selector.indexOf(
+                            "*/",
+                            selectorIndex + 2,
                         );
 
-                        if (childContext.eofRecovered) {
+                        if (endIndex === -1) {
+                            if (!context.inForgiving) {
+                                throw syntaxError("Comment was not terminated");
+                            }
+                            selectorIndex = selector.length;
                             context.eofRecovered = true;
+                        } else {
+                            selectorIndex = endIndex + 2;
                         }
 
+                        // Remove leading whitespace
+                        if (tokens.length === 0) {
+                            stripWhitespace(0);
+                        }
+
+                        // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                        break;
+                    }
+
+                    let namespace = null;
+                    let name: string;
+
+                    if (firstChar === CharCode.Asterisk) {
+                        selectorIndex += 1;
+                        name = "*";
+                    } else if (firstChar === CharCode.Pipe) {
+                        name = "";
+
                         if (
-                            selector.charCodeAt(selectorIndex) ===
-                            CharCode.RightParenthesis
+                            selector.charCodeAt(selectorIndex + 1) ===
+                            CharCode.Pipe
                         ) {
-                            selectorIndex += 1;
-                        } else if (
-                            selectorIndex !== selector.length ||
-                            !(isForgiving || childContext.eofRecovered)
+                            addTraversal(SelectorType.ColumnCombinator);
+                            stripWhitespace(2);
+                            // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                            break;
+                        }
+                    } else if (reName.test(selector.slice(selectorIndex))) {
+                        name = getSelectorName(0);
+                    } else if (
+                        stack.length > 0 &&
+                        firstChar === CharCode.RightParenthesis
+                    ) {
+                        if (!isForgivingList || tokens.length > 0) {
+                            finalizeSubselector();
+                        }
+                        restoreParent();
+                        selectorIndex += 1;
+                        // eslint-disable-next-line unicorn/no-break-in-nested-loop
+                        break;
+                    } else {
+                        if (
+                            context.inForgiving &&
+                            firstChar !== CharCode.RightParenthesis
                         ) {
+                            throw syntaxError("Invalid selector");
+                        }
+                        finalizeSubselector();
+                        if (stack.length > 0) {
+                            const name = restoreParent();
                             throw syntaxError(
                                 `Missing closing parenthesis in :${name} (${selector})`,
                             );
                         }
-                    } else {
-                        const isStringArgument =
-                            stripQuotesFromPseudos.has(name);
-                        const quotedData =
-                            context.inForgiving && isStringArgument
-                                ? readQuotedArgument()
-                                : null;
+                        return selectorIndex;
+                    }
 
-                        if (quotedData === null) {
-                            data = readValueWithParenthesis(isStringArgument);
-
-                            if (isStringArgument) {
-                                const quot = data.charCodeAt(0);
-
-                                if (
-                                    quot === data.charCodeAt(data.length - 1) &&
-                                    isQuote(quot)
-                                ) {
-                                    data = data.slice(1, -1);
-                                }
-                            }
-
-                            data = unescapeCSS(data);
+                    if (
+                        selector.charCodeAt(selectorIndex) === CharCode.Pipe &&
+                        selector.charCodeAt(selectorIndex + 1) !== CharCode.Pipe
+                    ) {
+                        namespace = name;
+                        if (
+                            selector.charCodeAt(selectorIndex + 1) ===
+                            CharCode.Asterisk
+                        ) {
+                            name = "*";
+                            selectorIndex += 2;
                         } else {
-                            data = quotedData;
+                            name = getSelectorName(1);
                         }
                     }
-                }
 
-                tokens.push({ type: SelectorType.Pseudo, name, data });
-                // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                break;
+                    tokens.push(
+                        name === "*"
+                            ? { type: SelectorType.Universal, namespace }
+                            : { type: SelectorType.Tag, name, namespace },
+                    );
+                }
             }
-            case CharCode.Comma: {
-                finalizeSubselector();
-                if (shouldStopAtComma) {
-                    return selectorIndex;
-                }
-                tokens = [];
-                stripWhitespace(1);
-                // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                break;
+        } catch (error) {
+            if (!(error instanceof ParseError)) {
+                throw error;
             }
-            default: {
-                if (selector.startsWith("/*", selectorIndex)) {
-                    const endIndex = selector.indexOf("*/", selectorIndex + 2);
-
-                    if (endIndex === -1) {
-                        if (!context.inForgiving) {
-                            throw syntaxError("Comment was not terminated");
-                        }
-                        selectorIndex = selector.length;
-                        context.eofRecovered = true;
-                    } else {
-                        selectorIndex = endIndex + 2;
-                    }
-
-                    // Remove leading whitespace
-                    if (tokens.length === 0) {
-                        stripWhitespace(0);
-                    }
-
-                    // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                    break;
-                }
-
-                let namespace = null;
-                let name: string;
-
-                if (firstChar === CharCode.Asterisk) {
-                    selectorIndex += 1;
-                    name = "*";
-                } else if (firstChar === CharCode.Pipe) {
-                    name = "";
-
-                    if (
-                        selector.charCodeAt(selectorIndex + 1) === CharCode.Pipe
-                    ) {
-                        addTraversal(SelectorType.ColumnCombinator);
-                        stripWhitespace(2);
-                        // eslint-disable-next-line unicorn/no-break-in-nested-loop
-                        break;
-                    }
-                } else if (reName.test(selector.slice(selectorIndex))) {
-                    name = getSelectorName(0);
-                } else {
-                    if (
-                        context.inForgiving &&
-                        firstChar !== CharCode.RightParenthesis
-                    ) {
-                        throw syntaxError("Invalid selector");
-                    }
-                    break loop;
-                }
-
-                if (
-                    selector.charCodeAt(selectorIndex) === CharCode.Pipe &&
-                    selector.charCodeAt(selectorIndex + 1) !== CharCode.Pipe
+            if (!isForgivingList) {
+                let frameIndex = stack.length - 1;
+                while (
+                    frameIndex !== -1 &&
+                    !stack[frameIndex].isForgivingList
                 ) {
-                    namespace = name;
-                    if (
-                        selector.charCodeAt(selectorIndex + 1) ===
-                        CharCode.Asterisk
-                    ) {
-                        name = "*";
-                        selectorIndex += 2;
-                    } else {
-                        name = getSelectorName(1);
-                    }
+                    frameIndex--;
                 }
-
-                tokens.push(
-                    name === "*"
-                        ? { type: SelectorType.Universal, namespace }
-                        : { type: SelectorType.Tag, name, namespace },
-                );
+                if (frameIndex === -1) {
+                    throw error;
+                }
+                ({ subselects, tokens, context, isForgivingList, tokenStart } =
+                    stack[frameIndex]);
+                stack.length = frameIndex;
             }
+            // A failed strict subtree invalidates its entire forgiving branch.
+            tokens = [];
+            selectorIndex = skipInvalidSelector(
+                selector,
+                error.syncStart,
+                error.depth - context.depth,
+            );
         }
     }
-
-    finalizeSubselector();
-    if (context.inForgiving && selectorIndex === selector.length) {
-        context.eofRecovered = true;
-    }
-    return selectorIndex;
 }

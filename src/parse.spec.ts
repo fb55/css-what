@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { tests } from "./__fixtures__/tests.js";
 import { parse } from "./parse.js";
+import { stringify } from "./stringify.js";
+import { SelectorType } from "./types.js";
 
 const broken = [
     "[",
@@ -789,11 +791,97 @@ describe("Parse", () => {
             ]);
         });
 
-        it("should propagate runtime errors instead of forgiving them", () => {
-            const selector = `${":is(".repeat(10_000)}a${")".repeat(10_000)}`;
-            expect(() => parse(selector, { forgiving: true })).toThrow(
-                RangeError,
+        it("should keep commas local to nested strict lists", () => {
+            const selector = ":is(:not(a,b),c).tail";
+            expect(parse(selector, { forgiving: true })).toStrictEqual(
+                parse(selector),
             );
+        });
+
+        it.each([
+            [":is(ol,:not(a,??),li).tail", ":is(ol,li).tail"],
+            [
+                ":is(ol,:not(:where(ul,??)),li).tail",
+                ":is(ol,:not(:where(ul)),li).tail",
+            ],
+            [":not(:is(ol,??", ":not(:is(ol))"],
+            [":is(ol,:not(ul", ":is(ol,:not(ul))"],
+            [":is(ol,:not(ul,", ":is(ol)"],
+            [":is(ol,:not(ul,??", ":is(ol)"],
+        ])("should restore the correct frame for %s", (selector, expected) => {
+            expect(() => parse(selector)).toThrow(Error);
+            expect(() => parse(selector, { forgiving: false })).toThrow(Error);
+            expect(parse(selector, { forgiving: true })).toStrictEqual(
+                parse(expected),
+            );
+        });
+
+        it.each([
+            ["forgiving", ":is(", 1],
+            ["strict", ":not(", 1],
+            ["alternating", ":not(:where(", 2],
+        ] as const)(
+            "should parse 100000 nested %s frames without recursion",
+            (_, prefix, width) => {
+                const depth = 100_000;
+                const selector = `${prefix.repeat(depth / width)}a${")".repeat(depth)}`;
+                let [[token]] = parse(selector, { forgiving: true });
+                let levels = 0;
+
+                while (
+                    token.type === SelectorType.Pseudo &&
+                    Array.isArray(token.data)
+                ) {
+                    [[token]] = token.data;
+                    levels++;
+                }
+
+                expect(levels).toBe(depth);
+                expect(token).toStrictEqual({
+                    type: "tag",
+                    name: "a",
+                    namespace: null,
+                });
+            },
+        );
+
+        it("should recover only the nearest deeply nested forgiving branch", () => {
+            const depth = 50_000;
+            const prefix = ":not(:where(".repeat(depth);
+            const suffix = "))".repeat(depth);
+            const selector = `:is(ol,${prefix}:not(ul,??)${suffix},li).tail`;
+
+            expect(stringify(parse(selector, { forgiving: true }))).toBe(
+                `:is(ol, ${prefix}${suffix}, li).tail`,
+            );
+        });
+
+        it("should reject unclosed deep strict lists with forgiving enabled", () => {
+            const selector = `:not(${":has(".repeat(100_000)}a`;
+            expect(() => parse(selector, { forgiving: true })).toThrow(
+                "Missing closing parenthesis in :has",
+            );
+        });
+
+        it("should propagate runtime errors instead of forgiving them", () => {
+            const sentinel = new Error("Unexpected runtime error");
+            class FailingSelector extends String {
+                override charCodeAt(index: number): number {
+                    if (index === 4) {
+                        throw sentinel;
+                    }
+                    return super.charCodeAt(index);
+                }
+            }
+            let thrown: unknown;
+            try {
+                parse(new FailingSelector(":is(a)") as unknown as string, {
+                    forgiving: true,
+                });
+            } catch (error) {
+                thrown = error;
+            }
+            expect(thrown).toBe(sentinel);
         });
     });
 
@@ -822,5 +910,33 @@ describe("Parse", () => {
         expect(parse(":before")).toEqual([
             [{ name: "before", data: null, type: "pseudo-element" }],
         ]);
+    });
+
+    it("should parse deeply nested pseudo-selectors", () => {
+        const depth = 100_000;
+        let [[token]] = parse(`${":is(".repeat(depth)}a${")".repeat(depth)}`);
+        let levels = 0;
+
+        while (
+            token.type === SelectorType.Pseudo &&
+            Array.isArray(token.data)
+        ) {
+            [[token]] = token.data;
+            levels++;
+        }
+
+        expect(levels).toBe(depth);
+        expect(token).toStrictEqual({
+            type: "tag",
+            name: "a",
+            namespace: null,
+        });
+    });
+
+    it("should report unclosed deeply nested pseudo-selectors", () => {
+        const selector = `:not(${":has(".repeat(100_000)}a`;
+        expect(() => parse(selector)).toThrow(
+            `Missing closing parenthesis in :has (${selector})`,
+        );
     });
 });
