@@ -124,21 +124,19 @@ function stringifyToken(
         }
 
         case SelectorType.PseudoElement: {
-            return `::${escapeName(token.name, charsToEscapeInName)}${
-                token.data === null
-                    ? ""
-                    : `(${escapeName(token.data, charsToEscapeInPseudoValue)})`
-            }`;
+            return `::${escapeName(token.name, charsToEscapeInName)}${token.data === null
+                ? ""
+                : `(${escapeName(token.data, charsToEscapeInPseudoValue, false)})`
+                }`;
         }
 
         case SelectorType.Pseudo: {
-            return `:${escapeName(token.name, charsToEscapeInName)}${
-                token.data === null
-                    ? ""
-                    : typeof token.data === "string"
-                      ? `(${escapeName(token.data, charsToEscapeInPseudoValue)})`
-                      : "("
-            }`;
+            return `:${escapeName(token.name, charsToEscapeInName)}${token.data === null
+                ? ""
+                : typeof token.data === "string"
+                    ? `(${escapeName(token.data, charsToEscapeInPseudoValue, false)})`
+                    : "("
+                }`;
         }
 
         case SelectorType.Attribute: {
@@ -168,9 +166,8 @@ function stringifyToken(
             return `[${name}${getActionValue(token.action)}="${escapeName(
                 token.value,
                 charsToEscapeInAttributeValue,
-            )}"${
-                token.ignoreCase === null ? "" : token.ignoreCase ? " i" : " s"
-            }]`;
+            )}"${token.ignoreCase === null ? "" : token.ignoreCase ? " i" : " s"
+                }]`;
         }
     }
 }
@@ -219,14 +216,13 @@ function getNamespacedName(token: {
 function getNamespace(namespace: string | null): string {
     return namespace === null
         ? ""
-        : `${
-              namespace === "*"
-                  ? "*"
-                  : escapeName(namespace, charsToEscapeInName)
-          }|`;
+        : `${namespace === "*"
+            ? "*"
+            : escapeName(namespace, charsToEscapeInName)
+        }|`;
 }
 
-function escapeName(name: string, charsToEscape: Set<number>): string {
+function escapeName(name: string, charsToEscape: Set<number>, shouldEscapeLeadingDigits = true): string {
     let lastIndex = 0;
     let escapedName = "";
 
@@ -238,16 +234,16 @@ function escapeName(name: string, charsToEscape: Set<number>): string {
         const isNeedsHex =
             code <= 0x1f ||
             code === 0x7f ||
-            (isDigit &&
+            (shouldEscapeLeadingDigits && isDigit &&
                 (index === 0 ||
                     (index === 1 && name.charCodeAt(0) === 0x2d))) ||
-            (index === 0 && code === 0x2d && name.length === 1);
+            (shouldEscapeLeadingDigits && index === 0 && code === 0x2d && name.length === 1);
 
         const escaped = isNeedsHex
             ? `\\${code === 0x00 ? "fffd" : code.toString(16)} `
             : charsToEscape.has(code)
-              ? `\\${name.charAt(index)}`
-              : undefined;
+                ? `\\${name.charAt(index)}`
+                : undefined;
 
         if (escaped !== undefined) {
             escapedName += name.slice(lastIndex, index) + escaped;
