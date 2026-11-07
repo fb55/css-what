@@ -76,6 +76,12 @@ describe("Stringify pseudo-class arguments", () => {
 
         expect(stringify(parse(selector))).toBe(selector);
     });
+
+    it("preserves identifier escaping in pseudo-element arguments", () => {
+        const selector = String.raw`::part(\31 foo)`;
+
+        expect(stringify(parse(selector))).toBe(selector);
+    });
 });
 
 describe("Stringify round-trips special characters in identifiers", () => {
