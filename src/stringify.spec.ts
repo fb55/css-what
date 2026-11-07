@@ -77,6 +77,12 @@ describe("Stringify pseudo-class arguments", () => {
         expect(stringify(parse(selector))).toBe(selector);
     });
 
+    it("does not escape negative numeric pseudo-class arguments", () => {
+        const selector = ":nth-child(-1)";
+
+        expect(stringify(parse(selector))).toBe(selector);
+    });
+
     it("preserves identifier escaping in pseudo-element arguments", () => {
         const selector = String.raw`::part(\31 foo)`;
 
