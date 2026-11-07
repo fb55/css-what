@@ -1,0 +1,21 @@
+src/parse.spec.ts
+  s_d4af7cbdeff790::t_c8e7686bebd26d 56-62
+src/parse.ts
+  s_d4af7cbdeff790::t_1f46d3f13b498b 12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "623f6423c6e74dbea6c6a4f2e4162085d04f5de6",
+  "prompts": {},
+  "sessions": {
+    "s_d4af7cbdeff790": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11ffa-84d3-73e2-bcb1-cb1f234ac16d",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Felix Boehm <188768+fb55@users.noreply.github.com>"
+    }
+  }
+}
