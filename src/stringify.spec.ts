@@ -70,6 +70,26 @@ describe("Stringify CSS spec compliance", () => {
     });
 });
 
+describe("Stringify pseudo-class arguments", () => {
+    it("does not escape leading digits in pseudo-class arguments", () => {
+        const selector = ":nth-child(1)";
+
+        expect(stringify(parse(selector))).toBe(selector);
+    });
+
+    it("does not escape negative numeric pseudo-class arguments", () => {
+        const selector = ":nth-child(-1)";
+
+        expect(stringify(parse(selector))).toBe(selector);
+    });
+
+    it("preserves identifier escaping in pseudo-element arguments", () => {
+        const selector = String.raw`::part(\31 foo)`;
+
+        expect(stringify(parse(selector))).toBe(selector);
+    });
+});
+
 describe("Stringify round-trips special characters in identifiers", () => {
     const selectors = [
         String.raw`.x\&y`,
