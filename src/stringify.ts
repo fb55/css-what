@@ -41,6 +41,12 @@ const charsToEscapeInName = new Set(
         "}",
     ].map((c) => c.charCodeAt(0)),
 );
+const pseudosWithNumericArguments = new Set([
+    "nth-child",
+    "nth-last-child",
+    "nth-of-type",
+    "nth-last-of-type",
+]);
 
 /**
  * Turns `selector` back into a string.
@@ -136,7 +142,11 @@ function stringifyToken(
                 token.data === null
                     ? ""
                     : typeof token.data === "string"
-                      ? `(${escapeName(token.data, charsToEscapeInPseudoValue)})`
+                      ? `(${escapeName(
+                            token.data,
+                            charsToEscapeInPseudoValue,
+                            !pseudosWithNumericArguments.has(token.name),
+                        )})`
                       : "("
             }`;
         }
@@ -226,7 +236,11 @@ function getNamespace(namespace: string | null): string {
           }|`;
 }
 
-function escapeName(name: string, charsToEscape: Set<number>): string {
+function escapeName(
+    name: string,
+    charsToEscape: Set<number>,
+    shouldEscapeLeadingDigits = true,
+): string {
     let lastIndex = 0;
     let escapedName = "";
 
@@ -238,16 +252,20 @@ function escapeName(name: string, charsToEscape: Set<number>): string {
         const isNeedsHex =
             code <= 0x1f ||
             code === 0x7f ||
-            (isDigit &&
+            (shouldEscapeLeadingDigits &&
+                isDigit &&
                 (index === 0 ||
                     (index === 1 && name.charCodeAt(0) === 0x2d))) ||
-            (index === 0 && code === 0x2d && name.length === 1);
+            (shouldEscapeLeadingDigits &&
+                index === 0 &&
+                code === 0x2d &&
+                name.length === 1);
 
         const escaped = isNeedsHex
             ? `\\${code === 0x00 ? "fffd" : code.toString(16)} `
-            : charsToEscape.has(code)
-              ? `\\${name.charAt(index)}`
-              : undefined;
+              : charsToEscape.has(code)
+                ? `\\${name.charAt(index)}`
+                : undefined;
 
         if (escaped !== undefined) {
             escapedName += name.slice(lastIndex, index) + escaped;
