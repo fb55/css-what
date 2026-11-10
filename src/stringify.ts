@@ -253,19 +253,16 @@ function escapeName(
             code <= 0x1f ||
             code === 0x7f ||
             (shouldEscapeLeadingDigits &&
-                isDigit &&
-                (index === 0 ||
-                    (index === 1 && name.charCodeAt(0) === 0x2d))) ||
-            (shouldEscapeLeadingDigits &&
-                index === 0 &&
-                code === 0x2d &&
-                name.length === 1);
+                ((isDigit &&
+                    (index === 0 ||
+                        (index === 1 && name.charCodeAt(0) === 0x2d))) ||
+                    (index === 0 && code === 0x2d && name.length === 1)));
 
         const escaped = isNeedsHex
             ? `\\${code === 0x00 ? "fffd" : code.toString(16)} `
-              : charsToEscape.has(code)
-                ? `\\${name.charAt(index)}`
-                : undefined;
+            : charsToEscape.has(code)
+              ? `\\${name.charAt(index)}`
+              : undefined;
 
         if (escaped !== undefined) {
             escapedName += name.slice(lastIndex, index) + escaped;
