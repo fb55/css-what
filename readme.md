@@ -29,7 +29,7 @@ CSSwhat.parse("foo[bar]:baz")
 
 ## API
 
-**`CSSwhat.parse(selector)` - Parses `selector`.**
+**`CSSwhat.parse(selector, options?)` - Parses `selector`.**
 
 The function returns a two-dimensional array. The first array represents selectors separated by commas (eg. `sub1, sub2`), the second contains the relevant tokens for that selector. Possible token types are:
 
@@ -50,6 +50,20 @@ The function returns a two-dimensional array. The first array represents selecto
 | `adjacent`          | -                                       | `+`           | `{ type: 'adjacent' }`                                                                   |
 | `descendant`        | -                                       |               | `{ type: 'descendant' }`                                                                 |
 | `column-combinator` | -                                       | `\|\|`        | `{ type: 'column-combinator' }`                                                          |
+
+Set `options.forgiving` to `true` to enable forgiving selector lists in `:is()` and `:where()`. Branches that cannot be parsed are discarded, and an empty list has `data: []`. Other selector lists remain strict. The option is disabled by default; TypeScript users can import the `ParseOptions` type.
+
+```js
+CSSwhat.parse(":is(ol, ul, ??$#$@#)", { forgiving: true });
+// Equivalent to CSSwhat.parse(":is(ol, ul)").
+
+CSSwhat.parse(":where(??)", { forgiving: true });
+// [[{ type: "pseudo", name: "where", data: [] }]]
+```
+
+Within forgiving lists, functions, attribute blocks, and strings can end at EOF. For example, `:is(ol, ??` keeps `ol`, and `:is(ol, [x` keeps both `ol` and `[x]`. Enclosing functions also finish when a nested forgiving list consumes EOF; their selector lists still require valid branches. The option does not relax syntax in selectors that contain no forgiving list.
+
+Unknown pseudo-classes are preserved in the AST. Support for them depends on the selector engine using the parsed result.
 
 **`CSSwhat.stringify(selector)` - Turns `selector` back into a string.**
 
