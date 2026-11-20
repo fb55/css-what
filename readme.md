@@ -10,7 +10,7 @@ A CSS selector parser.
 ```js
 import * as CSSwhat from "css-what";
 
-CSSwhat.parse("foo[bar]:baz")
+CSSwhat.parse("foo[bar]:baz");
 
 ~> [
     [
