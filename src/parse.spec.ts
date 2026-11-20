@@ -26,6 +26,12 @@ const broken = [
     "#",
     "##foo",
     "/*",
+    "div(x",
+    "div (x",
+    "div.foo(x",
+    "ns|div(x",
+    "span, div(x",
+    ":is(div(x)",
 ];
 
 describe("Parse", () => {

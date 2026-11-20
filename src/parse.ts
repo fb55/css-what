@@ -594,6 +594,9 @@ function parseSelector(
                 // eslint-disable-next-line unicorn/no-break-in-nested-loop
                 break;
             }
+            case CharCode.LeftParenthesis: {
+                break loop;
+            }
             default: {
                 if (selector.startsWith("/*", selectorIndex)) {
                     const endIndex = selector.indexOf("*/", selectorIndex + 2);
