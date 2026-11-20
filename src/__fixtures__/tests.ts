@@ -25,6 +25,32 @@ export const tests: [
         "simple tag",
     ],
     [
+        String.raw`div\(x`,
+        [
+            [
+                {
+                    type: SelectorType.Tag,
+                    namespace: null,
+                    name: "div(x",
+                },
+            ],
+        ],
+        "tag with escaped opening parenthesis",
+    ],
+    [
+        String.raw`div\28 x`,
+        [
+            [
+                {
+                    type: SelectorType.Tag,
+                    namespace: null,
+                    name: "div(x",
+                },
+            ],
+        ],
+        "tag with hex-escaped opening parenthesis",
+    ],
+    [
         "*",
         [
             [
