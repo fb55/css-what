@@ -32,6 +32,18 @@ const broken = [
     "ns|div(x",
     "span, div(x",
     ":is(div(x)",
+    "ns|(x",
+    "*|(x",
+    "|(x",
+    ".(x",
+    "#(x",
+    ":(x",
+    "::(x",
+    "[(x]",
+    "[ns|(x]",
+    "[*|(x]",
+    "[|(x]",
+    "[xml:(x]",
 ];
 
 describe("Parse", () => {
