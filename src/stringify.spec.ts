@@ -70,6 +70,13 @@ describe("Stringify CSS spec compliance", () => {
     });
 });
 
+describe("Stringify pseudo-class arguments", () => {
+    it.each([":nth-child(1)", ":nth-child(-1)"])(
+        "preserves the numeric argument in %s",
+        (selector) => expect(stringify(parse(selector))).toBe(selector),
+    );
+});
+
 describe("Stringify round-trips special characters in identifiers", () => {
     const selectors = [
         String.raw`.x\&y`,
