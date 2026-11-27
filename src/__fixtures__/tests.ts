@@ -25,6 +25,32 @@ export const tests: [
         "simple tag",
     ],
     [
+        String.raw`div\(x`,
+        [
+            [
+                {
+                    type: SelectorType.Tag,
+                    namespace: null,
+                    name: "div(x",
+                },
+            ],
+        ],
+        "tag with escaped opening parenthesis",
+    ],
+    [
+        String.raw`div\28 x`,
+        [
+            [
+                {
+                    type: SelectorType.Tag,
+                    namespace: null,
+                    name: "div(x",
+                },
+            ],
+        ],
+        "tag with hex-escaped opening parenthesis",
+    ],
+    [
         "*",
         [
             [
@@ -429,6 +455,38 @@ export const tests: [
     ],
 
     // Class names with special characters (Tailwind CSS-style)
+    [
+        String.raw`.\(x`,
+        [
+            [
+                {
+                    type: SelectorType.Attribute,
+                    namespace: null,
+                    action: AttributeAction.Element,
+                    name: "class",
+                    ignoreCase: IgnoreCaseMode.QuirksMode,
+                    value: "(x",
+                },
+            ],
+        ],
+        "class with escaped opening parenthesis",
+    ],
+    [
+        String.raw`.\28 x`,
+        [
+            [
+                {
+                    type: SelectorType.Attribute,
+                    namespace: null,
+                    action: AttributeAction.Element,
+                    name: "class",
+                    ignoreCase: IgnoreCaseMode.QuirksMode,
+                    value: "(x",
+                },
+            ],
+        ],
+        "class with hex-escaped opening parenthesis",
+    ],
     [
         String.raw`.before\:bottom-1\/2`,
         [
@@ -976,6 +1034,32 @@ export const tests: [
             ],
         ],
         "basic tag namespace",
+    ],
+    [
+        String.raw`ns|\(x`,
+        [
+            [
+                {
+                    name: "(x",
+                    type: SelectorType.Tag,
+                    namespace: "ns",
+                },
+            ],
+        ],
+        "namespaced tag with escaped opening parenthesis",
+    ],
+    [
+        String.raw`ns|\28 x`,
+        [
+            [
+                {
+                    name: "(x",
+                    type: SelectorType.Tag,
+                    namespace: "ns",
+                },
+            ],
+        ],
+        "namespaced tag with hex-escaped opening parenthesis",
     ],
     [
         "*|bar",

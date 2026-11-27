@@ -9,7 +9,7 @@ import {
 } from "./types.js";
 
 // eslint-disable-next-line unicorn/prefer-unicode-code-point-escapes -- regex has no `u` flag; code-point escapes would require it and alter matching semantics
-const reName = /^[^#\\]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\u00B0-\uFFFF-])+/;
+const reName = /^[^#(\\]?(?:\\(?:[\da-f]{1,6}\s?|.)|[\w\u00B0-\uFFFF-])+/;
 const reEscape = /\\([\da-f]{1,6}\s?|(\s)|.)/gi;
 
 const enum CharCode {
@@ -593,6 +593,9 @@ function parseSelector(
                 stripWhitespace(1);
                 // eslint-disable-next-line unicorn/no-break-in-nested-loop
                 break;
+            }
+            case CharCode.LeftParenthesis: {
+                break loop;
             }
             default: {
                 if (selector.startsWith("/*", selectorIndex)) {
